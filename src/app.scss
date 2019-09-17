@@ -1,0 +1,88 @@
+//
+// General
+//
+
+body {
+  margin: 0;
+  height: 100vh;
+}
+div#root {
+  height: 100%;
+}
+
+.sunday {
+  color: orangered;
+}
+.saturday {
+  color: royalblue;
+}
+
+.whole-content-area {
+  width: 100%;
+  height: 100%;
+}
+.full-width {
+  width: 100%;
+}
+
+.gutter-top {
+  margin-top: 1rem;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+//
+// molecules
+//
+
+div.time-select {
+  display: inline-block;
+
+  div.container {
+    display: flex;
+  }
+}
+
+//
+// Templates
+//
+
+.current-state {
+  .date {
+    display: block;
+    text-align: center;
+    height: 3rem;
+  }
+}
+
+.list {
+  .date-list-header {
+    width: 100%;
+    font-family: Roboto, sans-serif;
+    font-weight: bold;
+  }
+  .date-list-row {
+    width: 100%;
+    font-family: Roboto, sans-serif;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    text-align: center;
+    padding: 0.5rem;
+
+    .mdc-layout-grid__cell {
+      align-self: center;
+    }
+  }
+  .date-list-row:nth-child(odd) {
+    background-color: whitesmoke;
+  }
+}
+
+.detail {
+  .between {
+    display: inline-block;
+    padding: 0 1em;
+  }
+}

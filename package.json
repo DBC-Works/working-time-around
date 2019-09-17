@@ -1,0 +1,90 @@
+{
+  "name": "working-time-around",
+  "version": "0.1.0",
+  "description": "'Working time around' is a personal attendance and working time recording web application. It save records to browser's local storage, doesn't access any Web APIs.",
+  "main": "index.js",
+  "author": "D.B.C.",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.6.0",
+    "@babel/preset-env": "^7.6.0",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.6.0",
+    "@testing-library/jest-dom": "^4.1.0",
+    "@testing-library/react": "^9.1.4",
+    "@types/jest": "^24.0.18",
+    "@types/react-intl": "^3.0.0",
+    "@types/react-redux": "^7.1.2",
+    "@types/react-router-dom": "^4.3.5",
+    "@types/redux": "^3.6.0",
+    "@types/redux-persist": "^4.3.1",
+    "husky": "^3.0.5",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^24.9.0",
+    "jest-dom": "^4.0.0",
+    "jest-transform-css": "^2.0.0",
+    "lint-staged": "^9.2.5",
+    "parcel": "^1.12.3",
+    "prettier": "^1.18.2",
+    "sass": "^1.22.12",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.6.3"
+  },
+  "dependencies": {
+    "@material/react-button": "^0.15.0",
+    "@material/react-layout-grid": "^0.15.0",
+    "@material/react-list": "^0.15.0",
+    "@material/react-material-icon": "^0.15.0",
+    "@material/react-menu": "^0.15.0",
+    "@material/react-menu-surface": "^0.15.0",
+    "@material/react-select": "^0.15.0",
+    "@material/react-text-field": "^0.15.0",
+    "@material/react-top-app-bar": "^0.15.0",
+    "@material/react-typography": "^0.15.0",
+    "core-js": "^3.2.1",
+    "dayjs": "^1.8.16",
+    "intl": "^1.2.5",
+    "path-to-regexp": "^3.1.0",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-intl": "^3.2.1",
+    "react-redux": "^7.1.1",
+    "react-router": "^5.0.1",
+    "react-router-dom": "^5.0.1",
+    "redux": "^4.0.4",
+    "redux-devtools-extension": "^2.13.8",
+    "redux-persist": "^6.0.0",
+    "typescript-fsa": "^3.0.0",
+    "typescript-fsa-reducers": "^1.2.1"
+  },
+  "scripts": {
+    "start": "npx parcel ./src/index.html --open",
+    "build": "npx parcel build ./src/index.html",
+    "test": "jest",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,json,css,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.css$": "identity-obj-proxy",
+      "\\.scss$": "identity-obj-proxy"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

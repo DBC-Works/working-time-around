@@ -1,0 +1,17 @@
+{
+  "Working.time.around": "Working time around",
+  "Date": "日",
+  "Edit": "編集",
+  "Language": "言語",
+  "Memo": "メモ",
+  "Not.found": "見つかりませんでした。",
+  "Send.mail": "メール送信",
+  "Send.to.mail.address": "送信先メールアドレス",
+  "Settings": "設定",
+  "Start": "開始",
+  "Stop": "終了",
+  "Time": "時間",
+
+  "Format.date": "ll",
+  "Format.time.24": "HH:mm"
+}
