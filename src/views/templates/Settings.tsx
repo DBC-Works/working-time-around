@@ -113,7 +113,11 @@ const Settings: React.FC = () => {
       <Row>
         <Cell columns={12}>
           <TextField textarea={false} fullWidth={true}>
-            <Input value={mailAddress} onInput={handleInputMailAddress} />
+            <Input
+              type="email"
+              value={mailAddress}
+              onInput={handleInputMailAddress}
+            />
           </TextField>
         </Cell>
       </Row>
