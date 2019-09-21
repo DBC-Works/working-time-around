@@ -4,7 +4,7 @@
 import React from 'react'
 import { NavLink, Route, Switch } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { FormattedMessage } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 import MaterialIcon from '@material/react-material-icon'
 import TopAppBar, {
@@ -56,6 +56,8 @@ export default App
  */
 const AppBar: React.FC = () => {
   const time = useSelector((state: AppState) => getTime(state.running))
+  const intl = useIntl()
+
   return (
     <TopAppBar>
       <TopAppBarRow>
@@ -70,17 +72,26 @@ const AppBar: React.FC = () => {
         <TopAppBarSection align="end" role="toolbar">
           <TopAppBarIcon navIcon={true}>
             <NavLink to="/">
-              <MaterialIcon aria-label="today" icon="today" />
+              <MaterialIcon
+                aria-label={intl.formatMessage({ id: 'Top' })}
+                icon="today"
+              />
             </NavLink>
           </TopAppBarIcon>
           <TopAppBarIcon navIcon={true}>
             <NavLink to={`/${time.getFullYear()}/${time.getMonth() + 1}`}>
-              <MaterialIcon aria-label="list" icon="list" />
+              <MaterialIcon
+                aria-label={intl.formatMessage({ id: 'List' })}
+                icon="list"
+              />
             </NavLink>
           </TopAppBarIcon>
           <TopAppBarIcon navIcon={true}>
             <NavLink to="/settings">
-              <MaterialIcon aria-label="settings" icon="settings" />
+              <MaterialIcon
+                aria-label={intl.formatMessage({ id: 'Settings' })}
+                icon="settings"
+              />
             </NavLink>
           </TopAppBarIcon>
         </TopAppBarSection>

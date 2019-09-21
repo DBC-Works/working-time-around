@@ -3,6 +3,7 @@
   "Date": "日",
   "Edit": "編集",
   "Language": "言語",
+  "List": "一覧",
   "Memo": "メモ",
   "Not.found": "見つかりませんでした。",
   "Send.mail": "メール送信",
@@ -11,6 +12,7 @@
   "Start": "開始",
   "Stop": "終了",
   "Time": "時間",
+  "Top": "トップ",
 
   "Format.date": "ll",
   "Format.time.24": "HH:mm"

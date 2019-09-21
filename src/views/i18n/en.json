@@ -3,6 +3,7 @@
   "Date": "Date",
   "Edit": "Edit",
   "Language": "Language",
+  "List": "List",
   "Memo": "Memo",
   "Not.found": "Not found",
   "Send.mail": "Send mail",
@@ -11,6 +12,7 @@
   "Start": "Start",
   "Stop": "Stop",
   "Time": "Time",
+  "Top": "Top",
 
   "Format.date": "ll",
   "Format.time.24": "HH:mm"
