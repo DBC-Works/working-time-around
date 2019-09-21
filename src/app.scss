@@ -58,25 +58,42 @@ div.time-select {
 }
 
 .list {
-  .date-list-header {
-    width: 100%;
-    font-family: Roboto, sans-serif;
-    font-weight: bold;
-  }
-  .date-list-row {
-    width: 100%;
-    font-family: Roboto, sans-serif;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    text-align: center;
-    padding: 0.5rem;
+  .date-list {
+    margin-bottom: 3rem;
 
-    .mdc-layout-grid__cell {
-      align-self: center;
+    .date-list-header {
+      width: 100%;
+      font-family: Roboto, sans-serif;
+      font-weight: bold;
+    }
+    .date-list-row {
+      width: 100%;
+      font-family: Roboto, sans-serif;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      text-align: center;
+      padding: 0.5rem;
+  
+      .mdc-layout-grid__cell {
+        align-self: center;
+      }
+    }
+    .date-list-row:nth-child(odd) {
+      background-color: whitesmoke;
     }
   }
-  .date-list-row:nth-child(odd) {
-    background-color: whitesmoke;
+
+  .app-fab--absolute {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+  }
+  
+  @media(min-width: 1024px) {
+     .app-fab--absolute {
+      bottom: 1.5rem;
+      right: 1.5rem;
+    }
   }
 }
 

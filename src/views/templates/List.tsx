@@ -8,9 +8,10 @@ import { useSelector } from 'react-redux'
 import { FormattedMessage, useIntl } from 'react-intl'
 import dayjs, { Dayjs } from 'dayjs'
 
-import MaterialIcon from '@material/react-material-icon'
 import Button from '@material/react-button'
+import Fab from '@material/react-fab'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
+import MaterialIcon from '@material/react-material-icon'
 import { Headline5, Headline6 } from '@material/react-typography'
 
 import { AppState } from '../../state/store'
@@ -90,7 +91,8 @@ const List: React.FC<
   const firstDayOfMonth = new Date(+year, +month - 1, 1)
   const dj = dayjs(firstDayOfMonth)
 
-  const timeFormat = useIntl().formatMessage({ id: 'Format.time.24' })
+  const intl = useIntl()
+  const timeFormat = intl.formatMessage({ id: 'Format.time.24' })
 
   const records = useSelector((state: AppState) =>
     getMonthlyRecordsOf(firstDayOfMonth, state.records)
@@ -111,14 +113,12 @@ const List: React.FC<
       </Row>
       <Row>
         <Cell columns={12}>
-          <Button
-            className="full-width"
-            unelevated={true}
-            href={createMailToUri(dj, records)}
-            disabled={Object.keys(records).length === 0}
-          >
-            <FormattedMessage id="Send.mail" />
-          </Button>
+          <a className="app-fab--absolute" href={createMailToUri(dj, records)}>
+            <Fab
+              icon={<i className="material-icons">mail</i>}
+              textLabel={intl.formatMessage({ id: 'Send.mail' })}
+            />
+          </a>
         </Cell>
       </Row>
     </Grid>
@@ -183,7 +183,7 @@ const DateList: React.FC<{
   const days = getDaysInMonth(props.target)
 
   return (
-    <Grid>
+    <Grid className="date-list">
       <Row className="date-list-header date-list-row">
         <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
           <FormattedMessage id="Date" />
