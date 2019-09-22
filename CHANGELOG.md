@@ -7,11 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2019-09-22
+
+### Added
+
+- Transition controls to 'Detail' template
+- Type attribute with value "email" to input element for setting email address of 'Settings' template
+- Unit tests
+
+### Updated
+
+- Change send email button of 'List' template to floating action button
+- Multilingual support for toolbar button label text
+- Optimize layout, template headings and markup
+- Refactor unit tests
+- npm package
+  - [react-intl](https://github.com/formatjs/react-intl)
+
 ## [0.1.0] - 2019-09-18
 
 ### Added
 
 - Initial project files.
 
-[unreleased]: https://github.com/DBC-Works/SoundVisualShaderBase/compare/v0.1.0...HEAD
+[unreleased]: https://github.com/DBC-Works/SoundVisualShaderBase/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.2.0
 [0.1.0]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.1.0
