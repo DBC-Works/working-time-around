@@ -33,6 +33,14 @@ div#root {
   text-align: center;
 }
 
+.navigation-before, .navigation-next {
+  align-self: center;
+
+  .material-icons {
+    padding-top: 0.5rem;
+  }
+}
+
 //
 // molecules
 //
@@ -49,6 +57,23 @@ div.time-select {
 // Templates
 //
 
+.app-fab--absolute {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+@media(min-width: 1024px) {
+   .app-fab--absolute {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+}
+
+@mixin with-fab {
+  margin-bottom: 4rem;
+}
+
 .current-state {
   .date {
     display: block;
@@ -58,48 +83,35 @@ div.time-select {
 }
 
 .list {
+  @include with-fab();
+
   .date-list {
-    margin-bottom: 3rem;
+    font-family: Roboto, sans-serif;
+    white-space: nowrap;
+    text-align: center;
 
     .date-list-header {
-      width: 100%;
-      font-family: Roboto, sans-serif;
       font-weight: bold;
     }
     .date-list-row {
-      width: 100%;
-      font-family: Roboto, sans-serif;
       font-size: 0.9rem;
-      white-space: nowrap;
-      text-align: center;
       padding: 0.5rem;
-  
-      .mdc-layout-grid__cell {
-        align-self: center;
-      }
     }
     .date-list-row:nth-child(odd) {
       background-color: whitesmoke;
     }
-  }
-
-  .app-fab--absolute {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-  }
   
-  @media(min-width: 1024px) {
-     .app-fab--absolute {
-      bottom: 1.5rem;
-      right: 1.5rem;
+    .mdc-layout-grid__cell {
+      align-self: center;
     }
   }
 }
 
 .detail {
+  @include with-fab();
+
   .between {
     display: inline-block;
     padding: 0 1em;
-  }
+  } 
 }

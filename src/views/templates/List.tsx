@@ -2,7 +2,7 @@
  * @file 'List' component
  */
 import React from 'react'
-import { NavLink, RouteComponentProps } from 'react-router-dom'
+import { Link, RouteComponentProps } from 'react-router-dom'
 import H from 'history'
 import { useSelector } from 'react-redux'
 import { FormattedMessage, useIntl } from 'react-intl'
@@ -12,7 +12,7 @@ import Button from '@material/react-button'
 import Fab from '@material/react-fab'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import MaterialIcon from '@material/react-material-icon'
-import { Headline5, Headline6 } from '@material/react-typography'
+import { Headline6 } from '@material/react-typography'
 
 import { AppState } from '../../state/store'
 import {
@@ -129,47 +129,45 @@ export default List
 /**
  * 'MonthHeading' component
  */
-const MonthHeading: React.FC<{ target: Dayjs }> = props => (
-  <>
-    <Row>
-      <Cell columns={12}>
-        <Headline6 className="text-align-center" tag="h1">
-          {props.target.format('YYYY')}
+const MonthHeading: React.FC<{ target: Dayjs }> = props => {
+  const intl = useIntl()
+
+  return (
+    <Row className="text-align-center">
+      <Cell
+        desktopColumns={1}
+        tabletColumns={1}
+        phoneColumns={1}
+        className="navigation-before"
+      >
+        <Link to={props.target.add(-1, 'month').format('/YYYY/M')}>
+          <MaterialIcon
+            aria-label={intl.formatMessage({ id: 'Prev.month' })}
+            icon="navigate_before"
+          />
+        </Link>
+      </Cell>
+      <Cell desktopColumns={10} tabletColumns={6} phoneColumns={2}>
+        <Headline6 tag="h2">
+          {props.target.format(intl.formatMessage({ id: 'Format.month' }))}
         </Headline6>
       </Cell>
-    </Row>
-    <Row>
       <Cell
         desktopColumns={1}
         tabletColumns={1}
         phoneColumns={1}
-        className="text-align-center"
+        className="navigation-next"
       >
-        <NavLink to={props.target.add(-1, 'month').format('/YYYY/M')}>
-          <MaterialIcon aria-label="prev" hasRipple icon="navigate_before" />
-        </NavLink>
-      </Cell>
-      <Cell
-        desktopColumns={10}
-        tabletColumns={6}
-        phoneColumns={2}
-        className="text-align-center"
-      >
-        <Headline5 tag="h2">{props.target.format('MMMM')}</Headline5>
-      </Cell>
-      <Cell
-        desktopColumns={1}
-        tabletColumns={1}
-        phoneColumns={1}
-        className="text-align-center"
-      >
-        <NavLink to={props.target.add(1, 'month').format('/YYYY/M')}>
-          <MaterialIcon aria-label="next" hasRipple icon="navigate_next" />
-        </NavLink>
+        <Link to={props.target.add(1, 'month').format('/YYYY/M')}>
+          <MaterialIcon
+            aria-label={intl.formatMessage({ id: 'Next.month' })}
+            icon="navigate_next"
+          />
+        </Link>
       </Cell>
     </Row>
-  </>
-)
+  )
+}
 
 /**
  * 'DateList' component

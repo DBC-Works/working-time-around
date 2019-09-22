@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import TextField, { Input } from '@material/react-text-field'
-import { Headline4, Headline5 } from '@material/react-typography'
+import { Headline6 } from '@material/react-typography'
 
 import en from '../i18n/en.json'
 import ja from '../i18n/ja.json'
@@ -96,18 +96,18 @@ const Settings: React.FC = () => {
 
   return (
     <Grid>
-      <Row>
+      <Row className="text-align-center">
         <Cell columns={12}>
-          <Headline4 tag="h1" className="text-align-center">
+          <Headline6 tag="h1">
             <FormattedMessage id="Settings" />
-          </Headline4>
+          </Headline6>
         </Cell>
       </Row>
       <Row>
         <Cell columns={12}>
-          <Headline5 tag="h2">
+          <Headline6 tag="h2">
             <FormattedMessage id="Send.to.mail.address" />
-          </Headline5>
+          </Headline6>
         </Cell>
       </Row>
       <Row>
@@ -123,9 +123,9 @@ const Settings: React.FC = () => {
       </Row>
       <Row>
         <Cell columns={12}>
-          <Headline5 tag="h2">
+          <Headline6 tag="h2">
             <FormattedMessage id="Language" />
-          </Headline5>
+          </Headline6>
         </Cell>
       </Row>
       <Row>

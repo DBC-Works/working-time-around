@@ -47,27 +47,25 @@ describe('App', () => {
   })
 
   it('should change content to current state when click today action icon', () => {
-    const now = dayjs(new Date())
+    const dj = dayjs(new Date())
 
     const [renderResult] = setup()
     const { getByText } = renderResult
     act(() => {
-      fireEvent.click(getByText(now.format('ll')))
+      fireEvent.click(getByText(dj.format('ll')))
     })
-    expect(getByText(now.format('ll'))).toBeInTheDocument()
+    expect(getByText(dj.format('ll'))).toBeInTheDocument()
     expect(getByText('Time')).toBeInTheDocument()
     expect(getByText('Memo')).toBeInTheDocument()
   })
 
   it('should change content to monthly list when click list action icon', () => {
-    const now = dayjs(new Date())
-
     const [renderResult] = setup()
     const { getByText } = renderResult
     act(() => {
       fireEvent.click(getByText('list'))
     })
-    expect(getByText(now.format('MMMM'))).toBeInTheDocument()
+    expect(getByText(dayjs(new Date()).format('MMM YYYY'))).toBeInTheDocument()
   })
 
   it('should change content to settings when click settings action icon', () => {

@@ -15,11 +15,22 @@ describe('"Settings" template', () => {
     return renderWithProvider(<Settings />, '/settings')
   }
 
+  let renderResult: RenderResult
+
+  beforeEach(() => {
+    renderResult = setup()[0]
+  })
+
   afterEach(cleanup)
 
   it('should exist "Settings" heading', () => {
-    const [renderResult] = setup()
     const { getByText } = renderResult
     expect(getByText('Settings')).toBeInTheDocument()
+  })
+
+  it('should exist "Send to mail address" and "Language" heading', () => {
+    const { getByText } = renderResult
+    expect(getByText('Send to mail address')).toBeInTheDocument()
+    expect(getByText('Language')).toBeInTheDocument()
   })
 })

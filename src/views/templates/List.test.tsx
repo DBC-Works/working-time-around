@@ -36,8 +36,7 @@ describe('"List" template', () => {
       const target = dayjs(new Date(year, month - 1, 1))
       const [renderResult] = setup(target.format('/YYYY/M'))
       const { getByText } = renderResult
-      expect(getByText(target.format('YYYY'))).toBeInTheDocument()
-      expect(getByText(target.format('MMMM'))).toBeInTheDocument()
+      expect(getByText(target.format('MMM YYYY'))).toBeInTheDocument()
     }
   )
 
@@ -72,36 +71,31 @@ describe('"List" template', () => {
   )
 
   it('should exist a button to that date page in each date rows', () => {
-    const now = dayjs(new Date())
-    const [renderResult] = setup(now.format('/YYYY/M'))
+    const dj = dayjs(new Date())
+    const [renderResult] = setup(dj.format('/YYYY/M'))
     const { getAllByText } = renderResult
-    const buttonTexts = getAllByText('…')
-    expect(buttonTexts).toHaveLength(now.daysInMonth())
+    expect(getAllByText('…')).toHaveLength(dj.daysInMonth())
   })
 
   it('should move to the previous month when click "prev" icon link', () => {
-    const now = dayjs(new Date())
-    const [renderResult] = setup(now.format('/YYYY/M'))
+    const dj = dayjs(new Date())
+    const [renderResult] = setup(dj.format('/YYYY/M'))
     const { getByText } = renderResult
-    const prevButton = getByText('navigate_before')
     act(() => {
-      fireEvent.click(prevButton)
+      fireEvent.click(getByText('navigate_before'))
     })
-    const prevMonth = now.add(-1, 'month')
-    expect(getByText(prevMonth.format('YYYY'))).toBeInTheDocument()
-    expect(getByText(prevMonth.format('MMMM'))).toBeInTheDocument()
+    expect(
+      getByText(dj.add(-1, 'month').format('MMM YYYY'))
+    ).toBeInTheDocument()
   })
 
   it('should move to the next month when click "next" icon link', () => {
-    const now = dayjs(new Date())
-    const [renderResult] = setup(now.format('/YYYY/M'))
+    const dj = dayjs(new Date())
+    const [renderResult] = setup(dj.format('/YYYY/M'))
     const { getByText } = renderResult
-    const nextButton = getByText('navigate_next')
     act(() => {
-      fireEvent.click(nextButton)
+      fireEvent.click(getByText('navigate_next'))
     })
-    const nextMonth = now.add(1, 'month')
-    expect(getByText(nextMonth.format('YYYY'))).toBeInTheDocument()
-    expect(getByText(nextMonth.format('MMMM'))).toBeInTheDocument()
+    expect(getByText(dj.add(1, 'month').format('MMM YYYY'))).toBeInTheDocument()
   })
 })

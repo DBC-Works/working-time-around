@@ -1,11 +1,16 @@
 {
   "Working.time.around": "Working time around",
+  "Back.to.list": "Back to list",
   "Date": "Date",
   "Edit": "Edit",
   "Language": "Language",
   "List": "List",
   "Memo": "Memo",
+  "Next.day": "Next day",
+  "Next.month": "Next month",
   "Not.found": "Not found",
+  "Prev.day": "Previous day",
+  "Prev.month": "Previous month",
   "Send.mail": "Send mail",
   "Send.to.mail.address": "Send to mail address",
   "Settings": "Settings",
@@ -15,5 +20,6 @@
   "Top": "Top",
 
   "Format.date": "ll",
+  "Format.month": "MMM YYYY",
   "Format.time.24": "HH:mm"
 }
