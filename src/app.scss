@@ -62,6 +62,10 @@ div.time-select {
   bottom: 1rem;
   right: 1rem;
   text-decoration: none;
+  
+  a {
+    text-decoration: none;
+  }
 }
 
 @media(min-width: 1024px) {
