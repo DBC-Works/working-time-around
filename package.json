@@ -1,6 +1,6 @@
 {
   "name": "working-time-around",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "'Working time around' is a personal attendance and working time recording web application. It save records to browser's local storage, doesn't access any Web APIs.",
   "main": "index.js",
   "author": "D.B.C.",

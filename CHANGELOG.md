@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2019-10-06
+
+### Added
+
+- Slack linkage function
+- 'strictNullChecks' and 'noImplicitAny' compiler options
+
+### Updated
+
+- Add a style to hide the underline of FAB(only in Mobile Safari)
+- Update core packages
+- Fix some bugs
+
 ## [0.2.0] - 2019-09-22
 
 ### Added
@@ -30,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial project files.
 
-[unreleased]: https://github.com/DBC-Works/SoundVisualShaderBase/compare/v0.2.0...HEAD
+[unreleased]: https://github.com/DBC-Works/SoundVisualShaderBase/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.3.0
 [0.2.0]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.2.0
 [0.1.0]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.1.0
