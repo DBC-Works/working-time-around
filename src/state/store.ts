@@ -60,15 +60,26 @@ const setTransform = createTransform(
   (inboundState, key) =>
     key === 'records' ? JSON.stringify(inboundState) : inboundState,
   (outboundState, key) => {
-    if (key !== 'records') {
-      return outboundState
+    switch (key) {
+      case 'records':
+        return JSON.parse(outboundState as string, (key, value) =>
+          key === 'starts' || key === 'stops'
+            ? (value as string[]).map(v => dayjs(v).toDate())
+            : value
+        )
+      case 'settings':
+        if ((outboundState as any).hasOwnProperty('slack') === false) {
+          return {
+            ...outboundState,
+            slack: {
+              incomingWebhookUrl: '',
+              context: '',
+            },
+          }
+        }
+        break
     }
-
-    return JSON.parse(outboundState as string, (key, value) =>
-      key === 'starts' || key === 'stops'
-        ? (value as string[]).map(v => dayjs(v).toDate())
-        : value
-    )
+    return outboundState
   },
   { blacklist: ['recordsReducer'] }
 )

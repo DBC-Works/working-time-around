@@ -10,6 +10,11 @@ const actionCreator = actionCreatorFactory('settings')
 //
 
 /**
+ * 'Select language' action
+ */
+export const selectLanguage = actionCreator<string>('SELECT_LANGUAGE')
+
+/**
  * 'Update send to mail address' action
  */
 export const updateSendToMailAddress = actionCreator<string>(
@@ -17,6 +22,13 @@ export const updateSendToMailAddress = actionCreator<string>(
 )
 
 /**
- * 'Select language' action
+ * 'Update Slack context' action
  */
-export const selectLanguage = actionCreator<string>('SELECT_LANGUAGE')
+export const updateSlackContext = actionCreator<string>('UPDATE_SLACK_CONTEXT')
+
+/**
+ * 'Update Slack incoming webhook URL' action
+ */
+export const updateSlackIncomingWebhookUrl = actionCreator<string>(
+  'UPDATE_SLACK_INCOMING_WEBHOOK_URL'
+)

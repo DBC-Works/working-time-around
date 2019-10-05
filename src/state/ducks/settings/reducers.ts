@@ -3,7 +3,12 @@
  */
 import { reducerWithInitialState } from 'typescript-fsa-reducers'
 
-import { selectLanguage, updateSendToMailAddress } from './actions'
+import {
+  selectLanguage,
+  updateSendToMailAddress,
+  updateSlackContext,
+  updateSlackIncomingWebhookUrl,
+} from './actions'
 import { Lang, SettingsState } from './types'
 
 //
@@ -15,6 +20,7 @@ import { Lang, SettingsState } from './types'
  */
 export const INITIAL_STATE: SettingsState = {
   sendToMailAddress: '',
+  slack: { incomingWebhookUrl: '', context: '' },
   lang: Lang.EN,
 }
 
@@ -29,13 +35,27 @@ export const INITIAL_STATE: SettingsState = {
  * @returns New state
  */
 const settingsReducer = reducerWithInitialState(INITIAL_STATE)
-  .case(updateSendToMailAddress, (state, mailAddress) => ({
-    ...state,
-    sendToMailAddress: mailAddress,
-  }))
   .case(selectLanguage, (state, payload) => ({
     ...state,
     lang: payload as Lang,
+  }))
+  .case(updateSendToMailAddress, (state, sendToMailAddress) => ({
+    ...state,
+    sendToMailAddress,
+  }))
+  .case(updateSlackContext, (state, context) => ({
+    ...state,
+    slack: {
+      ...state.slack,
+      context,
+    },
+  }))
+  .case(updateSlackIncomingWebhookUrl, (state, incomingWebhookUrl) => ({
+    ...state,
+    slack: {
+      ...state.slack,
+      incomingWebhookUrl,
+    },
   }))
   .build()
 export default settingsReducer

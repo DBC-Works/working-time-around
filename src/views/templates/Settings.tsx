@@ -1,26 +1,33 @@
 /**
  * @file 'Settings' template component
  */
-import React, { useCallback } from 'react'
-import { FormattedMessage } from 'react-intl'
+import React, { useCallback, useState } from 'react'
+import { FormattedMessage, useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 
+import Button from '@material/react-button'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import TextField, { Input } from '@material/react-text-field'
-import { Headline6 } from '@material/react-typography'
+import { Headline6, Subtitle1 } from '@material/react-typography'
 
 import en from '../i18n/en.json'
 import ja from '../i18n/ja.json'
 
 import { AppState } from '../../state/store'
+import { getOnLine, showMessage } from '../../state/ducks/running'
 import {
+  canSendMessageToSlack,
   getLang,
   getSendToMailAddress,
+  getSlackSettings,
   selectLanguage,
   settingsTypes,
   updateSendToMailAddress,
+  updateSlackContext,
+  updateSlackIncomingWebhookUrl,
 } from '../../state/ducks/settings'
 import Select from '../atoms/Select'
+import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
 
 //
 // Types
@@ -76,33 +83,37 @@ export function getMessageCatalogueOf(
 /**
  * 'Settings' component
  */
-const Settings: React.FC = () => {
-  const dispatch = useDispatch()
+const Settings: React.FC = () => (
+  <Grid>
+    <Row className="text-align-center">
+      <Cell columns={12}>
+        <Headline6 tag="h1">
+          <FormattedMessage id="Settings" />
+        </Headline6>
+      </Cell>
+    </Row>
+    <MailAddress />
+    <SlackSettings />
+    <LanguageSelection />
+  </Grid>
+)
+export default Settings
 
-  const lang = useSelector((state: AppState) => getLang(state.settings))
+/**
+ * 'MailAddress' component
+ */
+const MailAddress: React.FC = () => {
   const mailAddress = useSelector((state: AppState) =>
     getSendToMailAddress(state.settings)
   )
 
-  const handleInputMailAddress = useCallback(
-    e => {
-      dispatch(updateSendToMailAddress(e.currentTarget.value))
-    },
-    [mailAddress]
-  )
-  const handleChangeLang = useCallback(e => {
-    dispatch(selectLanguage(e.target.value))
+  const dispatch = useDispatch()
+  const handleInputMailAddress = useCallback(e => {
+    dispatch(updateSendToMailAddress(e.currentTarget.value))
   }, [])
 
   return (
-    <Grid>
-      <Row className="text-align-center">
-        <Cell columns={12}>
-          <Headline6 tag="h1">
-            <FormattedMessage id="Settings" />
-          </Headline6>
-        </Cell>
-      </Row>
+    <>
       <Row>
         <Cell columns={12}>
           <Headline6 tag="h2">
@@ -112,7 +123,11 @@ const Settings: React.FC = () => {
       </Row>
       <Row>
         <Cell columns={12}>
-          <TextField textarea={false} fullWidth={true}>
+          <TextField
+            textarea={false}
+            fullWidth={true}
+            label="foobar@example.com"
+          >
             <Input
               type="email"
               value={mailAddress}
@@ -121,6 +136,148 @@ const Settings: React.FC = () => {
           </TextField>
         </Cell>
       </Row>
+    </>
+  )
+}
+
+/**
+ * 'SlackSettings' component
+ */
+const SlackSettings: React.FC = () => {
+  const slackSettings = useSelector((state: AppState) =>
+    getSlackSettings(state.settings)
+  )
+
+  const dispatch = useDispatch()
+  const handleInputUrl = useCallback(e => {
+    dispatch(updateSlackIncomingWebhookUrl(e.currentTarget.value))
+  }, [])
+  const handleInputContext = useCallback(e => {
+    dispatch(updateSlackContext(e.currentTarget.value))
+  }, [])
+
+  return (
+    <>
+      <Row>
+        <Cell columns={12}>
+          <Headline6 tag="h2">
+            <FormattedMessage id="Slack.linkage" />
+          </Headline6>
+        </Cell>
+      </Row>
+      <Row>
+        <Cell columns={12}>
+          <Subtitle1 tag="h3">
+            <FormattedMessage id="Incoming.webhook.URL" />
+          </Subtitle1>
+        </Cell>
+      </Row>
+      <Row>
+        <Cell columns={12}>
+          <TextField
+            textarea={false}
+            fullWidth={true}
+            label="https://hooks.slack.com/services/..."
+          >
+            <Input
+              type="url"
+              value={slackSettings.incomingWebhookUrl}
+              onInput={handleInputUrl}
+            />
+          </TextField>
+        </Cell>
+      </Row>
+      <Row>
+        <Cell columns={12}>
+          <Subtitle1 tag="h3">
+            <FormattedMessage id="Context" />
+          </Subtitle1>
+        </Cell>
+      </Row>
+      <Row>
+        <Cell columns={12}>
+          <TextField textarea={false} fullWidth={true}>
+            <Input
+              type="text"
+              value={slackSettings.context}
+              onInput={handleInputContext}
+            />
+          </TextField>
+        </Cell>
+      </Row>
+      <Row>
+        <Cell columns={12} className="gutter-top">
+          <SendTestMessageButton />
+        </Cell>
+      </Row>
+    </>
+  )
+}
+
+/**
+ * 'SendTestMessageButton' component
+ */
+const SendTestMessageButton: React.FC = () => {
+  const [posting, setPosting] = useState(false)
+
+  const onLine = useSelector((state: AppState) => getOnLine(state.running))
+  const canPost = useSelector((state: AppState) =>
+    canSendMessageToSlack(state.settings)
+  )
+  const slackSettings = useSelector((state: AppState) =>
+    getSlackSettings(state.settings)
+  )
+
+  const dispatch = useDispatch()
+  const intl = useIntl()
+  const handleClick = useCallback(
+    async e => {
+      if (canPost === false) {
+        return
+      }
+
+      setPosting(true)
+      const resultMessage = await sendMessageToSlack(
+        slackSettings,
+        intl.formatMessage({
+          id: 'Test.message.posted.from.Working.time.around.',
+        })
+      )
+      const message =
+        0 < resultMessage.length
+          ? formatSendFailedMessage(intl, resultMessage)
+          : intl.formatMessage({ id: 'Send.succeeded.' })
+      dispatch(showMessage(message))
+      setPosting(false)
+    },
+    [canPost, slackSettings.incomingWebhookUrl, slackSettings.context]
+  )
+
+  return (
+    <Button
+      className="full-width"
+      unelevated={true}
+      disabled={onLine === false || canPost === false || posting !== false}
+      onClick={handleClick}
+    >
+      <FormattedMessage id={onLine ? 'Send.a.test.message' : 'Offline'} />
+    </Button>
+  )
+}
+
+/**
+ * 'LanguageSelection' component
+ */
+const LanguageSelection: React.FC = () => {
+  const lang = useSelector((state: AppState) => getLang(state.settings))
+
+  const dispatch = useDispatch()
+  const handleChange = useCallback(e => {
+    dispatch(selectLanguage(e.target.value))
+  }, [])
+
+  return (
+    <>
       <Row>
         <Cell columns={12}>
           <Headline6 tag="h2">
@@ -130,11 +287,7 @@ const Settings: React.FC = () => {
       </Row>
       <Row>
         <Cell columns={12}>
-          <Select
-            value={lang}
-            className="full-width"
-            onChange={handleChangeLang}
-          >
+          <Select value={lang} className="full-width" onChange={handleChange}>
             {Array.from(Object.keys(langs), key => (
               <option key={key} value={key}>
                 {langs[key].literal}
@@ -143,7 +296,6 @@ const Settings: React.FC = () => {
           </Select>
         </Cell>
       </Row>
-    </Grid>
+    </>
   )
 }
-export default Settings

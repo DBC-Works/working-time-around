@@ -39,9 +39,11 @@
     "@material/react-menu": "^0.15.0",
     "@material/react-menu-surface": "^0.15.0",
     "@material/react-select": "^0.15.0",
+    "@material/react-snackbar": "^0.15.0",
     "@material/react-text-field": "^0.15.0",
     "@material/react-top-app-bar": "^0.15.0",
     "@material/react-typography": "^0.15.0",
+    "babel-core": "^7.0.0-bridge.0",
     "core-js": "^3.2.1",
     "dayjs": "^1.8.16",
     "intl": "^1.2.5",
@@ -56,7 +58,8 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-persist": "^6.0.0",
     "typescript-fsa": "^3.0.0",
-    "typescript-fsa-reducers": "^1.2.1"
+    "typescript-fsa-reducers": "^1.2.1",
+    "whatwg-fetch": "^3.0.0"
   },
   "scripts": {
     "start": "npx parcel ./src/index.html --open",

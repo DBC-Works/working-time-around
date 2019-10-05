@@ -3,7 +3,13 @@
  */
 import dayjs from 'dayjs'
 
-import { DailyRecord, makeRecordKey, Records, RecordsState } from './types'
+import {
+  DailyRecord,
+  DailyLatestRecord,
+  makeRecordKey,
+  Records,
+  RecordsState,
+} from './types'
 
 //
 // Functions
@@ -36,6 +42,19 @@ export function getLatestStopTimeOf(record: DailyRecord): Date | null {
  */
 export function getLatestMemoOf(record: DailyRecord): string {
   return 0 < record.memos.length ? record.memos[record.memos.length - 1] : ''
+}
+
+/**
+ * Get latest information of daily record
+ * @param record
+ * @returns Latest information of daily record
+ */
+export function getLatestOf(record: DailyRecord | null): DailyLatestRecord {
+  return {
+    start: record !== null ? getLatestStartTimeOf(record) : null,
+    stop: record !== null ? getLatestStopTimeOf(record) : null,
+    memo: record !== null ? getLatestMemoOf(record) : '',
+  }
 }
 
 /**

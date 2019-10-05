@@ -16,9 +16,7 @@ import { Headline6 } from '@material/react-typography'
 
 import { AppState } from '../../state/store'
 import {
-  getLatestMemoOf,
-  getLatestStartTimeOf,
-  getLatestStopTimeOf,
+  getLatestOf,
   getMonthlyRecordsOf,
   recordsTypes,
 } from '../../state/ducks/records'
@@ -54,13 +52,12 @@ function createMailToUri(
   const bodyLines = getDaysInMonth(firstDayOfMonth).map(date => {
     const key = makeRecordKey(date.toDate())
     const record = records.hasOwnProperty(key) ? records[key] : null
-    const start = record !== null ? getLatestStartTimeOf(record) : null
-    const stop = record !== null ? getLatestStopTimeOf(record) : null
+    const latest = getLatestOf(record)
     const columns = [
       date.format('YYYY-MM-DD'),
-      start !== null ? dayjs(start).format('HH:mm') : '',
-      stop !== null ? dayjs(stop).format('HH:mm') : '',
-      record ? getLatestMemoOf(record) : '',
+      latest.start !== null ? dayjs(latest.start).format('HH:mm') : '',
+      latest.stop !== null ? dayjs(latest.stop).format('HH:mm') : '',
+      latest.memo,
     ]
     return columns.map(column => `"${column}"`).join(',')
   })
@@ -207,8 +204,7 @@ const DateList: React.FC<{
         const record = props.records.hasOwnProperty(key)
           ? props.records[key]
           : null
-        const start = record !== null ? getLatestStartTimeOf(record) : null
-        const stop = record !== null ? getLatestStopTimeOf(record) : null
+        const latest = getLatestOf(record)
         return (
           <Row key={date.date()} className="date-list-row">
             <Cell
@@ -220,10 +216,14 @@ const DateList: React.FC<{
               {date.format('D(ddd)')}
             </Cell>
             <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
-              {start !== null ? dayjs(start).format(props.timeFormat) : ''}
+              {latest.start !== null
+                ? dayjs(latest.start).format(props.timeFormat)
+                : ''}
             </Cell>
             <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
-              {stop !== null ? dayjs(stop).format(props.timeFormat) : ''}
+              {latest.stop !== null
+                ? dayjs(latest.stop).format(props.timeFormat)
+                : ''}
             </Cell>
             <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
               <Button

@@ -8,6 +8,15 @@ import dayjs from 'dayjs'
 //
 
 /**
+ * Daily latest record
+ */
+export interface DailyLatestRecord {
+  start: Date | null
+  stop: Date | null
+  memo: string
+}
+
+/**
  * Daily record
  */
 export interface DailyRecord {
