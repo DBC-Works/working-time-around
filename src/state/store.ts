@@ -68,7 +68,9 @@ const setTransform = createTransform(
             : value
         )
       case 'settings':
-        if ((outboundState as any).hasOwnProperty('slack') === false) {
+        if (
+          Object.prototype.hasOwnProperty.call(outboundState, 'slack') === false
+        ) {
           return {
             ...outboundState,
             slack: {

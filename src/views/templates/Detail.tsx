@@ -34,7 +34,7 @@ import TimeSelect from '../molecules/TimeSelect'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
 
 //
-// Types & ariables
+// Types & variables
 //
 
 /**
@@ -247,7 +247,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
   })
   const [requireUpdate, setRequireUpdate] = useState(false)
 
-  const resetUpdate = () => {
+  const resetUpdate = (): void => {
     setRequireUpdate(false)
     updateRef.current.updated = {
       ...UPDATED_PLACE_HOLDER_INITIAL_VALUE,
@@ -265,8 +265,9 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     getSlackSettings(state.settings)
   )
   const intl = useIntl()
+  const dispatch = useDispatch()
   const updated = isUpdated(updateRef.current.updated)
-  const postUpdate = () => {
+  const postUpdate = (): void => {
     if (updated !== false) {
       if (w.navigator.onLine === false) {
         dispatch(
@@ -291,37 +292,40 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     }
   }
 
-  if (canPost !== false) {
-    useEffect(() => {
-      const beforeUnloadHandler = (e: BeforeUnloadEvent) => {
-        let msg = ''
-        if (updated !== false) {
-          msg = 'Do you want to leave this page?'
-          setRequireUpdate(true)
+  useEffect(
+    canPost !== false
+      ? (): (() => void) => {
+          w.addEventListener('unload', postUpdate)
+          return function cleanup(): void {
+            w.removeEventListener('unload', postUpdate)
+            postUpdate()
+          }
         }
-        e.returnValue = msg
-        return msg
-      }
-      w.addEventListener('beforeunload', beforeUnloadHandler)
-      return function cleanup() {
-        w.removeEventListener('beforeunload', beforeUnloadHandler)
-      }
-    }, [updated])
-
-    useEffect(() => {
-      w.addEventListener('unload', postUpdate)
-      return function cleanup() {
-        w.removeEventListener('unload', postUpdate)
-        postUpdate()
-      }
-    }, [])
-  }
+      : (): void => {},
+    [canPost]
+  )
+  useEffect(
+    canPost !== false && updated !== false
+      ? (): (() => void) => {
+          const beforeUnloadHandler = (e: BeforeUnloadEvent): string => {
+            setRequireUpdate(true)
+            e.returnValue = 'Do you want to leave this page?'
+            return e.returnValue
+          }
+          w.addEventListener('beforeunload', beforeUnloadHandler)
+          return function cleanup(): void {
+            w.removeEventListener('beforeunload', beforeUnloadHandler)
+          }
+        }
+      : (): void => {},
+    [canPost, updated]
+  )
 
   const record = useSelector((state: AppState) =>
     getDailyRecordOf(props.target, state.records)
   )
   const latest = getLatestOf(record)
-  useEffect(() => {
+  useEffect((): void => {
     if (dateKey === recordRef.current.dateKey) {
       return
     }
@@ -343,7 +347,6 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     resetUpdate()
   }, [dateKey, record])
 
-  const dispatch = useDispatch()
   const handleChangeStartTime = useCallback(time => {
     updateRef.current.updated.start = dj
       .hour(time.getHours())
@@ -381,7 +384,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     },
     [props.target]
   )
-  const handleClickRequireUpdate = useCallback(() => {
+  const handleClickRequireUpdate = useCallback((): void => {
     postUpdate()
     resetUpdate()
   }, [])

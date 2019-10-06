@@ -42,7 +42,7 @@ function updateTargetStartTime(
 ): Records {
   const newRecords = { ...state.records }
   const key = makeRecordKey(time)
-  if (newRecords.hasOwnProperty(key)) {
+  if (Object.prototype.hasOwnProperty.call(newRecords, key)) {
     const starts = [...newRecords[key].starts]
     const index = 0 <= targetIndex ? targetIndex : starts.length - 1
     if (starts.length === 0 || starts.length <= index) {
@@ -85,7 +85,7 @@ function updateTargetStopTime(
 ): Records {
   const newRecords = { ...state.records }
   const key = makeRecordKey(time)
-  if (newRecords.hasOwnProperty(key)) {
+  if (Object.prototype.hasOwnProperty.call(newRecords, key)) {
     const stops = [...newRecords[key].stops]
     const index = 0 <= targetIndex ? targetIndex : stops.length - 1
     if (stops.length === 0 || stops.length <= index) {
@@ -130,7 +130,7 @@ function updateTargetMemo(
 ): Records {
   const newRecords = { ...state.records }
   const key = makeRecordKey(date)
-  if (newRecords.hasOwnProperty(key)) {
+  if (Object.prototype.hasOwnProperty.call(newRecords, key)) {
     const memos = [...newRecords[key].memos]
     const index = 0 <= targetIndex ? targetIndex : memos.length - 1
     if (memos.length === 0 || memos.length <= index) {

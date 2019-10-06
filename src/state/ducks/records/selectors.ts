@@ -68,7 +68,9 @@ export function getDailyRecordOf(
   state: RecordsState
 ): DailyRecord | null {
   const key = makeRecordKey(date)
-  return state.records.hasOwnProperty(key) ? state.records[key] : null
+  return Object.prototype.hasOwnProperty.call(state.records, key)
+    ? state.records[key]
+    : null
 }
 
 /**

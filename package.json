@@ -18,12 +18,18 @@
     "@types/react-router-dom": "^4.3.5",
     "@types/redux": "^3.6.0",
     "@types/redux-persist": "^4.3.1",
-    "husky": "^3.0.5",
+    "@typescript-eslint/eslint-plugin": "^2.3.2",
+    "@typescript-eslint/parser": "^2.3.2",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react-hooks": "^2.1.2",
+    "husky": "^3.0.8",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.9.0",
     "jest-dom": "^4.0.0",
     "jest-transform-css": "^2.0.0",
-    "lint-staged": "^9.2.5",
+    "lint-staged": "^9.4.1",
     "parcel": "^1.12.3",
     "prettier": "^1.18.2",
     "sass": "^1.22.12",
@@ -46,6 +52,7 @@
     "babel-core": "^7.0.0-bridge.0",
     "core-js": "^3.2.1",
     "dayjs": "^1.8.16",
+    "eslint-plugin-react": "^7.16.0",
     "intl": "^1.2.5",
     "path-to-regexp": "^3.1.0",
     "react": "^16.10.2",
@@ -64,11 +71,17 @@
   "scripts": {
     "start": "npx parcel ./src/index.html --open",
     "build": "npx parcel build ./src/index.html",
+    "lint": "eslint src/**",
     "test": "jest",
     "precommit": "lint-staged"
   },
   "lint-staged": {
-    "*.{ts,tsx,json,css,md}": [
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ],
+    "*.{json,css,md}": [
       "prettier --write",
       "git add"
     ]

@@ -64,6 +64,7 @@ export async function sendMessageToSlack(
   settings: settingsTypes.SlackSettings,
   message: string
 ): Promise<string> {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const payload: any = {
     blocks: [
       {
@@ -121,17 +122,17 @@ export async function sendMessageToSlack(
 const App: React.FC = () => {
   const w = useSelector((state: AppState) => getWindow(state.running))
   const dispatch = useDispatch()
-  useEffect(() => {
-    const onlineEventHandler = () => {
+  useEffect((): (() => void) => {
+    const onlineEventHandler = (): void => {
       dispatch(updateOnLine(true))
     }
-    const offlineEventHandler = () => {
+    const offlineEventHandler = (): void => {
       dispatch(updateOnLine(false))
     }
     w.addEventListener('online', onlineEventHandler)
     w.addEventListener('offline', offlineEventHandler)
 
-    return function cleanup() {
+    return function cleanup(): void {
       w.removeEventListener('offline', offlineEventHandler)
       w.removeEventListener('online', onlineEventHandler)
     }

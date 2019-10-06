@@ -45,13 +45,13 @@ const CurrentState: React.FC<RouteComponentProps<{}>> = props => {
   const intervalRef = useRef<number>()
 
   const dispatch = useDispatch()
-  function timeout(): void {
-    dispatch(updateTime())
-    intervalRef.current = window.setTimeout(() => timeout(), 1000)
-  }
-  useEffect(() => {
+  useEffect((): (() => void) => {
+    const timeout = (): void => {
+      dispatch(updateTime())
+      intervalRef.current = window.setTimeout(() => timeout(), 1000)
+    }
     timeout()
-    return function cleanup() {
+    return function cleanup(): void {
       window.clearTimeout(intervalRef.current)
     }
   }, [])
@@ -123,37 +123,42 @@ const StartButton: React.FC<{
   const labelStart = intl.formatMessage({ id: 'Start' })
   const timeFormat = intl.formatMessage({ id: 'Format.time.24' })
 
+  const w = useSelector((state: AppState) => getWindow(state.running))
+  const slackSettings = useSelector((state: AppState) =>
+    getSlackSettings(state.settings)
+  )
   const canPost = useSelector((state: AppState) =>
     canSendMessageToSlack(state.settings)
   )
   const dispatch = useDispatch()
-  if (canPost !== false) {
-    const w = useSelector((state: AppState) => getWindow(state.running))
-    const slackSettings = useSelector((state: AppState) =>
-      getSlackSettings(state.settings)
-    )
-    useEffect(() => {
-      if (w.navigator.onLine === false) {
-        dispatch(
-          showMessage(
-            intl.formatMessage({ id: 'Could.not.send.because.offline.' })
-          )
-        )
-        return
-      }
+  useEffect(
+    canPost !== false
+      ? (): void => {
+          if (props.time !== null && props.time !== initialRef.current.time) {
+            if (w.navigator.onLine === false) {
+              dispatch(
+                showMessage(
+                  intl.formatMessage({ id: 'Could.not.send.because.offline.' })
+                )
+              )
+              return
+            }
 
-      if (props.time !== null && props.time !== initialRef.current.time) {
-        sendMessageToSlack(
-          slackSettings,
-          `[${labelStart}] ${dayjs(props.time).format(timeFormat)}`
-        ).then(resultMessage => {
-          if (0 < resultMessage.length) {
-            dispatch(showMessage(formatSendFailedMessage(intl, resultMessage)))
+            sendMessageToSlack(
+              slackSettings,
+              `[${labelStart}] ${dayjs(props.time).format(timeFormat)}`
+            ).then(resultMessage => {
+              if (0 < resultMessage.length) {
+                dispatch(
+                  showMessage(formatSendFailedMessage(intl, resultMessage))
+                )
+              }
+            })
           }
-        })
-      }
-    }, [props.time])
-  }
+        }
+      : (): void => {},
+    [canPost, props.time]
+  )
 
   const handleClick = useCallback(() => {
     dispatch(start())
@@ -192,37 +197,42 @@ const StopButton: React.FC<{
   const labelStop = intl.formatMessage({ id: 'Stop' })
   const timeFormat = intl.formatMessage({ id: 'Format.time.24' })
 
+  const w = useSelector((state: AppState) => getWindow(state.running))
   const canPost = useSelector((state: AppState) =>
     canSendMessageToSlack(state.settings)
   )
+  const slackSettings = useSelector((state: AppState) =>
+    getSlackSettings(state.settings)
+  )
   const dispatch = useDispatch()
-  if (canPost !== false) {
-    const w = useSelector((state: AppState) => getWindow(state.running))
-    const slackSettings = useSelector((state: AppState) =>
-      getSlackSettings(state.settings)
-    )
-    useEffect(() => {
-      if (w.navigator.onLine === false) {
-        dispatch(
-          showMessage(
-            intl.formatMessage({ id: 'Could.not.send.because.offline.' })
-          )
-        )
-        return
-      }
+  useEffect(
+    canPost !== false
+      ? (): void => {
+          if (props.time !== null && props.time !== initialRef.current.time) {
+            if (w.navigator.onLine === false) {
+              dispatch(
+                showMessage(
+                  intl.formatMessage({ id: 'Could.not.send.because.offline.' })
+                )
+              )
+              return
+            }
 
-      if (props.time !== null && props.time !== initialRef.current.time) {
-        sendMessageToSlack(
-          slackSettings,
-          `[${labelStop}] ${dayjs(props.time).format(timeFormat)}\n${memo}`
-        ).then(resultMessage => {
-          if (0 < resultMessage.length) {
-            dispatch(showMessage(formatSendFailedMessage(intl, resultMessage)))
+            sendMessageToSlack(
+              slackSettings,
+              `[${labelStop}] ${dayjs(props.time).format(timeFormat)}\n${memo}`
+            ).then(resultMessage => {
+              if (0 < resultMessage.length) {
+                dispatch(
+                  showMessage(formatSendFailedMessage(intl, resultMessage))
+                )
+              }
+            })
           }
-        })
-      }
-    }, [props.time])
-  }
+        }
+      : (): void => {},
+    [canPost, props.time]
+  )
 
   const handleClick = useCallback(() => {
     dispatch(stop())
@@ -267,7 +277,8 @@ const MemoTextField: React.FC<{
     getSlackSettings(state.settings)
   )
   const intl = useIntl()
-  const postUpdate = () => {
+  const dispatch = useDispatch()
+  const postUpdate = (): void => {
     if (updateRef.current.updated !== null) {
       if (w.navigator.onLine === false) {
         dispatch(
@@ -290,30 +301,34 @@ const MemoTextField: React.FC<{
   }
 
   const requirePost = props.afterStopped !== false && canPost !== false
-  if (requirePost !== false) {
-    useEffect(() => {
-      w.addEventListener('unload', postUpdate)
-      return function cleanup() {
-        w.removeEventListener('unload', postUpdate)
-        postUpdate()
-      }
-    }, [])
+  useEffect(
+    requirePost !== false
+      ? (): (() => void) => {
+          w.addEventListener('unload', postUpdate)
+          return function cleanup(): void {
+            w.removeEventListener('unload', postUpdate)
+            postUpdate()
+          }
+        }
+      : (): void => {},
+    [requirePost]
+  )
 
-    useEffect(() => {
-      const beforeUnloadHandler = (e: BeforeUnloadEvent) => {
-        const msg =
-          updateRef.current.updated !== null
-            ? 'Do you want to leave this page?'
-            : ''
-        e.returnValue = msg
-        return msg
-      }
-      w.addEventListener('beforeunload', beforeUnloadHandler)
-      return function cleanup() {
-        w.removeEventListener('beforeunload', beforeUnloadHandler)
-      }
-    }, [updateRef.current.updated])
-  }
+  useEffect(
+    requirePost !== false && updateRef.current.updated
+      ? (): (() => void) => {
+          const beforeUnloadHandler = (e: BeforeUnloadEvent): string => {
+            e.returnValue = 'Do you want to leave this page?'
+            return e.returnValue
+          }
+          w.addEventListener('beforeunload', beforeUnloadHandler)
+          return function cleanup(): void {
+            w.removeEventListener('beforeunload', beforeUnloadHandler)
+          }
+        }
+      : (): void => {},
+    [requirePost, updateRef.current.updated]
+  )
 
   const showSendButton =
     requirePost !== false && updateRef.current.updated !== null
@@ -328,13 +343,12 @@ const MemoTextField: React.FC<{
     )
   const handleTrailingIconSelect =
     showSendButton !== false
-      ? () => {
+      ? (): void => {
           postUpdate()
           updateRef.current.updated = null
         }
       : undefined
 
-  const dispatch = useDispatch()
   const handleInput = useCallback(e => {
     updateRef.current.updated = e.currentTarget.value
     dispatch(updateLatestMemo(e.currentTarget.value))

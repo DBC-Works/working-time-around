@@ -43,15 +43,19 @@ function getDaysInMonth(month: Dayjs): Dayjs[] {
  * Create mailto uri
  * @param firstDayOfMonth First day of target month
  * @param records Records to send
+ * @param mailAddress Mail address to send
  * @returns mailto uri
  */
 function createMailToUri(
   firstDayOfMonth: Dayjs,
-  records: recordsTypes.Records
+  records: recordsTypes.Records,
+  mailAddress: string
 ): string {
   const bodyLines = getDaysInMonth(firstDayOfMonth).map(date => {
     const key = makeRecordKey(date.toDate())
-    const record = records.hasOwnProperty(key) ? records[key] : null
+    const record = Object.prototype.hasOwnProperty.call(records, key)
+      ? records[key]
+      : null
     const latest = getLatestOf(record)
     const columns = [
       date.format('YYYY-MM-DD'),
@@ -61,10 +65,6 @@ function createMailToUri(
     ]
     return columns.map(column => `"${column}"`).join(',')
   })
-
-  const mailAddress = useSelector((state: AppState) =>
-    getSendToMailAddress(state.settings)
-  )
 
   const hfieldsMap: { [index: string]: string } = {
     subject: `${firstDayOfMonth.format('ll')} - ${firstDayOfMonth
@@ -88,13 +88,15 @@ const List: React.FC<
   const firstDayOfMonth = new Date(+year, +month - 1, 1)
   const dj = dayjs(firstDayOfMonth)
 
-  const intl = useIntl()
-  const timeFormat = intl.formatMessage({ id: 'Format.time.24' })
-
   const records = useSelector((state: AppState) =>
     getMonthlyRecordsOf(firstDayOfMonth, state.records)
   )
+  const mailAddress = useSelector((state: AppState) =>
+    getSendToMailAddress(state.settings)
+  )
 
+  const intl = useIntl()
+  const timeFormat = intl.formatMessage({ id: 'Format.time.24' })
   return (
     <Grid className="list">
       <MonthHeading target={dj} />
@@ -110,7 +112,10 @@ const List: React.FC<
       </Row>
       <Row>
         <Cell columns={12}>
-          <a className="app-fab--absolute" href={createMailToUri(dj, records)}>
+          <a
+            className="app-fab--absolute"
+            href={createMailToUri(dj, records, mailAddress)}
+          >
             <Fab
               icon={<i className="material-icons">mail</i>}
               textLabel={intl.formatMessage({ id: 'Send.mail' })}
@@ -201,7 +206,7 @@ const DateList: React.FC<{
           dayKind = 'saturday'
         }
         const key = makeRecordKey(date.toDate())
-        const record = props.records.hasOwnProperty(key)
+        const record = Object.prototype.hasOwnProperty.call(props.records, key)
           ? props.records[key]
           : null
         const latest = getLatestOf(record)
@@ -228,7 +233,9 @@ const DateList: React.FC<{
             <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
               <Button
                 dense={true}
-                onClick={e => props.history.push(date.format('/YYYY/M/D'))}
+                onClick={(): void =>
+                  props.history.push(date.format('/YYYY/M/D'))
+                }
               >
                 <span dangerouslySetInnerHTML={{ __html: '&hellip;' }} />
               </Button>

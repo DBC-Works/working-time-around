@@ -230,28 +230,25 @@ const SendTestMessageButton: React.FC = () => {
 
   const dispatch = useDispatch()
   const intl = useIntl()
-  const handleClick = useCallback(
-    async e => {
-      if (canPost === false) {
-        return
-      }
+  const handleClick = useCallback(async () => {
+    if (canPost === false) {
+      return
+    }
 
-      setPosting(true)
-      const resultMessage = await sendMessageToSlack(
-        slackSettings,
-        intl.formatMessage({
-          id: 'Test.message.posted.from.Working.time.around.',
-        })
-      )
-      const message =
-        0 < resultMessage.length
-          ? formatSendFailedMessage(intl, resultMessage)
-          : intl.formatMessage({ id: 'Send.succeeded.' })
-      dispatch(showMessage(message))
-      setPosting(false)
-    },
-    [canPost, slackSettings.incomingWebhookUrl, slackSettings.context]
-  )
+    setPosting(true)
+    const resultMessage = await sendMessageToSlack(
+      slackSettings,
+      intl.formatMessage({
+        id: 'Test.message.posted.from.Working.time.around.',
+      })
+    )
+    const message =
+      0 < resultMessage.length
+        ? formatSendFailedMessage(intl, resultMessage)
+        : intl.formatMessage({ id: 'Send.succeeded.' })
+    dispatch(showMessage(message))
+    setPosting(false)
+  }, [canPost, slackSettings.incomingWebhookUrl, slackSettings.context])
 
   return (
     <Button

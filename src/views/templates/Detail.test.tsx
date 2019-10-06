@@ -15,7 +15,7 @@ import { renderWithProvider } from '../componentTestUtilities'
 
 describe('"Detail" template', () => {
   function setup(
-    route: string = '/2019/1/1',
+    route = '/2019/1/1',
     state: AppState = INITIAL_STATE
   ): [RenderResult, Store<AppState, AnyAction>] {
     return renderWithProvider(

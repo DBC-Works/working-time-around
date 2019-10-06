@@ -13,9 +13,7 @@ import { act, cleanup, fireEvent, RenderResult } from '@testing-library/react'
 import { renderWithProvider } from '../componentTestUtilities'
 
 describe('App', () => {
-  function setup(
-    route: string = '/'
-  ): [RenderResult, Store<AppState, AnyAction>] {
+  function setup(route = '/'): [RenderResult, Store<AppState, AnyAction>] {
     return renderWithProvider(
       <Router initialEntries={[route]}>
         <App />

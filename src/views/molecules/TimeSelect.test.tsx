@@ -30,6 +30,7 @@ describe('"TimeSelect" molecule', () => {
         </IntlProvider>
       )
     })
+    /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
     return result!
   }
 

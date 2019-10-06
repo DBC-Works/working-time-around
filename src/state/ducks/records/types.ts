@@ -48,6 +48,6 @@ export interface RecordsState {
  * @param date Date to make key
  * @returns Record key
  */
-export function makeRecordKey(date: Date) {
+export function makeRecordKey(date: Date): string {
   return dayjs(date).format('YYYYMMDD')
 }

@@ -65,5 +65,6 @@ export function renderWithProvider(
       </Provider>
     )
   })
+  /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
   return [result!, store]
 }
