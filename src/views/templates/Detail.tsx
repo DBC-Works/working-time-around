@@ -293,18 +293,6 @@ const DetailForm: React.FC<{ target: Date }> = props => {
   }
 
   useEffect(
-    canPost !== false
-      ? (): (() => void) => {
-          w.addEventListener('unload', postUpdate)
-          return function cleanup(): void {
-            w.removeEventListener('unload', postUpdate)
-            postUpdate()
-          }
-        }
-      : (): void => {},
-    [canPost]
-  )
-  useEffect(
     canPost !== false && updated !== false
       ? (): (() => void) => {
           const beforeUnloadHandler = (e: BeforeUnloadEvent): string => {
@@ -315,6 +303,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
           w.addEventListener('beforeunload', beforeUnloadHandler)
           return function cleanup(): void {
             w.removeEventListener('beforeunload', beforeUnloadHandler)
+            postUpdate()
           }
         }
       : (): void => {},
