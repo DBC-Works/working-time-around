@@ -1,11 +1,12 @@
 /**
  * @file 'List' component
  */
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import H from 'history'
 import { useSelector } from 'react-redux'
 import { FormattedMessage, useIntl } from 'react-intl'
+import assert from 'assert'
 import dayjs, { Dayjs } from 'dayjs'
 
 import Button from '@material/react-button'
@@ -22,7 +23,10 @@ import {
 } from '../../state/ducks/records'
 import { getSendToMailAddress } from '../../state/ducks/settings'
 
-import { makeRecordKey } from '../../state/ducks/records/types'
+import {
+  makeRecordKey,
+  DailyLatestRecord,
+} from '../../state/ducks/records/types'
 
 //
 // Functions
@@ -31,12 +35,52 @@ import { makeRecordKey } from '../../state/ducks/records/types'
 /**
  * Get days in month
  * @param month Target month
- * @returns Array of Dayjs
+ * @returns Array of Dayjs instance
  */
 function getDaysInMonth(month: Dayjs): Dayjs[] {
   return Array.from(Array(month.daysInMonth()), (_, i) =>
     dayjs(month).set('date', i + 1)
   )
+}
+
+/**
+ * Get median time of specified times
+ * @param times Times
+ * @returns Median time(by minute)
+ */
+function getMedianMinuteOf(times: Date[]): number {
+  assert(0 < times.length)
+
+  const sorted = times
+    .map(time => {
+      const dj = dayjs(time)
+      return dj.hour() * 60 + dj.minute()
+    })
+    .sort((lhs, rhs) => (lhs < rhs ? -1 : 1))
+  const mid = Math.floor(times.length / 2)
+  return sorted.length % 2 === 0
+    ? Math.floor((sorted[mid - 1] + sorted[mid]) / 2)
+    : sorted[mid]
+}
+
+/**
+ * Make median time string
+ * @param times Times to get median
+ * @param format Time format
+ * @returns Formatted time
+ */
+function makeMedianTimeStringOf(times: Date[], format: string): string {
+  assert(0 < format.length)
+
+  if (times.length === 0) {
+    return ''
+  }
+
+  const time = getMedianMinuteOf(times)
+  return dayjs()
+    .hour(time / 60)
+    .minute(time % 60)
+    .format(format)
 }
 
 /**
@@ -77,6 +121,10 @@ function createMailToUri(
   )
   return `mailto:${encodeURIComponent(mailAddress)}?${hfields.join('&')}`
 }
+
+//
+// Components
+//
 
 /**
  * 'List' component
@@ -180,69 +228,146 @@ const DateList: React.FC<{
   timeFormat: string
   history: H.History
 }> = props => {
-  const days = getDaysInMonth(props.target)
+  const records = getDaysInMonth(props.target).map(date => {
+    const key = makeRecordKey(date.toDate())
+    return {
+      date,
+      latestRecord: Object.prototype.hasOwnProperty.call(props.records, key)
+        ? getLatestOf(props.records[key])
+        : null,
+    }
+  })
 
   return (
     <Grid className="date-list">
-      <Row className="date-list-header date-list-row">
-        <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
-          <FormattedMessage id="Date" />
-        </Cell>
-        <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
-          <FormattedMessage id="Start" />
-        </Cell>
-        <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
-          <FormattedMessage id="Stop" />
-        </Cell>
-        <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
-          <FormattedMessage id="Edit" />
-        </Cell>
-      </Row>
-      {days.map(date => {
-        let dayKind = ''
-        if (date.day() === 0) {
-          dayKind = 'sunday'
-        } else if (date.day() === 6) {
-          dayKind = 'saturday'
-        }
-        const key = makeRecordKey(date.toDate())
-        const record = Object.prototype.hasOwnProperty.call(props.records, key)
-          ? props.records[key]
-          : null
-        const latest = getLatestOf(record)
-        return (
-          <Row key={date.date()} className="date-list-row">
-            <Cell
-              desktopColumns={3}
-              tabletColumns={2}
-              phoneColumns={1}
-              className={dayKind}
-            >
-              {date.format('D(ddd)')}
-            </Cell>
-            <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
-              {latest.start !== null
-                ? dayjs(latest.start).format(props.timeFormat)
-                : ''}
-            </Cell>
-            <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
-              {latest.stop !== null
-                ? dayjs(latest.stop).format(props.timeFormat)
-                : ''}
-            </Cell>
-            <Cell desktopColumns={3} tabletColumns={2} phoneColumns={1}>
-              <Button
-                dense={true}
-                onClick={(): void =>
-                  props.history.push(date.format('/YYYY/M/D'))
-                }
-              >
-                <span dangerouslySetInnerHTML={{ __html: '&hellip;' }} />
-              </Button>
-            </Cell>
-          </Row>
-        )
-      })}
+      <DateListHeader />
+      {records.map(record => (
+        <DateRecordRow
+          key={record.date.format()}
+          date={record.date}
+          latest={record.latestRecord}
+          timeFormat={props.timeFormat}
+          history={props.history}
+        />
+      ))}
+      <DateListFooter
+        latestRecords={records.map(record => record.latestRecord)}
+        timeFormat={props.timeFormat}
+      />
     </Grid>
   )
 }
+
+/**
+ * 'DateListHeader' component
+ */
+const DateListHeader: React.FC = () => (
+  <Row className="date-list-header date-list-row">
+    <DateListCell>
+      <FormattedMessage id="Date" />
+    </DateListCell>
+    <DateListCell>
+      <FormattedMessage id="Start" />
+    </DateListCell>
+    <DateListCell>
+      <FormattedMessage id="Stop" />
+    </DateListCell>
+    <DateListCell>
+      <FormattedMessage id="Edit" />
+    </DateListCell>
+  </Row>
+)
+
+/**
+ * 'DateRecordRow' component
+ */
+const DateRecordRow: React.FC<{
+  date: Dayjs
+  latest: DailyLatestRecord | null
+  timeFormat: string
+  history: H.History
+}> = props => {
+  let dayKind = ''
+  if (props.date.day() === 0) {
+    dayKind = 'sunday'
+  } else if (props.date.day() === 6) {
+    dayKind = 'saturday'
+  }
+  const handleClick = useCallback(() => {
+    props.history.push(props.date.format('/YYYY/M/D'))
+  }, [props.date])
+
+  return (
+    <Row className="date-list-row">
+      <DateListCell className={dayKind}>
+        {props.date.format('D(ddd)')}
+      </DateListCell>
+      <DateListCell>
+        {props.latest !== null && props.latest.start !== null
+          ? dayjs(props.latest.start).format(props.timeFormat)
+          : ''}
+      </DateListCell>
+      <DateListCell>
+        {props.latest !== null && props.latest.stop !== null
+          ? dayjs(props.latest.stop).format(props.timeFormat)
+          : ''}
+      </DateListCell>
+      <DateListCell>
+        <Button dense={true} onClick={handleClick}>
+          <span dangerouslySetInnerHTML={{ __html: '&hellip;' }} />
+        </Button>
+      </DateListCell>
+    </Row>
+  )
+}
+
+/**
+ * 'DateListFooter' component
+ */
+const DateListFooter: React.FC<{
+  latestRecords: (recordsTypes.DailyLatestRecord | null)[]
+  timeFormat: string
+}> = props => {
+  const records = props.latestRecords.filter(
+    record => record !== null
+  ) as recordsTypes.DailyLatestRecord[]
+  const starts = records
+    .map(record => record.start)
+    .filter(start => start !== null) as Date[]
+  const stops = records
+    .map(record => record.stop)
+    .filter(stop => stop !== null) as Date[]
+
+  return (
+    <Row className="date-list-footer date-list-row">
+      <DateListCell>
+        <FormattedMessage id="Median" />
+      </DateListCell>
+      <DateListCell>
+        <span data-testid="median-start">
+          {makeMedianTimeStringOf(starts, props.timeFormat)}
+        </span>
+      </DateListCell>
+      <DateListCell>
+        <span data-testid="median-stop">
+          {makeMedianTimeStringOf(stops, props.timeFormat)}
+        </span>
+      </DateListCell>
+      <DateListCell />
+    </Row>
+  )
+}
+
+/**
+ * 'DateListCell' component
+ */
+const DateListCell: React.FC<{ className?: string }> = props => (
+  <Cell
+    desktopColumns={3}
+    tabletColumns={2}
+    phoneColumns={1}
+    className={props.className}
+  >
+    {props.children}
+  </Cell>
+)
