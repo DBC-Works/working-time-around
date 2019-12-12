@@ -39,6 +39,7 @@
         "trailingComma": "es5"
       }
     ],
+    "complexity": ["error", 10],
     "react/prop-types": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "off"

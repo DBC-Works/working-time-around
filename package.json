@@ -81,6 +81,7 @@
     "*.{ts,tsx}": [
       "prettier --write",
       "eslint --fix",
+      "jest --findRelatedTests",
       "git add"
     ],
     "*.{json,css,md}": [
