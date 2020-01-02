@@ -22,6 +22,17 @@ export function canSendMessageToSlack(state: SettingsState): boolean {
 }
 
 /**
+ * Get default break time length
+ * @param state State to get from
+ * @returns Break time length(undefined if not set)
+ */
+export function getDefaultBreakTimeLengthMin(
+  state: SettingsState
+): number | undefined {
+  return state.defaultBreakTimeLengthMin
+}
+
+/**
  * Get lang
  * @param state State to get from
  * @returns Lang

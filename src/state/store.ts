@@ -41,16 +41,34 @@ export interface AppState {
 }
 
 //
-// Variables
+// Internal functions
 //
 
 /**
- * Initial state
+ * Migrate state
+ * @param originalState
+ * @returns Migrated state
  */
-export const INITIAL_STATE: AppState = {
-  records: recordsInitialState,
-  settings: settingsInitialState,
-  running: runningInitialState,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function migrateSettingsState(originalState: any): settingsTypes.SettingsState {
+  const migratedState = {
+    ...originalState,
+  }
+  if (Object.prototype.hasOwnProperty.call(originalState, 'slack') === false) {
+    migratedState.slack = {
+      incomingWebhookUrl: '',
+      context: '',
+    }
+  }
+  if (
+    Object.prototype.hasOwnProperty.call(
+      originalState,
+      'defaultBreakTimeLengthMin'
+    ) === false
+  ) {
+    migratedState.defaultBreakTimeLengthMin = undefined
+  }
+  return migratedState
 }
 
 /**
@@ -68,23 +86,25 @@ const setTransform = createTransform(
             : value
         )
       case 'settings':
-        if (
-          Object.prototype.hasOwnProperty.call(outboundState, 'slack') === false
-        ) {
-          return {
-            ...outboundState,
-            slack: {
-              incomingWebhookUrl: '',
-              context: '',
-            },
-          }
-        }
-        break
+        return migrateSettingsState(outboundState)
     }
     return outboundState
   },
   { blacklist: ['recordsReducer'] }
 )
+
+//
+// Variables
+//
+
+/**
+ * Initial state
+ */
+export const INITIAL_STATE: AppState = {
+  records: recordsInitialState,
+  settings: settingsInitialState,
+  running: runningInitialState,
+}
 
 /**
  * Persistence configuration
@@ -98,7 +118,7 @@ const persistConfig = {
 }
 
 //
-// Functions
+// Exported functions
 //
 
 /**

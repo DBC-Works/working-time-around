@@ -10,6 +10,20 @@ const actionCreator = actionCreatorFactory('settings')
 //
 
 /**
+ * 'Clear default break time length' action
+ */
+export const clearDefaultBreakTimeLength = actionCreator<void>(
+  'CLEAR_DEFAULT_BREAK_TIME_LENGTH'
+)
+
+/**
+ * 'Update default break time length' action
+ */
+export const updateDefaultBreakTimeLengthMin = actionCreator<number>(
+  'UPDATE_DEFAULT_BREAK_TIME_LENGTH_MINUTE'
+)
+
+/**
  * 'Select language' action
  */
 export const selectLanguage = actionCreator<string>('SELECT_LANGUAGE')

@@ -4,10 +4,12 @@
 import React, { useCallback, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
+import dayjs from 'dayjs'
 
 import Button from '@material/react-button'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import TextField, { Input } from '@material/react-text-field'
+import MaterialIcon from '@material/react-material-icon'
 import { Headline6, Subtitle1 } from '@material/react-typography'
 
 import en from '../i18n/en.json'
@@ -17,16 +19,20 @@ import { AppState } from '../../state/store'
 import { getOnLine, showMessage } from '../../state/ducks/running'
 import {
   canSendMessageToSlack,
+  clearDefaultBreakTimeLength,
+  getDefaultBreakTimeLengthMin,
   getLang,
   getSendToMailAddress,
   getSlackSettings,
   selectLanguage,
   settingsTypes,
+  updateDefaultBreakTimeLengthMin,
   updateSendToMailAddress,
   updateSlackContext,
   updateSlackIncomingWebhookUrl,
 } from '../../state/ducks/settings'
 import Select from '../atoms/Select'
+import TimeSelect from '../molecules/TimeSelect'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
 
 //
@@ -92,12 +98,80 @@ const Settings: React.FC = () => (
         </Headline6>
       </Cell>
     </Row>
+    <BreakTimeLength />
     <MailAddress />
     <SlackSettings />
     <LanguageSelection />
   </Grid>
 )
 export default Settings
+
+/**
+ * 'BreakTimeLength' component
+ */
+const BreakTimeLength: React.FC = () => {
+  const breakTimeLength = useSelector((state: AppState) =>
+    getDefaultBreakTimeLengthMin(state.settings)
+  )
+
+  const dispatch = useDispatch()
+  const handleChangeHour = useCallback(
+    e => {
+      if (!breakTimeLength) {
+        dispatch(updateDefaultBreakTimeLengthMin(+e.currentTarget.value * 60))
+      }
+    },
+    [breakTimeLength]
+  )
+  const handleChangeMinute = useCallback(
+    e => {
+      if (!breakTimeLength) {
+        dispatch(updateDefaultBreakTimeLengthMin(+e.currentTarget.value))
+      }
+    },
+    [breakTimeLength]
+  )
+  const handleChangeTime = useCallback(time => {
+    dispatch(
+      updateDefaultBreakTimeLengthMin(time.getHours() * 60 + time.getMinutes())
+    )
+  }, [])
+  const handleClickClear = useCallback(() => {
+    dispatch(clearDefaultBreakTimeLength())
+  }, [])
+
+  const time = breakTimeLength
+    ? dayjs()
+        .startOf('date')
+        .add(breakTimeLength, 'minute')
+        .toDate()
+    : undefined
+  return (
+    <div data-testid="break-time-length">
+      <Row>
+        <Cell columns={12}>
+          <Headline6 tag="h2">
+            <FormattedMessage id="Default.break.time.length" />
+          </Headline6>
+        </Cell>
+      </Row>
+      <Row>
+        <Cell columns={12}>
+          <TimeSelect
+            label="--"
+            time={time}
+            onChangeHour={handleChangeHour}
+            onChangeMinute={handleChangeMinute}
+            onChange={handleChangeTime}
+          />
+          <Button disabled={!breakTimeLength} onClick={handleClickClear}>
+            <MaterialIcon icon="clear" />
+          </Button>
+        </Cell>
+      </Row>
+    </div>
+  )
+}
 
 /**
  * 'MailAddress' component

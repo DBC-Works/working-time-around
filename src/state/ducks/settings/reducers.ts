@@ -4,7 +4,9 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers'
 
 import {
+  clearDefaultBreakTimeLength,
   selectLanguage,
+  updateDefaultBreakTimeLengthMin,
   updateSendToMailAddress,
   updateSlackContext,
   updateSlackIncomingWebhookUrl,
@@ -22,6 +24,7 @@ export const INITIAL_STATE: SettingsState = {
   sendToMailAddress: '',
   slack: { incomingWebhookUrl: '', context: '' },
   lang: Lang.EN,
+  defaultBreakTimeLengthMin: 60,
 }
 
 //
@@ -35,6 +38,14 @@ export const INITIAL_STATE: SettingsState = {
  * @returns New state
  */
 const settingsReducer = reducerWithInitialState(INITIAL_STATE)
+  .case(clearDefaultBreakTimeLength, state => ({
+    ...state,
+    defaultBreakTimeLengthMin: undefined,
+  }))
+  .case(updateDefaultBreakTimeLengthMin, (state, minute) => ({
+    ...state,
+    defaultBreakTimeLengthMin: minute,
+  }))
   .case(selectLanguage, (state, payload) => ({
     ...state,
     lang: payload as Lang,

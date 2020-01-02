@@ -4,6 +4,7 @@
   "Back.to.list": "一覧に戻る",
   "Context": "コンテクスト",
   "Could.not.send.because.offline.": "オフラインのため送信できませんでした。",
+  "Default.break.time.length": "既定の休憩時間の長さ",
   "Date": "日",
   "Edit": "編集",
   "Incoming.webhook.URL": "Incoming webhook URL",

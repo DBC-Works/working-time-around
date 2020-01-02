@@ -1,7 +1,7 @@
 /**
  * @file 'TimeSelect' component
  */
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 
 import Select from '../atoms/Select'
@@ -17,6 +17,8 @@ const TimeSelect: React.FC<{
   label?: string
   time?: Date | null
   onChange?: (time: Date) => void
+  onChangeHour?: (e: ChangeEvent) => void
+  onChangeMinute?: (e: ChangeEvent) => void
 }> = props => {
   const dj = dayjs(props.time ? props.time : new Date())
 
@@ -31,6 +33,9 @@ const TimeSelect: React.FC<{
 
   const handleChangeHour = useCallback(
     e => {
+      if (props.onChangeHour) {
+        props.onChangeHour(e)
+      }
       const newHour = e.currentTarget.value
       setHour(newHour)
       if (props.onChange && 0 < newHour.length && 0 < minute.length) {
@@ -42,10 +47,13 @@ const TimeSelect: React.FC<{
         )
       }
     },
-    [hour, minute]
+    [props.onChangeHour, hour, minute]
   )
   const handleChangeMinute = useCallback(
     e => {
+      if (props.onChangeMinute) {
+        props.onChangeMinute(e)
+      }
       const newMinute = e.currentTarget.value
       setMinute(newMinute)
       if (props.onChange && 0 < hour.length && 0 < newMinute.length) {
@@ -57,11 +65,11 @@ const TimeSelect: React.FC<{
         )
       }
     },
-    [hour, minute]
+    [props.onChangeMinute, hour, minute]
   )
 
   return (
-    <div className="time-select">
+    <div className="time-select" data-testid="time-select">
       <div className="container">
         <Select testId="hour" value={hour} onChange={handleChangeHour}>
           <>
