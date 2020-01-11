@@ -6,7 +6,7 @@ import { Route } from 'react-router-dom'
 import { AnyAction, Store } from 'redux'
 import dayjs from 'dayjs'
 
-import { recordsTypes } from '../../state/ducks/records'
+import { recordsTypes, KEY_RECORD } from '../../state/ducks/records'
 import { runningTypes } from '../../state/ducks/running'
 import { AppState, INITIAL_STATE } from '../../state/store'
 import CurrentState from './CurrentState'
@@ -38,6 +38,9 @@ describe('"CurrentState" template', () => {
     const now = new Date()
     const runningState: runningTypes.RunningState = {
       time: now,
+      onLine: true,
+      message: '',
+      window: {} as Window,
     }
     const appState = {
       ...INITIAL_STATE,
@@ -70,11 +73,12 @@ describe('"CurrentState" template', () => {
       starts: [now],
       stops: [],
       memos: [],
+      breakTimeLengthsMin: [],
     }
     const recordsState: recordsTypes.RecordsState = {
       records: {},
     }
-    recordsState.records[dj.format('YYYYMMDD')] = record
+    recordsState.records[dj.format(KEY_RECORD)] = record
     const appState = {
       ...INITIAL_STATE,
       records: recordsState,
@@ -96,12 +100,13 @@ describe('"CurrentState" template', () => {
       starts: [now],
       stops: [now],
       memos: [],
+      breakTimeLengthsMin: [],
     }
     const recordsState: recordsTypes.RecordsState = {
       records: {},
     }
     const dj = dayjs(now)
-    recordsState.records[dj.format('YYYYMMDD')] = record
+    recordsState.records[dj.format(KEY_RECORD)] = record
     const appState = {
       ...INITIAL_STATE,
       records: recordsState,

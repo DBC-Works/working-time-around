@@ -117,6 +117,7 @@ describe('"List" template', () => {
           starts: [dayjs(start).toDate()],
           stops: [],
           memos: [],
+          breakTimeLengthsMin: [],
         }
       })
 
@@ -161,6 +162,7 @@ describe('"List" template', () => {
           starts: [],
           stops: [dayjs(stop).toDate()],
           memos: [],
+          breakTimeLengthsMin: [],
         }
       })
 

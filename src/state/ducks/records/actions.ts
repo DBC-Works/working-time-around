@@ -48,3 +48,12 @@ export const updateMemo = actionCreator<{
   memo: string
   targetIndex: number
 }>('UPDATE_MEMO')
+
+/**
+ * 'Update break time length' action
+ */
+export const updateBreakTimeLengthMin = actionCreator<{
+  date: Date
+  breakTimeLengthMin: number
+  targetIndex: number
+}>('UPDATE_BREAK_TIME_LENGTH_MIN')

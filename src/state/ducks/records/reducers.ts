@@ -6,12 +6,13 @@ import { reducerWithInitialState } from 'typescript-fsa-reducers'
 import {
   start,
   stop,
+  updateBreakTimeLengthMin,
   updateLatestMemo,
   updateMemo,
   updateStartTime,
   updateStopTime,
 } from './actions'
-import { makeRecordKey, Records, RecordsState } from './types'
+import { DailyRecord, makeRecordKey, Records, RecordsState } from './types'
 
 //
 // Variables
@@ -22,6 +23,16 @@ import { makeRecordKey, Records, RecordsState } from './types'
  */
 export const INITIAL_STATE: RecordsState = {
   records: {},
+}
+
+/**
+ * Initial daily record
+ */
+const INITIAL_DAILY_RECORD: DailyRecord = {
+  starts: [],
+  stops: [],
+  memos: [],
+  breakTimeLengthsMin: [],
 }
 
 //
@@ -63,9 +74,8 @@ function updateTargetStartTime(
     }
   } else {
     newRecords[key] = {
+      ...INITIAL_DAILY_RECORD,
       starts: [time],
-      stops: [],
-      memos: [],
     }
   }
   return newRecords
@@ -106,9 +116,8 @@ function updateTargetStopTime(
     }
   } else {
     newRecords[key] = {
-      starts: [],
+      ...INITIAL_DAILY_RECORD,
       stops: [time],
-      memos: [],
     }
   }
   return newRecords
@@ -151,8 +160,7 @@ function updateTargetMemo(
     }
   } else {
     newRecords[key] = {
-      starts: [],
-      stops: [],
+      ...INITIAL_DAILY_RECORD,
       memos: [memo],
     }
   }
@@ -257,6 +265,66 @@ function updateMemoActionHandler(
 }
 
 /**
+ * 'Update break time length' action handler
+ * @param state Current state
+ * @param payload Update info
+ * @returns New state
+ */
+function updateBreakTimeLengthMinActionHandler(
+  state: RecordsState,
+  payload: {
+    date: Date
+    breakTimeLengthMin: number
+    targetIndex: number
+  }
+): RecordsState {
+  if (payload.breakTimeLengthMin < 0) {
+    throw new Error('Invalid precondition')
+  }
+
+  const newRecords = { ...state.records }
+  const key = makeRecordKey(payload.date)
+  if (Object.prototype.hasOwnProperty.call(newRecords, key)) {
+    const breakTimeLengthsMin = newRecords[key].breakTimeLengthsMin
+      ? [...(newRecords[key].breakTimeLengthsMin as number[])]
+      : []
+    const index =
+      0 <= payload.targetIndex
+        ? payload.targetIndex
+        : breakTimeLengthsMin.length - 1
+    if (
+      breakTimeLengthsMin.length === 0 ||
+      breakTimeLengthsMin.length <= index
+    ) {
+      breakTimeLengthsMin.push(payload.breakTimeLengthMin)
+      newRecords[key] = {
+        ...newRecords[key],
+        breakTimeLengthsMin,
+      }
+    } else {
+      const current = breakTimeLengthsMin[index]
+      if (current !== payload.breakTimeLengthMin) {
+        breakTimeLengthsMin[index] = payload.breakTimeLengthMin
+        newRecords[key] = {
+          ...newRecords[key],
+          breakTimeLengthsMin,
+        }
+      }
+    }
+  } else {
+    newRecords[key] = {
+      ...INITIAL_DAILY_RECORD,
+      breakTimeLengthsMin: [payload.breakTimeLengthMin],
+    }
+  }
+
+  return {
+    ...state,
+    records: newRecords,
+  }
+}
+
+/**
  * Records state reducer
  * @param state Current state
  * @param action Action
@@ -269,5 +337,6 @@ const recordsReducer = reducerWithInitialState(INITIAL_STATE)
   .case(updateStartTime, updateStartTimeActionHandler)
   .case(updateStopTime, updateStopTimeActionHandler)
   .case(updateMemo, updateMemoActionHandler)
+  .case(updateBreakTimeLengthMin, updateBreakTimeLengthMinActionHandler)
   .build()
 export default recordsReducer

@@ -1,11 +1,18 @@
 /**
  * @file 'Detail' component
  */
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 
 import Button from '@material/react-button'
 import Fab from '@material/react-fab'
@@ -18,14 +25,17 @@ import { AppState } from '../../state/store'
 import {
   getDailyRecordOf,
   getLatestOf,
+  KEY_RECORD,
   recordsTypes,
   updateMemo,
+  updateBreakTimeLengthMin,
   updateStartTime,
   updateStopTime,
 } from '../../state/ducks/records'
 import { getWindow, showMessage } from '../../state/ducks/running'
 import {
   canSendMessageToSlack,
+  getDefaultBreakTimeLengthMin,
   getSlackSettings,
   settingsTypes,
 } from '../../state/ducks/settings'
@@ -44,15 +54,39 @@ interface UpdatePlaceHolder {
   start: Date | null
   stop: Date | null
   memo: string | null
+  breakTimeLengthMin: number | null
 }
 
 /**
  * Update data place holder initial value
  */
-const UPDATED_PLACE_HOLDER_INITIAL_VALUE = {
+const UPDATED_PLACE_HOLDER_INITIAL_VALUE: UpdatePlaceHolder = {
   start: null,
   stop: null,
   memo: null,
+  breakTimeLengthMin: null,
+}
+
+/**
+ * Latest indexes of DailyRecord properties
+ */
+interface LatestIndexes {
+  dateKey: string
+  latestStart: number
+  latestStop: number
+  latestMemo: number
+  latestBreakTimeMin: number
+}
+
+/**
+ * Latest indexes initial value
+ */
+const LATEST_INDEXES_INITIAL_VALUE: LatestIndexes = {
+  dateKey: '',
+  latestStart: 0,
+  latestStop: 0,
+  latestMemo: 0,
+  latestBreakTimeMin: 0,
 }
 
 //
@@ -143,6 +177,46 @@ async function sendUpdateToSlack(
   return await sendMessageToSlack(settings, messages.join('\n'))
 }
 
+/**
+ * Translate time to target date
+ * @param time Selected time
+ * @param dj Dayjs instance of target day
+ * @returns Target date including time
+ */
+function translateTimeToDate(time: Date, dj: Dayjs): Date {
+  return dj
+    .hour(time.getHours())
+    .minute(time.getMinutes())
+    .toDate()
+}
+
+/**
+ * Get latest indexes of DaylyRecord properties
+ * @param dateKey Date key
+ * @param record Target record
+ * @returns Latest indexes
+ */
+function getDailyRecordLatestIndexes(
+  dateKey: string,
+  record: recordsTypes.DailyRecord | null
+): LatestIndexes {
+  if (record === null) {
+    return {
+      ...LATEST_INDEXES_INITIAL_VALUE,
+      dateKey,
+    }
+  }
+  return {
+    dateKey,
+    latestStart: record.starts.length,
+    latestStop: record.stops.length,
+    latestMemo: record.memos.length,
+    latestBreakTimeMin: record.breakTimeLengthsMin
+      ? record.breakTimeLengthsMin.length
+      : 0,
+  }
+}
+
 //
 // Components
 //
@@ -223,17 +297,7 @@ export default Detail
  * 'DetailForm' component
  */
 const DetailForm: React.FC<{ target: Date }> = props => {
-  const recordRef = useRef<{
-    dateKey: string
-    latestStart: number
-    latestStop: number
-    latestMemo: number
-  }>({
-    dateKey: '',
-    latestStart: 0,
-    latestStop: 0,
-    latestMemo: 0,
-  })
+  const recordRef = useRef<LatestIndexes>(LATEST_INDEXES_INITIAL_VALUE)
   const updateRef = useRef<{
     initial: recordsTypes.DailyLatestRecord
     updated: UpdatePlaceHolder
@@ -242,6 +306,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
       start: null,
       stop: null,
       memo: '',
+      breakTimeLengthMin: null,
     },
     updated: { ...UPDATED_PLACE_HOLDER_INITIAL_VALUE },
   })
@@ -255,7 +320,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
   }
 
   const dj = dayjs(props.target)
-  const dateKey = dj.format('YYYYMMDD')
+  const dateKey = dj.format(KEY_RECORD)
 
   const w = useSelector((state: AppState) => getWindow(state.running))
   const canPost = useSelector((state: AppState) =>
@@ -263,6 +328,9 @@ const DetailForm: React.FC<{ target: Date }> = props => {
   )
   const slackSettings = useSelector((state: AppState) =>
     getSlackSettings(state.settings)
+  )
+  const defaultBreakTimeLength = useSelector((state: AppState) =>
+    getDefaultBreakTimeLengthMin(state.settings)
   )
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -313,7 +381,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
   const record = useSelector((state: AppState) =>
     getDailyRecordOf(props.target, state.records)
   )
-  const latest = getLatestOf(record)
+  const latest = getLatestOf(record, defaultBreakTimeLength)
   useEffect((): void => {
     if (dateKey === recordRef.current.dateKey) {
       return
@@ -322,25 +390,13 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     if (0 < recordRef.current.dateKey.length && canPost !== false) {
       postUpdate()
     }
-    recordRef.current.dateKey = dateKey
+    recordRef.current = getDailyRecordLatestIndexes(dateKey, record)
     updateRef.current.initial = latest
-    if (record !== null) {
-      recordRef.current.latestStart = record.starts.length
-      recordRef.current.latestStop = record.stops.length
-      recordRef.current.latestMemo = record.memos.length
-    } else {
-      recordRef.current.latestStart = 0
-      recordRef.current.latestStop = 0
-      recordRef.current.latestMemo = 0
-    }
     resetUpdate()
   }, [dateKey, record])
 
-  const handleChangeStartTime = useCallback(time => {
-    updateRef.current.updated.start = dj
-      .hour(time.getHours())
-      .minute(time.getMinutes())
-      .toDate()
+  const handleChangeStartTime = useCallback((time: Date) => {
+    updateRef.current.updated.start = translateTimeToDate(time, dj)
     dispatch(
       updateStartTime({
         time: updateRef.current.updated.start,
@@ -348,11 +404,8 @@ const DetailForm: React.FC<{ target: Date }> = props => {
       })
     )
   }, [])
-  const handleChangeStopTime = useCallback(time => {
-    updateRef.current.updated.stop = dj
-      .hour(time.getHours())
-      .minute(time.getMinutes())
-      .toDate()
+  const handleChangeStopTime = useCallback((time: Date) => {
+    updateRef.current.updated.stop = translateTimeToDate(time, dj)
     dispatch(
       updateStopTime({
         time: updateRef.current.updated.stop,
@@ -361,7 +414,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     )
   }, [])
   const handleInputMemo = useCallback(
-    e => {
+    (e: FormEvent<HTMLInputElement>) => {
       updateRef.current.updated.memo = e.currentTarget.value
       dispatch(
         updateMemo({
@@ -372,6 +425,50 @@ const DetailForm: React.FC<{ target: Date }> = props => {
       )
     },
     [props.target]
+  )
+  const handleChangeHour = useCallback(
+    !latest.breakTimeLengthMin
+      ? (e: ChangeEvent<HTMLSelectElement>): void => {
+          const breakTimeLengthMin = +e.currentTarget.value * 60
+          updateRef.current.updated.breakTimeLengthMin = breakTimeLengthMin
+          dispatch(
+            updateBreakTimeLengthMin({
+              date: props.target,
+              breakTimeLengthMin,
+              targetIndex: recordRef.current.latestBreakTimeMin,
+            })
+          )
+        }
+      : (): void => {},
+    [latest.breakTimeLengthMin]
+  )
+  const handleChangeMinute = useCallback(
+    !latest.breakTimeLengthMin
+      ? (e: ChangeEvent<HTMLSelectElement>): void => {
+          const breakTimeLengthMin = +e.currentTarget.value
+          updateRef.current.updated.breakTimeLengthMin = breakTimeLengthMin
+          dispatch(
+            updateBreakTimeLengthMin({
+              date: props.target,
+              breakTimeLengthMin,
+              targetIndex: recordRef.current.latestBreakTimeMin,
+            })
+          )
+        }
+      : (): void => {},
+    [latest.breakTimeLengthMin]
+  )
+  const handleChangeBreakTimeLength = useCallback(
+    (time: Date) => {
+      dispatch(
+        updateBreakTimeLengthMin({
+          date: props.target,
+          breakTimeLengthMin: time.getHours() * 60 + time.getMinutes(),
+          targetIndex: recordRef.current.latestBreakTimeMin,
+        })
+      )
+    },
+    [latest.breakTimeLengthMin]
   )
   const handleClickRequireUpdate = useCallback((): void => {
     postUpdate()
@@ -387,6 +484,12 @@ const DetailForm: React.FC<{ target: Date }> = props => {
         onChangeStopTime={handleChangeStopTime}
       />
       <Memo memo={latest.memo} onInput={handleInputMemo} />
+      <BreakTimeLength
+        lengthMin={latest.breakTimeLengthMin}
+        onChangeHour={handleChangeHour}
+        onChangeMinute={handleChangeMinute}
+        onChange={handleChangeBreakTimeLength}
+      />
       <RequireUpdateButton
         require={requireUpdate}
         onClick={handleClickRequireUpdate}
@@ -457,6 +560,45 @@ const Memo: React.FC<{
         </Cell>
       </Row>
     </>
+  )
+}
+
+/**
+ * 'BreakTimeLength' component
+ */
+const BreakTimeLength: React.FC<{
+  lengthMin: number | null
+  onChangeHour: (e: ChangeEvent<HTMLSelectElement>) => void
+  onChangeMinute: (e: ChangeEvent<HTMLSelectElement>) => void
+  onChange: (time: Date) => void
+}> = props => {
+  const time = props.lengthMin
+    ? dayjs()
+        .startOf('date')
+        .add(props.lengthMin, 'minute')
+        .toDate()
+    : undefined
+  return (
+    <div data-testid="break-time-length">
+      <Row>
+        <Cell columns={12}>
+          <Headline6 tag="h2">
+            <FormattedMessage id="Break.time.length" />
+          </Headline6>
+        </Cell>
+      </Row>
+      <Row>
+        <Cell columns={12}>
+          <TimeSelect
+            label="--"
+            time={time}
+            onChangeHour={props.onChangeHour}
+            onChangeMinute={props.onChangeMinute}
+            onChange={props.onChange}
+          />
+        </Cell>
+      </Row>
+    </div>
   )
 }
 

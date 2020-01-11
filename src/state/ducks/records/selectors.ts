@@ -45,15 +45,41 @@ export function getLatestMemoOf(record: DailyRecord): string {
 }
 
 /**
+ * Get latest break time length of specified record
+ * @param record Target record
+ * @returns Break time length(min, null if not set)
+ */
+export function getLatestBreakTimeLengthMinOf(
+  record: DailyRecord
+): number | null {
+  return record.breakTimeLengthsMin && 0 < record.breakTimeLengthsMin.length
+    ? record.breakTimeLengthsMin[record.breakTimeLengthsMin.length - 1]
+    : null
+}
+
+/**
  * Get latest information of daily record
- * @param record
+ * @param record Daily record
+ * @param defaultBreakTimeLengthMin Default break time length
  * @returns Latest information of daily record
  */
-export function getLatestOf(record: DailyRecord | null): DailyLatestRecord {
+export function getLatestOf(
+  record: DailyRecord | null,
+  defaultBreakTimeLengthMin: number | undefined
+): DailyLatestRecord {
+  let breakTimeLengthMin
+  if (record !== null) {
+    breakTimeLengthMin = getLatestBreakTimeLengthMinOf(record)
+  } else {
+    breakTimeLengthMin = defaultBreakTimeLengthMin
+      ? defaultBreakTimeLengthMin
+      : null
+  }
   return {
     start: record !== null ? getLatestStartTimeOf(record) : null,
     stop: record !== null ? getLatestStopTimeOf(record) : null,
     memo: record !== null ? getLatestMemoOf(record) : '',
+    breakTimeLengthMin,
   }
 }
 

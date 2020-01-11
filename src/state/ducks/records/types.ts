@@ -14,6 +14,7 @@ export interface DailyLatestRecord {
   start: Date | null
   stop: Date | null
   memo: string
+  breakTimeLengthMin: number | null
 }
 
 /**
@@ -23,6 +24,7 @@ export interface DailyRecord {
   starts: Date[]
   stops: Date[]
   memos: string[]
+  breakTimeLengthsMin?: number[]
 }
 
 /**
@@ -40,6 +42,15 @@ export interface RecordsState {
 }
 
 //
+// Constants
+//
+
+/**
+ * Record key
+ */
+export const KEY_RECORD = 'YYYYMMDD'
+
+//
 // Helper functions
 //
 
@@ -49,5 +60,5 @@ export interface RecordsState {
  * @returns Record key
  */
 export function makeRecordKey(date: Date): string {
-  return dayjs(date).format('YYYYMMDD')
+  return dayjs(date).format(KEY_RECORD)
 }

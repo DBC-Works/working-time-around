@@ -32,6 +32,26 @@ export const INITIAL_STATE: SettingsState = {
 //
 
 /**
+ * Update default break time length(by minute)
+ * @param state Current state
+ * @param minute Default break time length(minute, undefined if not set)
+ * @returns New state
+ */
+function updateDefaultBreakTimeLengthMinActionHandler(
+  state: SettingsState,
+  minute?: number
+): SettingsState {
+  if (!(minute === undefined || 0 <= minute)) {
+    throw new Error('Invalid precondition.')
+  }
+
+  return {
+    ...state,
+    defaultBreakTimeLengthMin: minute,
+  }
+}
+
+/**
  * Settings state reducer
  * @param state Current state
  * @param action Action
@@ -42,10 +62,10 @@ const settingsReducer = reducerWithInitialState(INITIAL_STATE)
     ...state,
     defaultBreakTimeLengthMin: undefined,
   }))
-  .case(updateDefaultBreakTimeLengthMin, (state, minute) => ({
-    ...state,
-    defaultBreakTimeLengthMin: minute,
-  }))
+  .case(
+    updateDefaultBreakTimeLengthMin,
+    updateDefaultBreakTimeLengthMinActionHandler
+  )
   .case(selectLanguage, (state, payload) => ({
     ...state,
     lang: payload as Lang,
