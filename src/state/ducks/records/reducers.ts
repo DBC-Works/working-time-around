@@ -42,12 +42,14 @@ const INITIAL_DAILY_RECORD: DailyRecord = {
 /**
  * Update target start time
  * @param time Time to update
+ * @param breakTimeLengthMin Break time length
  * @param targetIndex Target index to update(latest if value is -1)
  * @param state Records state
  * @returns Updated records
  */
 function updateTargetStartTime(
   time: Date,
+  breakTimeLengthMin: number | undefined,
   targetIndex: number,
   state: RecordsState
 ): Records {
@@ -76,6 +78,7 @@ function updateTargetStartTime(
     newRecords[key] = {
       ...INITIAL_DAILY_RECORD,
       starts: [time],
+      breakTimeLengthsMin: breakTimeLengthMin ? [breakTimeLengthMin] : [],
     }
   }
   return newRecords
@@ -84,12 +87,14 @@ function updateTargetStartTime(
 /**
  * Update target stop time
  * @param time Time to update
+ * @param breakTimeLengthMin Break time length
  * @param targetIndex Target index to update(latest if value is -1)
  * @param state Records state
  * @returns Updated records
  */
 function updateTargetStopTime(
   time: Date,
+  breakTimeLengthMin: number | undefined,
   targetIndex: number,
   state: RecordsState
 ): Records {
@@ -118,6 +123,7 @@ function updateTargetStopTime(
     newRecords[key] = {
       ...INITIAL_DAILY_RECORD,
       stops: [time],
+      breakTimeLengthsMin: breakTimeLengthMin ? [breakTimeLengthMin] : [],
     }
   }
   return newRecords
@@ -170,19 +176,33 @@ function updateTargetMemo(
 /**
  * 'Start' action handler
  * @param state Current state
+ * @param breakTimeLengthMin Break time length
  * @returns New state
  */
-function startActionHandler(state: RecordsState): RecordsState {
-  return { ...state, records: updateTargetStartTime(new Date(), -1, state) }
+function startActionHandler(
+  state: RecordsState,
+  breakTimeLengthMin?: number
+): RecordsState {
+  return {
+    ...state,
+    records: updateTargetStartTime(new Date(), breakTimeLengthMin, -1, state),
+  }
 }
 
 /**
  * 'Stop' action handler
  * @param state Current state
+ * @param breakTimeLengthMin Break time length
  * @returns New state
  */
-function stopActionHandler(state: RecordsState): RecordsState {
-  return { ...state, records: updateTargetStopTime(new Date(), -1, state) }
+function stopActionHandler(
+  state: RecordsState,
+  breakTimeLengthMin?: number
+): RecordsState {
+  return {
+    ...state,
+    records: updateTargetStopTime(new Date(), breakTimeLengthMin, -1, state),
+  }
 }
 
 /**
@@ -216,7 +236,12 @@ function updateStartTimeActionHandler(
 ): RecordsState {
   return {
     ...state,
-    records: updateTargetStartTime(payload.time, payload.targetIndex, state),
+    records: updateTargetStartTime(
+      payload.time,
+      undefined,
+      payload.targetIndex,
+      state
+    ),
   }
 }
 
@@ -235,7 +260,12 @@ function updateStopTimeActionHandler(
 ): RecordsState {
   return {
     ...state,
-    records: updateTargetStopTime(payload.time, payload.targetIndex, state),
+    records: updateTargetStopTime(
+      payload.time,
+      undefined,
+      payload.targetIndex,
+      state
+    ),
   }
 }
 

@@ -1,7 +1,7 @@
 /**
  * @file 'CurrentState' component
  */
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { FormEvent, useCallback, useEffect, useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
@@ -30,6 +30,7 @@ import {
 } from '../../state/ducks/running'
 import {
   canSendMessageToSlack,
+  getDefaultBreakTimeLengthMin,
   getSlackSettings,
 } from '../../state/ducks/settings'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
@@ -57,10 +58,13 @@ const CurrentState: React.FC<RouteComponentProps<{}>> = props => {
   }, [])
 
   const time = useSelector((state: AppState) => getTime(state.running))
+  const defaultBreakTimeLength = useSelector((state: AppState) =>
+    getDefaultBreakTimeLengthMin(state.settings)
+  )
   const record = useSelector((state: AppState) =>
     getDailyRecordOf(time, state.records)
   )
-  const latest = getLatestOf(record)
+  const latest = getLatestOf(record, defaultBreakTimeLength)
   const dj = dayjs(time)
 
   const handleClick = useCallback(() => {
@@ -160,8 +164,11 @@ const StartButton: React.FC<{
     [canPost, props.time]
   )
 
+  const defaultBreakTimeLength = useSelector((state: AppState) =>
+    getDefaultBreakTimeLengthMin(state.settings)
+  )
   const handleClick = useCallback(() => {
-    dispatch(start())
+    dispatch(start(defaultBreakTimeLength))
   }, [])
 
   return (
@@ -234,8 +241,11 @@ const StopButton: React.FC<{
     [canPost, props.time]
   )
 
+  const defaultBreakTimeLength = useSelector((state: AppState) =>
+    getDefaultBreakTimeLengthMin(state.settings)
+  )
   const handleClick = useCallback(() => {
-    dispatch(stop())
+    dispatch(stop(defaultBreakTimeLength))
   }, [])
   return (
     <Button
@@ -349,7 +359,7 @@ const MemoTextField: React.FC<{
         }
       : undefined
 
-  const handleInput = useCallback(e => {
+  const handleInput = useCallback((e: FormEvent<HTMLInputElement>) => {
     updateRef.current.updated = e.currentTarget.value
     dispatch(updateLatestMemo(e.currentTarget.value))
   }, [])

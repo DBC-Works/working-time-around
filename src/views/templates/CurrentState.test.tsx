@@ -123,7 +123,7 @@ describe('"CurrentState" template', () => {
   })
 
   it('should change the start button to be disabled and update text to clicked time when the button is clicked', () => {
-    const [renderResult] = setup()
+    const [renderResult, store] = setup()
     const { getByTestId } = renderResult
 
     const startButton = getByTestId('start')
@@ -137,5 +137,57 @@ describe('"CurrentState" template', () => {
     expect(startButton).toBeDisabled()
     expect(startButton).not.toHaveTextContent('Start')
     expect(startButton).toHaveTextContent(/^[0-2][0-9]:[0-5][0-9]$/)
+
+    // Record should have a break time length initialized by default setting
+    const {
+      settings: { defaultBreakTimeLengthMin },
+      records: { records },
+    } = store.getState()
+    const keys = Object.keys(records)
+    expect(keys).toHaveLength(1)
+    keys.forEach(key => {
+      expect(records[key].breakTimeLengthsMin).toHaveLength(1)
+      expect((records[key].breakTimeLengthsMin as number[])[0]).toBe(
+        defaultBreakTimeLengthMin
+      )
+    })
+  })
+
+  it('should change buttons to be disabled and update text of the stop button to clicked time when the stop button is clicked', () => {
+    const [renderResult, store] = setup()
+    const { getByTestId } = renderResult
+
+    const startButton = getByTestId('start')
+    expect(startButton).toBeEnabled()
+    expect(startButton).toHaveTextContent('Start')
+    const stopButton = getByTestId('stop')
+    expect(stopButton).toBeEnabled()
+    expect(stopButton).toHaveTextContent('Stop')
+
+    act(() => {
+      fireEvent.click(stopButton)
+    })
+
+    expect(startButton).toBeDisabled()
+    expect(startButton).toHaveTextContent('Start')
+    expect(startButton).not.toHaveTextContent(/^[0-2][0-9]:[0-5][0-9]$/)
+
+    expect(stopButton).toBeDisabled()
+    expect(stopButton).not.toHaveTextContent('Start')
+    expect(stopButton).toHaveTextContent(/^[0-2][0-9]:[0-5][0-9]$/)
+
+    // Record should have a break time length initialized by default setting
+    const {
+      settings: { defaultBreakTimeLengthMin },
+      records: { records },
+    } = store.getState()
+    const keys = Object.keys(records)
+    expect(keys).toHaveLength(1)
+    keys.forEach(key => {
+      expect(records[key].breakTimeLengthsMin).toHaveLength(1)
+      expect((records[key].breakTimeLengthsMin as number[])[0]).toBe(
+        defaultBreakTimeLengthMin
+      )
+    })
   })
 })

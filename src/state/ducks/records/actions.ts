@@ -12,12 +12,12 @@ const actionCreator = actionCreatorFactory('records')
 /**
  * 'Start' action
  */
-export const start = actionCreator('START')
+export const start = actionCreator<number | undefined>('START')
 
 /**
  * 'Stop' action
  */
-export const stop = actionCreator('STOP')
+export const stop = actionCreator<number | undefined>('STOP')
 
 /**
  * 'Update latest memo' action
