@@ -3,6 +3,8 @@
  */
 import actionCreatorFactory from 'typescript-fsa'
 
+import { UpdateBreakTimeActionPayload } from './types'
+
 const actionCreator = actionCreatorFactory('records')
 
 //
@@ -52,8 +54,6 @@ export const updateMemo = actionCreator<{
 /**
  * 'Update break time length' action
  */
-export const updateBreakTimeLengthMin = actionCreator<{
-  date: Date
-  breakTimeLengthMin: number
-  targetIndex: number
-}>('UPDATE_BREAK_TIME_LENGTH_MIN')
+export const updateBreakTimeLengthMin = actionCreator<
+  UpdateBreakTimeActionPayload
+>('UPDATE_BREAK_TIME_LENGTH_MIN')

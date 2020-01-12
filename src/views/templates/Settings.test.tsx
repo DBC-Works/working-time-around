@@ -133,56 +133,65 @@ describe('"Settings" template', () => {
       expect(queryByDisplayValue(LITERAL_NO_SELECTION)).not.toBeInTheDocument()
       expect(clearButton).not.toBeDisabled()
     })
-    it('should be set minute to "00" automatically when not selected and hour is selected', () => {
-      const [renderResult] = setup(
-        makeSettingsTestState({
-          ...INITIAL_STATE.settings,
-          defaultBreakTimeLengthMin: undefined,
-        })
-      )
-      const { getAllByDisplayValue, getByDisplayValue, getByText } = within(
-        renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
-      )
-      act(() => {
-        fireEvent.change(
-          (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[0],
-          {
-            target: { value: '1' },
-          }
+    it.each([{ value: '1', expected: '01' }, { value: '0', expected: '00' }])(
+      'should be set minute to "00" automatically when not selected and hour is selected',
+      table => {
+        const [renderResult] = setup(
+          makeSettingsTestState({
+            ...INITIAL_STATE.settings,
+            defaultBreakTimeLengthMin: undefined,
+          })
         )
-      })
-      expect(getByDisplayValue('01')).toBeInTheDocument
-      expect(getByDisplayValue(':00')).toBeInTheDocument
-      const clearButton = getByText('clear')
-      expect(clearButton).toBeInTheDocument()
-      expect(clearButton).not.toBeDisabled()
-    })
-    it('should be set hour to "00" automatically when not selected and minute is selected', () => {
-      const [renderResult] = setup(
-        makeSettingsTestState({
-          ...INITIAL_STATE.settings,
-          defaultBreakTimeLengthMin: undefined,
-        })
-      )
-      const { getAllByDisplayValue, getByDisplayValue, getByText } = within(
-        renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
-      )
-      act(() => {
-        fireEvent.change(
-          (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[1],
-          {
-            target: { value: '45' },
-          }
+        const { getAllByDisplayValue, getByDisplayValue, getByText } = within(
+          renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
         )
-      })
-      expect(getByDisplayValue('00')).toBeInTheDocument
-      expect(getByDisplayValue(':45')).toBeInTheDocument
-      const clearButton = getByText('clear')
-      expect(clearButton).toBeInTheDocument()
-      expect(clearButton).not.toBeDisabled()
-    })
+        act(() => {
+          fireEvent.change(
+            (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[0],
+            {
+              target: { value: table.value },
+            }
+          )
+        })
+        expect(getByDisplayValue(table.expected)).toBeInTheDocument()
+        expect(getByDisplayValue(':00')).toBeInTheDocument()
+        const clearButton = getByText('clear')
+        expect(clearButton).toBeInTheDocument()
+        expect(clearButton).not.toBeDisabled()
+      }
+    )
+    it.each([
+      { value: '45', expected: ':45' },
+      { value: '0', expected: ':00' },
+    ])(
+      'should be set hour to "00" automatically when not selected and minute is selected',
+      table => {
+        const [renderResult] = setup(
+          makeSettingsTestState({
+            ...INITIAL_STATE.settings,
+            defaultBreakTimeLengthMin: undefined,
+          })
+        )
+        const { getAllByDisplayValue, getByDisplayValue, getByText } = within(
+          renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+        )
+        act(() => {
+          fireEvent.change(
+            (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[1],
+            {
+              target: { value: table.value },
+            }
+          )
+        })
+        expect(getByDisplayValue('00')).toBeInTheDocument()
+        expect(getByDisplayValue(table.expected)).toBeInTheDocument()
+        const clearButton = getByText('clear')
+        expect(clearButton).toBeInTheDocument()
+        expect(clearButton).not.toBeDisabled()
+      }
+    )
     it('should be clear the selection when "clear" button is selected', () => {
-      const [renderResult] = setup(
+      const [renderResult, store] = setup(
         makeSettingsTestState({
           ...INITIAL_STATE.settings,
           defaultBreakTimeLengthMin: 5,
@@ -201,6 +210,10 @@ describe('"Settings" template', () => {
       })
       expect(getAllByDisplayValue(LITERAL_NO_SELECTION)).toHaveLength(2)
       expect(clearButton).toBeDisabled()
+      const {
+        settings: { defaultBreakTimeLengthMin },
+      } = store.getState()
+      expect(defaultBreakTimeLengthMin).toBeUndefined()
     })
   })
 

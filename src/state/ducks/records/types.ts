@@ -41,6 +41,15 @@ export interface RecordsState {
   records: Records
 }
 
+/**
+ * 'Update break time length' action payload
+ */
+export interface UpdateBreakTimeActionPayload {
+  date: Date
+  breakTimeLengthMin: number
+  targetIndex: number
+}
+
 //
 // Constants
 //

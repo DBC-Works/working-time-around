@@ -1,8 +1,7 @@
 /**
- * @file 'Detail' component
+ * @file 'Detail' template component
  */
 import React, {
-  ChangeEvent,
   FormEvent,
   useCallback,
   useEffect,
@@ -12,6 +11,7 @@ import React, {
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
+import { Action } from 'typescript-fsa'
 import dayjs, { Dayjs } from 'dayjs'
 
 import Button from '@material/react-button'
@@ -41,6 +41,7 @@ import {
 } from '../../state/ducks/settings'
 
 import TimeSelect from '../molecules/TimeSelect'
+import BreakTimeLengthSelect from '../molecules/BreakTimeLengthSelect'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
 
 //
@@ -426,50 +427,6 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     },
     [props.target]
   )
-  const handleChangeHour = useCallback(
-    !latest.breakTimeLengthMin
-      ? (e: ChangeEvent<HTMLSelectElement>): void => {
-          const breakTimeLengthMin = +e.currentTarget.value * 60
-          updateRef.current.updated.breakTimeLengthMin = breakTimeLengthMin
-          dispatch(
-            updateBreakTimeLengthMin({
-              date: props.target,
-              breakTimeLengthMin,
-              targetIndex: recordRef.current.latestBreakTimeMin,
-            })
-          )
-        }
-      : (): void => {},
-    [latest.breakTimeLengthMin]
-  )
-  const handleChangeMinute = useCallback(
-    !latest.breakTimeLengthMin
-      ? (e: ChangeEvent<HTMLSelectElement>): void => {
-          const breakTimeLengthMin = +e.currentTarget.value
-          updateRef.current.updated.breakTimeLengthMin = breakTimeLengthMin
-          dispatch(
-            updateBreakTimeLengthMin({
-              date: props.target,
-              breakTimeLengthMin,
-              targetIndex: recordRef.current.latestBreakTimeMin,
-            })
-          )
-        }
-      : (): void => {},
-    [latest.breakTimeLengthMin]
-  )
-  const handleChangeBreakTimeLength = useCallback(
-    (time: Date) => {
-      dispatch(
-        updateBreakTimeLengthMin({
-          date: props.target,
-          breakTimeLengthMin: time.getHours() * 60 + time.getMinutes(),
-          targetIndex: recordRef.current.latestBreakTimeMin,
-        })
-      )
-    },
-    [latest.breakTimeLengthMin]
-  )
   const handleClickRequireUpdate = useCallback((): void => {
     postUpdate()
     resetUpdate()
@@ -485,10 +442,9 @@ const DetailForm: React.FC<{ target: Date }> = props => {
       />
       <Memo memo={latest.memo} onInput={handleInputMemo} />
       <BreakTimeLength
+        date={props.target}
         lengthMin={latest.breakTimeLengthMin}
-        onChangeHour={handleChangeHour}
-        onChangeMinute={handleChangeMinute}
-        onChange={handleChangeBreakTimeLength}
+        targetIndex={recordRef.current.latestBreakTimeMin}
       />
       <RequireUpdateButton
         require={requireUpdate}
@@ -567,17 +523,11 @@ const Memo: React.FC<{
  * 'BreakTimeLength' component
  */
 const BreakTimeLength: React.FC<{
+  date: Date
   lengthMin: number | null
-  onChangeHour: (e: ChangeEvent<HTMLSelectElement>) => void
-  onChangeMinute: (e: ChangeEvent<HTMLSelectElement>) => void
-  onChange: (time: Date) => void
+  targetIndex: number
 }> = props => {
-  const time = props.lengthMin
-    ? dayjs()
-        .startOf('date')
-        .add(props.lengthMin, 'minute')
-        .toDate()
-    : undefined
+  const { date, lengthMin, targetIndex } = props
   return (
     <div data-testid="break-time-length">
       <Row>
@@ -589,12 +539,18 @@ const BreakTimeLength: React.FC<{
       </Row>
       <Row>
         <Cell columns={12}>
-          <TimeSelect
-            label="--"
-            time={time}
-            onChangeHour={props.onChangeHour}
-            onChangeMinute={props.onChangeMinute}
-            onChange={props.onChange}
+          <BreakTimeLengthSelect
+            lengthMin={lengthMin}
+            actionCreators={{
+              update: (
+                lengthMin: number
+              ): Action<recordsTypes.UpdateBreakTimeActionPayload> =>
+                updateBreakTimeLengthMin({
+                  date,
+                  breakTimeLengthMin: lengthMin,
+                  targetIndex,
+                }),
+            }}
           />
         </Cell>
       </Row>
