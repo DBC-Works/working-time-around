@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2020-01-13
+
+### Added
+
+- Add break time length recording function
+  - You can set default break time length in "Settings" page
+  - You can also change break time length in "Details" page
+- Add Monthly statistics(total working time by month and median working time by day) to list
+
+### Updated
+
+- Refactor some codes
+- Update package references
+
 ## [0.4.0] - 2019-10-13
 
 ### Added
