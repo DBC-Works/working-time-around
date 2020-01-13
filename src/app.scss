@@ -33,7 +33,8 @@ div#root {
   text-align: center;
 }
 
-.navigation-before, .navigation-next {
+.navigation-before,
+.navigation-next {
   align-self: center;
 
   .material-icons {
@@ -62,14 +63,14 @@ div.time-select {
   bottom: 1rem;
   right: 1rem;
   text-decoration: none;
-  
+
   a {
     text-decoration: none;
   }
 }
 
-@media(min-width: 1024px) {
-   .app-fab--absolute {
+@media (min-width: 1024px) {
+  .app-fab--absolute {
     bottom: 1.5rem;
     right: 1.5rem;
   }
@@ -90,22 +91,28 @@ div.time-select {
 .list {
   @include with-fab();
 
-  .date-list {
+  .date-list,
+  .statistics-list {
     font-family: Roboto, sans-serif;
     white-space: nowrap;
     text-align: center;
 
-    .date-list-header, .date-list-footer {
+    .date-list-header,
+    .date-list-footer {
       font-weight: bold;
     }
-    .date-list-row {
+    .date-list-row,
+    .statistics-list-row {
       font-size: 0.9rem;
       padding: 0.5rem;
     }
     .date-list-row:nth-child(odd) {
       background-color: whitesmoke;
     }
-  
+    .statistics-list-cell {
+      text-align: right;
+    }
+
     .mdc-layout-grid__cell {
       align-self: center;
     }
@@ -118,5 +125,5 @@ div.time-select {
   .between {
     display: inline-block;
     padding: 0 1em;
-  } 
+  }
 }

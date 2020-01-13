@@ -2,6 +2,7 @@
  * @file Records state reducers
  */
 import { reducerWithInitialState } from 'typescript-fsa-reducers'
+import assert from 'assert'
 
 import {
   start,
@@ -308,9 +309,7 @@ function updateBreakTimeLengthMinActionHandler(
     targetIndex: number
   }
 ): RecordsState {
-  if (payload.breakTimeLengthMin < 0) {
-    throw new Error('Invalid precondition')
-  }
+  assert(0 <= payload.breakTimeLengthMin)
 
   const newRecords = { ...state.records }
   const key = makeRecordKey(payload.date)

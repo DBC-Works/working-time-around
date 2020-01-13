@@ -2,6 +2,7 @@
  * @file Settings state reducers
  */
 import { reducerWithInitialState } from 'typescript-fsa-reducers'
+import assert from 'assert'
 
 import {
   clearDefaultBreakTimeLength,
@@ -41,9 +42,7 @@ function updateDefaultBreakTimeLengthMinActionHandler(
   state: SettingsState,
   minute?: number
 ): SettingsState {
-  if (!(minute === undefined || 0 <= minute)) {
-    throw new Error('Invalid precondition.')
-  }
+  assert(minute === undefined || 0 <= minute)
 
   return {
     ...state,

@@ -212,9 +212,10 @@ function getDailyRecordLatestIndexes(
     latestStart: record.starts.length,
     latestStop: record.stops.length,
     latestMemo: record.memos.length,
-    latestBreakTimeMin: record.breakTimeLengthsMin
-      ? record.breakTimeLengthsMin.length
-      : 0,
+    latestBreakTimeMin:
+      record.breakTimeLengthsMin !== undefined
+        ? record.breakTimeLengthsMin.length
+        : 0,
   }
 }
 
@@ -298,7 +299,27 @@ export default Detail
  * 'DetailForm' component
  */
 const DetailForm: React.FC<{ target: Date }> = props => {
-  const recordRef = useRef<LatestIndexes>(LATEST_INDEXES_INITIAL_VALUE)
+  const dj = dayjs(props.target)
+  const dateKey = dj.format(KEY_RECORD)
+
+  const w = useSelector((state: AppState) => getWindow(state.running))
+  const canPost = useSelector((state: AppState) =>
+    canSendMessageToSlack(state.settings)
+  )
+  const slackSettings = useSelector((state: AppState) =>
+    getSlackSettings(state.settings)
+  )
+  const record = useSelector((state: AppState) =>
+    getDailyRecordOf(props.target, state.records)
+  )
+  const defaultBreakTimeLength = useSelector((state: AppState) =>
+    getDefaultBreakTimeLengthMin(state.settings)
+  )
+  const latest = getLatestOf(record, defaultBreakTimeLength)
+
+  const recordRef = useRef<LatestIndexes>(
+    getDailyRecordLatestIndexes(dateKey, record)
+  )
   const updateRef = useRef<{
     initial: recordsTypes.DailyLatestRecord
     updated: UpdatePlaceHolder
@@ -320,19 +341,6 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     }
   }
 
-  const dj = dayjs(props.target)
-  const dateKey = dj.format(KEY_RECORD)
-
-  const w = useSelector((state: AppState) => getWindow(state.running))
-  const canPost = useSelector((state: AppState) =>
-    canSendMessageToSlack(state.settings)
-  )
-  const slackSettings = useSelector((state: AppState) =>
-    getSlackSettings(state.settings)
-  )
-  const defaultBreakTimeLength = useSelector((state: AppState) =>
-    getDefaultBreakTimeLengthMin(state.settings)
-  )
   const intl = useIntl()
   const dispatch = useDispatch()
   const updated = isUpdated(updateRef.current.updated)
@@ -379,10 +387,6 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     [canPost, updated]
   )
 
-  const record = useSelector((state: AppState) =>
-    getDailyRecordOf(props.target, state.records)
-  )
-  const latest = getLatestOf(record, defaultBreakTimeLength)
   useEffect((): void => {
     if (dateKey === recordRef.current.dateKey) {
       return

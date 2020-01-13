@@ -126,24 +126,24 @@ describe('"Detail" template', () => {
     const LITERAL_NO_SELECTION = '--'
 
     function makeTestRecord(
-      breakTimeLengthMin: number | null
+      breakTimeLengthsMin: number[] | null
     ): recordsTypes.DailyRecord {
       return {
         starts: [],
         stops: [],
         memos: [],
         breakTimeLengthsMin:
-          breakTimeLengthMin !== null ? [breakTimeLengthMin] : [],
+          breakTimeLengthsMin !== null ? breakTimeLengthsMin : [],
       }
     }
 
     function makeTestState(
       dj: Dayjs,
-      breakTimeLengthMin: number | null
+      breakTimeLengthsMin: number[] | null
     ): recordsTypes.RecordsState {
       const testState = { ...recordsInitialState }
       testState.records[dj.format(KEY_RECORD)] = makeTestRecord(
-        breakTimeLengthMin
+        breakTimeLengthsMin
       )
       return testState
     }
@@ -174,7 +174,7 @@ describe('"Detail" template', () => {
     it('should be selected if break time length is set', () => {
       const [renderResult] = setup(
         dj.format(PATH_DETAIL),
-        makeRecordsTestState(makeTestState(dj, 95))
+        makeRecordsTestState(makeTestState(dj, [95]))
       )
       const { getByDisplayValue } = within(
         renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
@@ -182,28 +182,31 @@ describe('"Detail" template', () => {
       expect(getByDisplayValue('01')).toBeInTheDocument()
       expect(getByDisplayValue(':35')).toBeInTheDocument()
     })
-    it('should be able to change', () => {
+    it.each([
+      { lengthsMin: [60], hour: '01', minute: ':00' },
+      { lengthsMin: [60, 120], hour: '02', minute: ':00' },
+    ])('should be able to change', table => {
       const [renderResult] = setup(
         dj.format(PATH_DETAIL),
-        makeRecordsTestState(makeTestState(dj, 60))
+        makeRecordsTestState(makeTestState(dj, table.lengthsMin))
       )
       const { getByDisplayValue, queryByDisplayValue } = within(
         renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
       )
-      expect(getByDisplayValue('01')).toBeInTheDocument()
-      expect(getByDisplayValue(':00')).toBeInTheDocument()
+      expect(getByDisplayValue(table.hour)).toBeInTheDocument()
+      expect(getByDisplayValue(table.minute)).toBeInTheDocument()
 
       act(() => {
         fireEvent.change(getByDisplayValue(':00') as HTMLElement, {
           target: { value: '45' },
         })
       })
-      expect(getByDisplayValue('01')).toBeInTheDocument()
+      expect(getByDisplayValue(table.hour)).toBeInTheDocument()
       expect(getByDisplayValue(':45')).toBeInTheDocument()
       expect(queryByDisplayValue(LITERAL_NO_SELECTION)).not.toBeInTheDocument()
 
       act(() => {
-        fireEvent.change(getByDisplayValue('01') as HTMLElement, {
+        fireEvent.change(getByDisplayValue(table.hour) as HTMLElement, {
           target: { value: '0' },
         })
       })

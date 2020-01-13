@@ -52,7 +52,8 @@ export function getLatestMemoOf(record: DailyRecord): string {
 export function getLatestBreakTimeLengthMinOf(
   record: DailyRecord
 ): number | null {
-  return record.breakTimeLengthsMin && 0 < record.breakTimeLengthsMin.length
+  return record.breakTimeLengthsMin !== undefined &&
+    0 < record.breakTimeLengthsMin.length
     ? record.breakTimeLengthsMin[record.breakTimeLengthsMin.length - 1]
     : null
 }
