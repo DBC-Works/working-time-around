@@ -214,7 +214,11 @@ describe('"Detail" template', () => {
       expect(getByDisplayValue(':45')).toBeInTheDocument()
       expect(queryByDisplayValue(LITERAL_NO_SELECTION)).not.toBeInTheDocument()
     })
-    it.each([{ value: '1', expected: '01' }, { value: '0', expected: '00' }])(
+    // eslint-disable-next-line prettier/prettier
+    it.each([
+      { value: '1', expected: '01' },
+      { value: '0', expected: '00' },
+    ])(
       'should be set minute to "00" automatically when not selected and hour is selected',
       table => {
         const [renderResult] = setup(

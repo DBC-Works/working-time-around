@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { Link, RouteComponentProps } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
 import { Action } from 'typescript-fsa'
@@ -226,11 +226,13 @@ function getDailyRecordLatestIndexes(
 /**
  * 'Detail' component
  */
-const Detail: React.FC<
-  RouteComponentProps<{ year: string; month: string; date: string }>
-> = props => {
-  const { year, month, date } = props.match.params
-  const target = new Date(+year, +month - 1, +date)
+const Detail: React.FC = () => {
+  const { year, month, date } = useParams()
+  const target = new Date(
+    +(year as string),
+    +(month as string) - 1,
+    +(date as string)
+  )
   const dj = dayjs(target)
 
   let headingClassName = ''

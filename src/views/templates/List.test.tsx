@@ -38,7 +38,11 @@ describe('"List" template', () => {
   afterEach(cleanup)
 
   describe('header', () => {
-    it.each([[2019, 1], [2018, 12]])(
+    // eslint-disable-next-line prettier/prettier
+    it.each([
+      [2019, 1],
+      [2018, 12],
+    ])(
       'should exist an formatted year %i and month %i heading',
       (year, month) => {
         const target = dayjs(new Date(year, month - 1, 1))

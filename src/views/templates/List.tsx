@@ -2,8 +2,7 @@
  * @file 'List' component
  */
 import React, { useCallback } from 'react'
-import { Link, RouteComponentProps } from 'react-router-dom'
-import H from 'history'
+import { Link, useHistory, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { FormattedMessage, useIntl } from 'react-intl'
 import assert from 'assert'
@@ -171,11 +170,9 @@ function formatStatisticsTime(timeMin: number): string {
 /**
  * 'List' component
  */
-const List: React.FC<
-  RouteComponentProps<{ year: string; month: string }>
-> = props => {
-  const { year, month } = props.match.params
-  const firstDayOfMonth = new Date(+year, +month - 1, 1)
+const List: React.FC = () => {
+  const { year, month } = useParams()
+  const firstDayOfMonth = new Date(+(year as string), +(month as string) - 1, 1)
   const dj = dayjs(firstDayOfMonth)
 
   const records = useSelector((state: AppState) =>
@@ -197,11 +194,7 @@ const List: React.FC<
   return (
     <Grid className="list">
       <MonthHeading target={dj} />
-      <DateList
-        target={dj}
-        latestRecords={latestRecords}
-        history={props.history}
-      />
+      <DateList latestRecords={latestRecords} />
       <Statistics latestRecords={latestRecords} />
       <Footer target={dj} records={records} />
     </Grid>
@@ -256,11 +249,9 @@ const MonthHeading: React.FC<{ target: Dayjs }> = props => {
  * 'DateList' component
  */
 const DateList: React.FC<{
-  target: Dayjs
   latestRecords: LatestRecord[]
-  history: H.History
 }> = props => {
-  const { latestRecords, history } = props
+  const { latestRecords } = props
   const timeFormat = useIntl().formatMessage({ id: 'Format.time.24' })
   return (
     <Row>
@@ -273,7 +264,6 @@ const DateList: React.FC<{
               date={record.date}
               latest={record.latestRecord}
               timeFormat={timeFormat}
-              history={history}
             />
           ))}
           <DateListFooter
@@ -313,7 +303,6 @@ const DateRecordRow: React.FC<{
   date: Dayjs
   latest: DailyLatestRecord | null
   timeFormat: string
-  history: H.History
 }> = props => {
   let dayKind = ''
   if (props.date.day() === 0) {
@@ -321,8 +310,9 @@ const DateRecordRow: React.FC<{
   } else if (props.date.day() === 6) {
     dayKind = 'saturday'
   }
+  const history = useHistory()
   const handleClick = useCallback(() => {
-    props.history.push(props.date.format('/YYYY/M/D'))
+    history.push(props.date.format('/YYYY/M/D'))
   }, [props.date])
 
   return (

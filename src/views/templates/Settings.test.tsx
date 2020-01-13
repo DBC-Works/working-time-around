@@ -133,7 +133,10 @@ describe('"Settings" template', () => {
       expect(queryByDisplayValue(LITERAL_NO_SELECTION)).not.toBeInTheDocument()
       expect(clearButton).not.toBeDisabled()
     })
-    it.each([{ value: '1', expected: '01' }, { value: '0', expected: '00' }])(
+    it.each([
+      { value: '1', expected: '01' },
+      { value: '0', expected: '00' },
+    ])(
       'should be set minute to "00" automatically when not selected and hour is selected',
       table => {
         const [renderResult] = setup(

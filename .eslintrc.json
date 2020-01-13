@@ -28,8 +28,11 @@
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
+    "plugin:react/recommended",
+    "prettier",
     "prettier/@typescript-eslint",
-    "plugin:react/recommended"
+    "prettier/babel",
+    "prettier/react"
   ],
   "rules": {
     "prettier/prettier": [
@@ -40,6 +43,7 @@
       }
     ],
     "complexity": ["error", 10],
+    "@typescript-eslint/no-empty-function": "off",
     "react/prop-types": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "off"

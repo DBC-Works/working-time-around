@@ -2,7 +2,7 @@
  * @file 'CurrentState' component
  */
 import React, { FormEvent, useCallback, useEffect, useRef } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import dayjs from 'dayjs'
@@ -42,7 +42,7 @@ import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
 /**
  * 'CurrentState' component
  */
-const CurrentState: React.FC<RouteComponentProps<{}>> = props => {
+const CurrentState: React.FC = () => {
   const intervalRef = useRef<number>()
 
   const dispatch = useDispatch()
@@ -67,8 +67,9 @@ const CurrentState: React.FC<RouteComponentProps<{}>> = props => {
   const latest = getLatestOf(record, defaultBreakTimeLength)
   const dj = dayjs(time)
 
+  const history = useHistory()
   const handleClick = useCallback(() => {
-    props.history.push(dj.format('/YYYY/M/D'))
+    history.push(dj.format('/YYYY/M/D'))
   }, [time])
 
   const intl = useIntl()
