@@ -270,6 +270,8 @@ describe('"List" template', () => {
 
       it('should exist a calculated total work time', () => {
         const dj = dayjs()
+          .startOf('day')
+          .add(9, 'hour')
         const recordsState: recordsTypes.RecordsState = {
           records: {},
         }
@@ -352,6 +354,8 @@ describe('"List" template', () => {
 
       it('should exist a calculated median', () => {
         const dj = dayjs()
+          .startOf('day')
+          .add(9, 'hour')
         const recordsState: recordsTypes.RecordsState = {
           records: {},
         }
