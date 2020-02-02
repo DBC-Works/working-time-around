@@ -27,6 +27,11 @@ import '@material/react-text-field/dist/text-field.css'
 import '@material/react-top-app-bar/dist/top-app-bar.css'
 import '@material/react-typography/dist/typography.css'
 
+import '@material/react-tab-bar/dist/tab-bar.css'
+import '@material/react-tab-scroller/dist/tab-scroller.css'
+import '@material/react-tab/dist/tab.css'
+import '@material/react-tab-indicator/dist/tab-indicator.css'
+
 import configureStore, { AppState } from './state/store'
 import { getLang } from './state/ducks/settings'
 import AppPage from './views/pages/App'

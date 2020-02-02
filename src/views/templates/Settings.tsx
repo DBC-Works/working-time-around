@@ -11,6 +11,9 @@ import { Cell, Grid, Row } from '@material/react-layout-grid'
 import TextField, { Input } from '@material/react-text-field'
 import { Headline6, Subtitle1 } from '@material/react-typography'
 
+import Tab from '@material/react-tab'
+import TabBar from '@material/react-tab-bar'
+
 import en from '../i18n/en.json'
 import ja from '../i18n/ja.json'
 
@@ -37,6 +40,14 @@ import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
 //
 // Types
 //
+
+/**
+ * Tab type
+ */
+enum TabType {
+  Operation,
+  Linkage,
+}
 
 /**
  * Language information
@@ -88,22 +99,55 @@ export function getMessageCatalogueOf(
 /**
  * 'Settings' component
  */
-const Settings: React.FC = () => (
-  <Grid>
-    <Row className="text-align-center">
-      <Cell columns={12}>
-        <Headline6 tag="h1">
-          <FormattedMessage id="Settings" />
-        </Headline6>
-      </Cell>
-    </Row>
-    <DefaultBreakTimeLength />
-    <MailAddress />
-    <SlackSettings />
-    <LanguageSelection />
-  </Grid>
-)
+const Settings: React.FC = () => {
+  const [activeTab, setActiveTab] = React.useState(TabType.Operation)
 
+  const handleActiveIndexUpdate = useCallback(
+    index => {
+      setActiveTab(index)
+    },
+    [setActiveTab]
+  )
+
+  return (
+    <Grid>
+      <Row className="text-align-center">
+        <Cell columns={12}>
+          <Headline6 tag="h1">
+            <FormattedMessage id="Settings" />
+          </Headline6>
+        </Cell>
+      </Row>
+      <Row>
+        <Cell columns={12}>
+          <TabBar
+            activeIndex={activeTab}
+            handleActiveIndexUpdate={handleActiveIndexUpdate}
+          >
+            <Tab>
+              <FormattedMessage id="Operation" />
+            </Tab>
+            <Tab>
+              <FormattedMessage id="Linkage" />
+            </Tab>
+          </TabBar>
+        </Cell>
+      </Row>
+      {activeTab === TabType.Operation && (
+        <>
+          <DefaultBreakTimeLength />
+          <LanguageSelection />
+        </>
+      )}
+      {activeTab === TabType.Linkage && (
+        <>
+          <MailAddress />
+          <SlackSettings />
+        </>
+      )}
+    </Grid>
+  )
+}
 export default Settings
 
 /**
