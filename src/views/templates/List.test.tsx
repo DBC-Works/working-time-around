@@ -238,7 +238,7 @@ describe('"List" template', () => {
       })
 
       it('should exist "--:--" as total work time if exists invalid record', () => {
-        const dj = dayjs()
+        const dj = dayjs().startOf('month')
         const recordsState: recordsTypes.RecordsState = {
           records: {},
         }
@@ -270,6 +270,7 @@ describe('"List" template', () => {
 
       it('should exist a calculated total work time', () => {
         const dj = dayjs()
+          .startOf('month')
           .startOf('day')
           .add(9, 'hour')
         const recordsState: recordsTypes.RecordsState = {
@@ -322,7 +323,7 @@ describe('"List" template', () => {
       })
 
       it('should exist "--:--" as median if exists invalid record', () => {
-        const dj = dayjs()
+        const dj = dayjs().startOf('month')
         const recordsState: recordsTypes.RecordsState = {
           records: {},
         }
@@ -354,6 +355,7 @@ describe('"List" template', () => {
 
       it('should exist a calculated median', () => {
         const dj = dayjs()
+          .startOf('month')
           .startOf('day')
           .add(9, 'hour')
         const recordsState: recordsTypes.RecordsState = {
