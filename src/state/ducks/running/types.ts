@@ -10,4 +10,5 @@ export interface RunningState {
   onLine: boolean
   time: Date
   message: string
+  downloadObjectUrl: string
 }

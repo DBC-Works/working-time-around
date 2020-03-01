@@ -3,7 +3,13 @@
  */
 import { reducerWithInitialState } from 'typescript-fsa-reducers'
 
-import { clearMessage, showMessage, updateOnLine, updateTime } from './actions'
+import {
+  clearMessage,
+  setExportObjectUrl,
+  showMessage,
+  updateOnLine,
+  updateTime,
+} from './actions'
 import { RunningState } from './types'
 
 //
@@ -18,6 +24,7 @@ export const INITIAL_STATE: RunningState = {
   onLine: window.navigator.onLine,
   time: new Date(),
   message: '',
+  downloadObjectUrl: '#',
 }
 
 //
@@ -35,5 +42,9 @@ const runningReducer = reducerWithInitialState(INITIAL_STATE)
   .case(showMessage, (state, message) => ({ ...state, message }))
   .case(updateOnLine, (state, onLine) => ({ ...state, onLine }))
   .case(updateTime, state => ({ ...state, time: new Date() }))
+  .case(setExportObjectUrl, (state, exportObjectUrl) => ({
+    ...state,
+    downloadObjectUrl: exportObjectUrl,
+  }))
   .build()
 export default runningReducer

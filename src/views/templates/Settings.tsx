@@ -1,7 +1,7 @@
 /**
  * @file 'Settings' template component
  */
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { Action } from 'typescript-fsa'
@@ -18,7 +18,13 @@ import en from '../i18n/en.json'
 import ja from '../i18n/ja.json'
 
 import { AppState } from '../../state/store'
-import { getOnLine, showMessage } from '../../state/ducks/running'
+import {
+  getExportObjectUrl,
+  getOnLine,
+  getWindow,
+  setExportObjectUrl,
+  showMessage,
+} from '../../state/ducks/running'
 import {
   canSendMessageToSlack,
   clearDefaultBreakTimeLength,
@@ -36,6 +42,8 @@ import {
 import Select from '../atoms/Select'
 import BreakTimeLengthSelect from '../molecules/BreakTimeLengthSelect'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
+import { RecordsState } from '../../state/ducks/records/types.js'
+import { SettingsState } from '../../state/ducks/settings/types.js'
 
 //
 // Types
@@ -46,6 +54,7 @@ import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
  */
 enum TabType {
   Operation,
+  Record,
   Linkage,
 }
 
@@ -92,6 +101,24 @@ export function getMessageCatalogueOf(
   return langs[lang].catalogue
 }
 
+/**
+ * Format state to export
+ * @param records Records state
+ * @param settings  Settings state
+ * @returns JSON string
+ */
+function formatStateToExport(
+  records: RecordsState,
+  settings: SettingsState
+): string {
+  return JSON.stringify({
+    version: 202003,
+    createTime: new Date(),
+    records,
+    settings,
+  })
+}
+
 //
 // Components
 //
@@ -128,6 +155,9 @@ const Settings: React.FC = () => {
               <FormattedMessage id="Operation" />
             </Tab>
             <Tab>
+              <FormattedMessage id="Record" />
+            </Tab>
+            <Tab>
               <FormattedMessage id="Linkage" />
             </Tab>
           </TabBar>
@@ -139,6 +169,7 @@ const Settings: React.FC = () => {
           <LanguageSelection />
         </>
       )}
+      {activeTab === TabType.Record && <Export />}
       {activeTab === TabType.Linkage && (
         <>
           <MailAddress />
@@ -368,12 +399,63 @@ const LanguageSelection: React.FC = () => {
       <Row>
         <Cell columns={12}>
           <Select value={lang} className="full-width" onChange={handleChange}>
-            {Array.from(Object.keys(langs), key => (
+            {Array.from(Object.keys(langs), (key: string) => (
               <option key={key} value={key}>
                 {langs[key].literal}
               </option>
             ))}
           </Select>
+        </Cell>
+      </Row>
+    </>
+  )
+}
+
+/**
+ * 'Export' component
+ */
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    URL: any
+  }
+}
+const Export: React.FC = () => {
+  const records = useSelector((state: AppState) => state.records)
+  const settings = useSelector((state: AppState) => state.settings)
+  const exportObjectUrl = useSelector((state: AppState) =>
+    getExportObjectUrl(state.running)
+  )
+  const w = useSelector((state: AppState) => getWindow(state.running))
+  const dispatch = useDispatch()
+  useEffect((): (() => void) => {
+    const blob = new Blob([formatStateToExport(records, settings)], {
+      type: 'application/json',
+    })
+    dispatch(setExportObjectUrl(w.URL.createObjectURL(blob)))
+    return function cleanup(): void {
+      w.URL.revokeObjectURL(exportObjectUrl)
+      dispatch(setExportObjectUrl('#'))
+    }
+  }, [])
+
+  return (
+    <>
+      <Row>
+        <Cell columns={12}>
+          <Headline6 tag="h2">
+            <FormattedMessage id="Export" />
+          </Headline6>
+        </Cell>
+      </Row>
+      <Row>
+        <Cell columns={12}>
+          <a
+            href={exportObjectUrl}
+            download="working-time-around-record-data.json"
+          >
+            <FormattedMessage id="Download" />
+          </a>
         </Cell>
       </Row>
     </>

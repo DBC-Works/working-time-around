@@ -42,3 +42,12 @@ export function getTime(state: RunningState): Date {
 export function getWindow(state: RunningState): Window {
   return state.window
 }
+
+/**
+ * Get export object url
+ * @param state State to get from
+ * @returns export object url
+ */
+export function getExportObjectUrl(state: RunningState): string {
+  return state.downloadObjectUrl
+}

@@ -21,15 +21,21 @@ import {
 } from '@testing-library/react'
 import { renderWithProvider } from '../componentTestUtilities'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const global: any
+
 describe('"Settings" template', () => {
   enum TAB {
     OPERATION = 'Operation',
+    RECORD = 'Record',
     LINKAGE = 'Linkage',
   }
 
   enum HEADING {
     DEFAULT_BREAK_TIME_LENGTH = 'Default break time length',
     LANGUAGE = 'Language',
+
+    EXPORT = 'Export',
 
     SEND_TO_MAIL_ADDRESS = 'Send to mail address',
     SLACK_LINKAGE = 'Slack linkage',
@@ -57,11 +63,12 @@ describe('"Settings" template', () => {
     const { getByText } = renderResult
     expect(getByText('Settings')).toBeInTheDocument()
   })
-  it('should exist "Operation" and "Linkage" tab heading', () => {
+  it('should exist "Operation", "Record" and "Linkage" tab heading', () => {
     const [renderResult] = setup()
     const { getByText } = renderResult
 
     expect(getByText(TAB.OPERATION)).toBeInTheDocument()
+    expect(getByText(TAB.RECORD)).toBeInTheDocument()
     expect(getByText(TAB.LINKAGE)).toBeInTheDocument()
   })
 
@@ -274,7 +281,59 @@ describe('"Settings" template', () => {
     })
   })
 
-  describe('"Linkage" tag', () => {
+  describe('"Record" tab', () => {
+    let mockURL: {
+      createObjectURL: jest.Mock
+      revokeObjectURL: jest.Mock
+    }
+
+    beforeAll(() => {
+      mockURL = {
+        createObjectURL: jest.fn(),
+        revokeObjectURL: jest.fn(),
+      }
+      mockURL.createObjectURL.mockReturnValue('created-url')
+      global.URL = mockURL
+    })
+
+    describe('Export', () => {
+      const LABEL_DOWNLOAD = 'Download'
+
+      it('should exist when "Record" tab is selected', () => {
+        const [renderResult] = setup()
+        const { getByText } = renderResult
+        act(() => {
+          fireEvent.click(getByText(TAB.RECORD))
+        })
+
+        expect(getByText(HEADING.EXPORT)).toBeInTheDocument()
+      })
+      it('should not exist when "Record" tab is not selected', () => {
+        const [renderResult] = setup()
+        const { queryByText } = renderResult
+
+        expect(queryByText(HEADING.EXPORT)).not.toBeInTheDocument()
+      })
+      it('should exist "Start download" link', () => {
+        const [renderResult] = setup()
+        const { getByText } = renderResult
+        act(() => {
+          fireEvent.click(getByText(TAB.RECORD))
+        })
+
+        const startDownloadAnchor = getByText(LABEL_DOWNLOAD)
+        expect(startDownloadAnchor).toBeInTheDocument()
+        expect(startDownloadAnchor).toHaveAttribute(
+          'download',
+          'working-time-around-record-data.json'
+        )
+        expect(mockURL.createObjectURL).toHaveBeenCalled()
+        expect(startDownloadAnchor).toHaveAttribute('href', 'created-url')
+      })
+    })
+  })
+
+  describe('"Linkage" tab', () => {
     describe('Send to mail address', () => {
       it('should exist when "Linkage" tab is selected', () => {
         const [renderResult] = setup()

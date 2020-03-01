@@ -41,6 +41,7 @@ describe('"CurrentState" template', () => {
       onLine: true,
       message: '',
       window: {} as Window,
+      downloadObjectUrl: '#',
     }
     const appState = {
       ...INITIAL_STATE,
