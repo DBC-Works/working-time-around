@@ -6,7 +6,8 @@
  * Running state
  */
 export interface RunningState {
-  window: Window
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  window: any
   onLine: boolean
   time: Date
   message: string

@@ -40,7 +40,7 @@ export function getTime(state: RunningState): Date {
  * @returns 'window' object
  */
 export function getWindow(state: RunningState): Window {
-  return state.window
+  return state.window as Window
 }
 
 /**
