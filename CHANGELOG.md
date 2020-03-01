@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2020-03-01
+
+### Added
+
+- Export function(#9)
+
+### Updated
+
+- Fix "List" template test cases that failed only at the end of the month
+- Adjust type of store properties
+- Update some configurations
+- Update package references
+
 ## [0.6.0] - 2020-02-02
 
 ### Updated
@@ -82,7 +95,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial project files.
 
-[unreleased]: https://github.com/DBC-Works/SoundVisualShaderBase/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/DBC-Works/SoundVisualShaderBase/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.7.0
 [0.6.0]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.6.0
 [0.5.0]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.5.0
 [0.4.0]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.4.0
