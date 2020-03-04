@@ -326,12 +326,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     initial: recordsTypes.DailyLatestRecord
     updated: UpdatePlaceHolder
   }>({
-    initial: {
-      start: null,
-      stop: null,
-      memo: '',
-      breakTimeLengthMin: null,
-    },
+    initial: latest,
     updated: { ...UPDATED_PLACE_HOLDER_INITIAL_VALUE },
   })
   const [requireUpdate, setRequireUpdate] = useState(false)
@@ -346,7 +341,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
   const intl = useIntl()
   const dispatch = useDispatch()
   const updated = isUpdated(updateRef.current.updated)
-  const postUpdate = (): void => {
+  const postUpdate = (target: Date): void => {
     if (updated !== false) {
       if (w.navigator.onLine === false) {
         dispatch(
@@ -358,7 +353,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
       }
 
       sendUpdateToSlack(
-        props.target,
+        target,
         updateRef.current.initial,
         updateRef.current.updated,
         slackSettings,
@@ -382,7 +377,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
           w.addEventListener('beforeunload', beforeUnloadHandler)
           return function cleanup(): void {
             w.removeEventListener('beforeunload', beforeUnloadHandler)
-            postUpdate()
+            postUpdate(props.target)
           }
         }
       : (): void => {},
@@ -395,7 +390,8 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     }
 
     if (0 < recordRef.current.dateKey.length && canPost !== false) {
-      postUpdate()
+      const dj = dayjs(recordRef.current.dateKey, KEY_RECORD)
+      postUpdate(dj.toDate())
     }
     recordRef.current = getDailyRecordLatestIndexes(dateKey, record)
     updateRef.current.initial = latest
@@ -434,7 +430,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     [props.target]
   )
   const handleClickRequireUpdate = useCallback((): void => {
-    postUpdate()
+    postUpdate(props.target)
     resetUpdate()
   }, [])
 
