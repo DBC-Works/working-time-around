@@ -20,6 +20,7 @@ import { Cell, Grid, Row } from '@material/react-layout-grid'
 import MaterialIcon from '@material/react-material-icon'
 import TextField, { Input } from '@material/react-text-field'
 import { Headline6 } from '@material/react-typography'
+import assert from 'assert'
 
 import { AppState } from '../../state/store'
 import {
@@ -140,6 +141,8 @@ async function sendUpdateToSlack(
   settings: settingsTypes.SlackSettings,
   intl: IntlShape
 ): Promise<string> {
+  assert(update.start !== null || update.stop !== null || update.memo !== null)
+
   const formatDate = intl.formatMessage({ id: 'Format.date' })
   const formatTime = intl.formatMessage({ id: 'Format.time.24' })
   const noRecordLiteral = intl.formatMessage({ id: '(No.record)' })
