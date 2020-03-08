@@ -273,8 +273,8 @@ const MemoTextField: React.FC<{
     initial: string | null
     updated: string | null
   }>({
-    initial: null,
-    updated: null,
+    initial: props.memo,
+    updated: props.memo,
   })
 
   const dj = dayjs(props.time)
@@ -290,33 +290,55 @@ const MemoTextField: React.FC<{
   const intl = useIntl()
   const dispatch = useDispatch()
   const postUpdate = (): void => {
-    if (updateRef.current.updated !== null) {
-      if (w.navigator.onLine === false) {
-        dispatch(
-          showMessage(
-            intl.formatMessage({ id: 'Could.not.send.because.offline.' })
-          )
-        )
-        return
-      }
-
-      sendMessageToSlack(
-        slackSettings,
-        `[${intl.formatMessage({ id: 'Memo' })}] ${updateRef.current.updated}`
-      ).then(resultMessage => {
-        if (0 < resultMessage.length) {
-          dispatch(showMessage(formatSendFailedMessage(intl, resultMessage)))
-        }
-      })
+    const postMemo = updateRef.current.updated
+    if (
+      postMemo === null ||
+      postMemo.length === 0 ||
+      postMemo === updateRef.current.initial
+    ) {
+      return
     }
+    if (w.navigator.onLine === false) {
+      dispatch(
+        showMessage(
+          intl.formatMessage({ id: 'Could.not.send.because.offline.' })
+        )
+      )
+      return
+    }
+
+    sendMessageToSlack(
+      slackSettings,
+      `[${intl.formatMessage({ id: 'Memo' })}] ${postMemo}`
+    ).then(resultMessage => {
+      if (0 < resultMessage.length) {
+        dispatch(showMessage(formatSendFailedMessage(intl, resultMessage)))
+      }
+    })
   }
 
-  const requirePost = props.afterStopped !== false && canPost !== false
+  useEffect(() => {
+    updateRef.current.initial = props.memo
+    updateRef.current.updated = props.memo
+  }, [props.afterStopped])
+
+  const requirePost =
+    props.afterStopped !== false &&
+    canPost !== false &&
+    props.memo !== updateRef.current.initial
   useEffect(
     requirePost !== false
       ? (): (() => void) => {
           w.addEventListener('unload', postUpdate)
+
+          const beforeUnloadHandler = (e: BeforeUnloadEvent): string => {
+            e.returnValue = 'Do you want to leave this page?'
+            return e.returnValue
+          }
+          w.addEventListener('beforeunload', beforeUnloadHandler)
+
           return function cleanup(): void {
+            w.removeEventListener('beforeunload', beforeUnloadHandler)
             w.removeEventListener('unload', postUpdate)
             postUpdate()
           }
@@ -325,26 +347,8 @@ const MemoTextField: React.FC<{
     [requirePost]
   )
 
-  useEffect(
-    requirePost !== false && updateRef.current.updated
-      ? (): (() => void) => {
-          const beforeUnloadHandler = (e: BeforeUnloadEvent): string => {
-            e.returnValue = 'Do you want to leave this page?'
-            return e.returnValue
-          }
-          w.addEventListener('beforeunload', beforeUnloadHandler)
-          return function cleanup(): void {
-            w.removeEventListener('beforeunload', beforeUnloadHandler)
-          }
-        }
-      : (): void => {},
-    [requirePost, updateRef.current.updated]
-  )
-
-  const showSendButton =
-    requirePost !== false && updateRef.current.updated !== null
   const trailingIcon =
-    showSendButton !== false ? (
+    requirePost !== false ? (
       <MaterialIcon
         aria-label={intl.formatMessage({ id: 'Send.update' })}
         icon="send"
@@ -353,10 +357,11 @@ const MemoTextField: React.FC<{
       <></>
     )
   const handleTrailingIconSelect =
-    showSendButton !== false
+    requirePost !== false
       ? (): void => {
           postUpdate()
-          updateRef.current.updated = null
+          updateRef.current.initial = props.memo
+          updateRef.current.updated = props.memo
         }
       : undefined
 
