@@ -125,17 +125,23 @@ function createMailToUri(
       ? records[key]
       : null
     const latest = getLatestOf(record, defaultBreakTimeLength)
+    let breakTimeLength = ''
+    if (
+      latest.breakTimeLengthMin !== null &&
+      latest.start !== null &&
+      latest.stop !== null
+    ) {
+      breakTimeLength = dayjs()
+        .hour(Math.floor(latest.breakTimeLengthMin / 60))
+        .minute(latest.breakTimeLengthMin % 60)
+        .format('HH:mm')
+    }
     const columns = [
       date.format('YYYY-MM-DD'),
       latest.start !== null ? dayjs(latest.start).format('HH:mm') : '',
       latest.stop !== null ? dayjs(latest.stop).format('HH:mm') : '',
       latest.memo,
-      latest.breakTimeLengthMin !== null
-        ? dayjs()
-            .hour(Math.floor(latest.breakTimeLengthMin / 60))
-            .minute(latest.breakTimeLengthMin % 60)
-            .format('HH:mm')
-        : '',
+      breakTimeLength,
     ]
     return columns.map(column => `"${column}"`).join(',')
   })
