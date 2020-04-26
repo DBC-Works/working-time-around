@@ -24,11 +24,13 @@ import {
   getDefaultBreakTimeLengthMin,
   getSendToMailAddress,
 } from '../../state/ducks/settings'
-
 import {
   makeRecordKey,
   DailyLatestRecord,
 } from '../../state/ducks/records/types'
+
+import { getDaysInMonth } from '../../implementations/utilities'
+import { formatSpecifiedMonthRecordsAsCsvForMail } from '../../implementations/formatter'
 
 //
 // Types
@@ -45,17 +47,6 @@ interface LatestRecord {
 //
 // Functions
 //
-
-/**
- * Get days in month
- * @param month Target month
- * @returns Array of Dayjs instance
- */
-function getDaysInMonth(month: Dayjs): Dayjs[] {
-  return Array.from(Array(month.daysInMonth()), (_, i) =>
-    dayjs(month).set('date', i + 1)
-  )
-}
 
 /**
  * Get median value
@@ -81,7 +72,7 @@ function getMedianMinuteOf(times: Date[]): number {
   assert(0 < times.length)
 
   return getMedianOf(
-    times.map(time => time.getHours() * 60 + time.getMinutes())
+    times.map((time) => time.getHours() * 60 + time.getMinutes())
   )
 }
 
@@ -119,32 +110,11 @@ function createMailToUri(
   mailAddress: string,
   defaultBreakTimeLength: number | undefined
 ): string {
-  const bodyLines = getDaysInMonth(firstDayOfMonth).map(date => {
-    const key = makeRecordKey(date.toDate())
-    const record = Object.prototype.hasOwnProperty.call(records, key)
-      ? records[key]
-      : null
-    const latest = getLatestOf(record, defaultBreakTimeLength)
-    let breakTimeLength = ''
-    if (
-      latest.breakTimeLengthMin !== null &&
-      latest.start !== null &&
-      latest.stop !== null
-    ) {
-      breakTimeLength = dayjs()
-        .hour(Math.floor(latest.breakTimeLengthMin / 60))
-        .minute(latest.breakTimeLengthMin % 60)
-        .format('HH:mm')
-    }
-    const columns = [
-      date.format('YYYY-MM-DD'),
-      latest.start !== null ? dayjs(latest.start).format('HH:mm') : '',
-      latest.stop !== null ? dayjs(latest.stop).format('HH:mm') : '',
-      latest.memo,
-      breakTimeLength,
-    ]
-    return columns.map(column => `"${column}"`).join(',')
-  })
+  const bodyLines = formatSpecifiedMonthRecordsAsCsvForMail(
+    firstDayOfMonth,
+    records,
+    defaultBreakTimeLength
+  )
 
   const hfieldsMap: { [index: string]: string } = {
     subject: `${firstDayOfMonth.format('ll')} - ${firstDayOfMonth
@@ -153,7 +123,7 @@ function createMailToUri(
     body: bodyLines.join('\r\n'),
   }
   const hfields = Object.keys(hfieldsMap).map(
-    key => `${key}=${encodeURIComponent(hfieldsMap[key])}`
+    (key) => `${key}=${encodeURIComponent(hfieldsMap[key])}`
   )
   return `mailto:${encodeURIComponent(mailAddress)}?${hfields.join('&')}`
 }
@@ -188,7 +158,7 @@ const List: React.FC = () => {
   const defaultBreakTimeLength = useSelector((state: AppState) =>
     getDefaultBreakTimeLengthMin(state.settings)
   )
-  const latestRecords = getDaysInMonth(dj).map(date => {
+  const latestRecords = getDaysInMonth(dj).map((date) => {
     const key = makeRecordKey(date.toDate())
     return {
       date,
@@ -211,7 +181,7 @@ export default List
 /**
  * 'MonthHeading' component
  */
-const MonthHeading: React.FC<{ target: Dayjs }> = props => {
+const MonthHeading: React.FC<{ target: Dayjs }> = (props) => {
   const intl = useIntl()
 
   return (
@@ -256,7 +226,7 @@ const MonthHeading: React.FC<{ target: Dayjs }> = props => {
  */
 const DateList: React.FC<{
   latestRecords: LatestRecord[]
-}> = props => {
+}> = (props) => {
   const { latestRecords } = props
   const timeFormat = useIntl().formatMessage({ id: 'Format.time.24' })
   return (
@@ -264,7 +234,7 @@ const DateList: React.FC<{
       <Cell columns={12}>
         <Grid className="date-list">
           <DateListHeader />
-          {latestRecords.map(record => (
+          {latestRecords.map((record) => (
             <DateRecordRow
               key={record.date.format()}
               date={record.date}
@@ -273,7 +243,7 @@ const DateList: React.FC<{
             />
           ))}
           <DateListFooter
-            latestRecords={latestRecords.map(record => record.latestRecord)}
+            latestRecords={latestRecords.map((record) => record.latestRecord)}
             timeFormat={timeFormat}
           />
         </Grid>
@@ -309,7 +279,7 @@ const DateRecordRow: React.FC<{
   date: Dayjs
   latest: DailyLatestRecord | null
   timeFormat: string
-}> = props => {
+}> = (props) => {
   let dayKind = ''
   if (props.date.day() === 0) {
     dayKind = 'sunday'
@@ -351,16 +321,16 @@ const DateRecordRow: React.FC<{
 const DateListFooter: React.FC<{
   latestRecords: (recordsTypes.DailyLatestRecord | null)[]
   timeFormat: string
-}> = props => {
+}> = (props) => {
   const records = props.latestRecords.filter(
-    record => record !== null
+    (record) => record !== null
   ) as recordsTypes.DailyLatestRecord[]
   const starts = records
-    .map(record => record.start)
-    .filter(start => start !== null) as Date[]
+    .map((record) => record.start)
+    .filter((start) => start !== null) as Date[]
   const stops = records
-    .map(record => record.stop)
-    .filter(stop => stop !== null) as Date[]
+    .map((record) => record.stop)
+    .filter((stop) => stop !== null) as Date[]
 
   return (
     <Row
@@ -388,7 +358,7 @@ const DateListFooter: React.FC<{
 /**
  * 'DateListCell' component
  */
-const DateListCell: React.FC<{ className?: string }> = props => (
+const DateListCell: React.FC<{ className?: string }> = (props) => (
   <Cell
     desktopColumns={3}
     tabletColumns={2}
@@ -404,20 +374,21 @@ const DateListCell: React.FC<{ className?: string }> = props => (
  */
 const Statistics: React.FC<{
   latestRecords: LatestRecord[]
-}> = props => {
+}> = (props) => {
   let totalWorkingTimeString = '--:--'
   let medianWorkingTimeString = '--:--'
   const targets = props.latestRecords
-    .map(record => record.latestRecord)
+    .map((record) => record.latestRecord)
     .filter(
-      record => record !== null && record.start !== null && record.stop !== null
+      (record) =>
+        record !== null && record.start !== null && record.stop !== null
     )
   if (
     targets.some(
-      record => record !== null && record.breakTimeLengthMin === null
+      (record) => record !== null && record.breakTimeLengthMin === null
     ) === false
   ) {
-    const workingTimes = targets.map(target => {
+    const workingTimes = targets.map((target) => {
       const record = target as DailyLatestRecord
       const start = record.start as Date
       const stop = record.stop as Date
@@ -425,7 +396,7 @@ const Statistics: React.FC<{
       const stopTimeMin = stop.getHours() * 60 + stop.getMinutes()
       return stopTimeMin - startTimeMin - (record.breakTimeLengthMin as number)
     })
-    if (!(workingTimes.length === 0 || workingTimes.some(time => time < 0))) {
+    if (!(workingTimes.length === 0 || workingTimes.some((time) => time < 0))) {
       const totalWorkingTimeMin = workingTimes.reduce(
         (accumulator, time) => accumulator + time
       )
@@ -486,7 +457,7 @@ const Statistics: React.FC<{
 const Footer: React.FC<{
   target: Dayjs
   records: recordsTypes.Records
-}> = props => {
+}> = (props) => {
   const { target, records } = props
   const defaultBreakTimeLength = useSelector((state: AppState) =>
     getDefaultBreakTimeLengthMin(state.settings)
