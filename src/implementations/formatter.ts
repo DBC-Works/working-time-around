@@ -4,13 +4,32 @@
 import dayjs, { Dayjs } from 'dayjs'
 
 import { getLatestOf, recordsTypes } from '../state/ducks/records'
-import { makeRecordKey } from '../state/ducks/records/types'
+import { makeRecordKey, RecordsState } from '../state/ducks/records/types'
+import { SettingsState } from '../state/ducks/settings/types.js'
 
 import { getDaysInMonth } from './utilities'
 
 //
 // Functions
 //
+
+/**
+ * Format state for export
+ * @param records Records state
+ * @param settings  Settings state
+ * @returns JSON string
+ */
+export function formatStateForExport(
+  records: RecordsState,
+  settings: SettingsState
+): string {
+  return JSON.stringify({
+    version: 202003,
+    createTime: new Date(),
+    records,
+    settings,
+  })
+}
 
 /**
  * Format specified month records as CSV for mail

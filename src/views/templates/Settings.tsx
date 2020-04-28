@@ -33,7 +33,7 @@ import {
   getSendToMailAddress,
   getSlackSettings,
   selectLanguage,
-  settingsTypes,
+  Lang,
   updateDefaultBreakTimeLengthMin,
   updateSendToMailAddress,
   updateSlackContext,
@@ -42,8 +42,7 @@ import {
 import Select from '../atoms/Select'
 import BreakTimeLengthSelect from '../molecules/BreakTimeLengthSelect'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
-import { RecordsState } from '../../state/ducks/records/types.js'
-import { SettingsState } from '../../state/ducks/settings/types.js'
+import { formatStateForExport } from '../../implementations/formatter'
 
 //
 // Types
@@ -95,28 +94,8 @@ const langs: LanguageInformation = {
  * @param lang Language to get
  * @returns Message catalogue
  */
-export function getMessageCatalogueOf(
-  lang: settingsTypes.Lang
-): Record<string, string> {
+export function getMessageCatalogueOf(lang: Lang): Record<string, string> {
   return langs[lang].catalogue
-}
-
-/**
- * Format state to export
- * @param records Records state
- * @param settings  Settings state
- * @returns JSON string
- */
-function formatStateToExport(
-  records: RecordsState,
-  settings: SettingsState
-): string {
-  return JSON.stringify({
-    version: 202003,
-    createTime: new Date(),
-    records,
-    settings,
-  })
 }
 
 //
@@ -130,7 +109,7 @@ const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState(TabType.Operation)
 
   const handleActiveIndexUpdate = useCallback(
-    index => {
+    (index) => {
       setActiveTab(index)
     },
     [setActiveTab]
@@ -222,7 +201,7 @@ const MailAddress: React.FC = () => {
   )
 
   const dispatch = useDispatch()
-  const handleInputMailAddress = useCallback(e => {
+  const handleInputMailAddress = useCallback((e) => {
     dispatch(updateSendToMailAddress(e.currentTarget.value))
   }, [])
 
@@ -263,10 +242,10 @@ const SlackSettings: React.FC = () => {
   )
 
   const dispatch = useDispatch()
-  const handleInputUrl = useCallback(e => {
+  const handleInputUrl = useCallback((e) => {
     dispatch(updateSlackIncomingWebhookUrl(e.currentTarget.value))
   }, [])
-  const handleInputContext = useCallback(e => {
+  const handleInputContext = useCallback((e) => {
     dispatch(updateSlackContext(e.currentTarget.value))
   }, [])
 
@@ -383,7 +362,7 @@ const LanguageSelection: React.FC = () => {
   const lang = useSelector((state: AppState) => getLang(state.settings))
 
   const dispatch = useDispatch()
-  const handleChange = useCallback(e => {
+  const handleChange = useCallback((e) => {
     dispatch(selectLanguage(e.target.value))
   }, [])
 
@@ -429,7 +408,7 @@ const Export: React.FC = () => {
   const w = useSelector((state: AppState) => getWindow(state.running))
   const dispatch = useDispatch()
   useEffect((): (() => void) => {
-    const blob = new Blob([formatStateToExport(records, settings)], {
+    const blob = new Blob([formatStateForExport(records, settings)], {
       type: 'application/json',
     })
     dispatch(setExportObjectUrl(w.URL.createObjectURL(blob)))

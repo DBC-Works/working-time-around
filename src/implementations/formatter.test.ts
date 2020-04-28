@@ -3,9 +3,47 @@
  */
 import dayjs from 'dayjs'
 
-import { formatSpecifiedMonthRecordsAsCsvForMail } from './formatter'
+import { Lang } from '../state/ducks/settings'
+
+import {
+  formatStateForExport,
+  formatSpecifiedMonthRecordsAsCsvForMail,
+} from './formatter'
 
 describe('Formatter', () => {
+  describe('formatStateForExport', () => {
+    const TEST_RECORDS_STATE = {
+      records: {},
+    }
+    const TEST_SETTINGS_STATE = {
+      sendToMailAddress: 'mail-address@example.com',
+      slack: {
+        incomingWebhookUrl: 'https://example.com/slack-incoming-web-hook',
+        context: 'Slack context',
+      },
+      lang: Lang.EN,
+      defaultBreakTimeLengthMin: 60,
+    }
+    it('should format state as a JSON string', () => {
+      const jsonString = formatStateForExport(
+        TEST_RECORDS_STATE,
+        TEST_SETTINGS_STATE
+      )
+
+      expect(typeof jsonString).toBe('string')
+      expect(typeof JSON.parse(jsonString)).toBe('object')
+    })
+    it('should have "version", "createTime", "records" and "settings" property', () => {
+      const json = JSON.parse(
+        formatStateForExport(TEST_RECORDS_STATE, TEST_SETTINGS_STATE)
+      )
+      const keys = ['version', 'createTime', 'records', 'settings']
+      expect(
+        keys.every((key) => Object.prototype.hasOwnProperty.call(json, key))
+      ).toBeTruthy()
+    })
+  })
+
   describe('formatSpecifiedMonthRecordsAsCsvForMail', () => {
     it('should format records to list of CSV string for mail', () => {
       const dj = dayjs('20200515')
