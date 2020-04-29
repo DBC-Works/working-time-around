@@ -8,7 +8,8 @@ import dayjs, { Dayjs } from 'dayjs'
 
 import {
   INITIAL_STATE as recordsInitialState,
-  recordsTypes,
+  DailyRecord,
+  RecordsState,
 } from '../../state/ducks/records'
 import { AppState, INITIAL_STATE } from '../../state/store'
 import List from './List'
@@ -49,7 +50,7 @@ describe('"Detail" template', () => {
     )
   }
 
-  function makeRecordsTestState(records: recordsTypes.RecordsState): AppState {
+  function makeRecordsTestState(records: RecordsState): AppState {
     return {
       ...INITIAL_STATE,
       records,
@@ -125,9 +126,7 @@ describe('"Detail" template', () => {
     const TEST_ID_BREAK_TIME_LENGTH = 'break-time-length'
     const LITERAL_NO_SELECTION = '--'
 
-    function makeTestRecord(
-      breakTimeLengthsMin: number[] | null
-    ): recordsTypes.DailyRecord {
+    function makeTestRecord(breakTimeLengthsMin: number[] | null): DailyRecord {
       return {
         starts: [],
         stops: [],
@@ -140,7 +139,7 @@ describe('"Detail" template', () => {
     function makeTestState(
       dj: Dayjs,
       breakTimeLengthsMin: number[] | null
-    ): recordsTypes.RecordsState {
+    ): RecordsState {
       const testState = { ...recordsInitialState }
       testState.records[dj.format(KEY_RECORD)] = makeTestRecord(
         breakTimeLengthsMin
@@ -185,7 +184,7 @@ describe('"Detail" template', () => {
     it.each([
       { lengthsMin: [60], hour: '01', minute: ':00' },
       { lengthsMin: [60, 120], hour: '02', minute: ':00' },
-    ])('should be able to change', table => {
+    ])('should be able to change', (table) => {
       const [renderResult] = setup(
         dj.format(PATH_DETAIL),
         makeRecordsTestState(makeTestState(dj, table.lengthsMin))
@@ -220,7 +219,7 @@ describe('"Detail" template', () => {
       { value: '0', expected: '00' },
     ])(
       'should be set minute to "00" automatically when not selected and hour is selected',
-      table => {
+      (table) => {
         const [renderResult] = setup(
           dj.format(PATH_DETAIL),
           makeRecordsTestState(makeTestState(dj, null))
@@ -245,7 +244,7 @@ describe('"Detail" template', () => {
       { value: '0', expected: ':00' },
     ])(
       'should be set hour to "00" automatically when not selected and minute is selected',
-      table => {
+      (table) => {
         const [renderResult] = setup(
           dj.format(PATH_DETAIL),
           makeRecordsTestState(makeTestState(dj, null))

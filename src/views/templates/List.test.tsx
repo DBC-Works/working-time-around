@@ -7,7 +7,7 @@ import { AnyAction, Store } from 'redux'
 import dayjs from 'dayjs'
 
 import { AppState, INITIAL_STATE } from '../../state/store'
-import { recordsTypes } from '../../state/ducks/records'
+import { RecordsState } from '../../state/ducks/records'
 import List from './List'
 
 import {
@@ -90,16 +90,14 @@ describe('"List" template', () => {
 
     it.each(Array.from(Array(12).keys()))(
       'should exist date rows for that month(%i)',
-      monthIndex => {
-        const target = dayjs(new Date())
-          .month(monthIndex)
-          .startOf('month')
+      (monthIndex) => {
+        const target = dayjs(new Date()).month(monthIndex).startOf('month')
         const [renderResult] = setup(target.format('/YYYY/M'))
         const { getByText } = renderResult
 
         Array.from(Array(target.daysInMonth()), (_, i) =>
           target.set('date', i + 1)
-        ).forEach(date => {
+        ).forEach((date) => {
           expect(getByText(date.format('D(ddd)'))).toBeInTheDocument()
         })
       }
@@ -140,11 +138,11 @@ describe('"List" template', () => {
       },
     ])(
       'should be exist the median start time when the start time list is not empty',
-      table => {
-        const recordsState: recordsTypes.RecordsState = {
+      (table) => {
+        const recordsState: RecordsState = {
           records: {},
         }
-        table.starts.forEach(start => {
+        table.starts.forEach((start) => {
           const dj = dayjs(start)
           recordsState.records[dj.format('YYYYMMDD')] = {
             starts: [dayjs(start).toDate()],
@@ -187,11 +185,11 @@ describe('"List" template', () => {
       },
     ])(
       'should be exist the median stop time when the stop time list is not empty',
-      table => {
-        const recordsState: recordsTypes.RecordsState = {
+      (table) => {
+        const recordsState: RecordsState = {
           records: {},
         }
-        table.stops.forEach(stop => {
+        table.stops.forEach((stop) => {
           const dj = dayjs(stop)
           recordsState.records[dj.format('YYYYMMDD')] = {
             starts: [],
@@ -239,7 +237,7 @@ describe('"List" template', () => {
 
       it('should exist "--:--" as total work time if exists invalid record', () => {
         const dj = dayjs().startOf('month')
-        const recordsState: recordsTypes.RecordsState = {
+        const recordsState: RecordsState = {
           records: {},
         }
         recordsState.records[dj.format('YYYYMMDD')] = {
@@ -269,11 +267,8 @@ describe('"List" template', () => {
       })
 
       it('should exist a calculated total work time', () => {
-        const dj = dayjs()
-          .startOf('month')
-          .startOf('day')
-          .add(9, 'hour')
-        const recordsState: recordsTypes.RecordsState = {
+        const dj = dayjs().startOf('month').startOf('day').add(9, 'hour')
+        const recordsState: RecordsState = {
           records: {},
         }
         recordsState.records[dj.format('YYYYMMDD')] = {
@@ -324,7 +319,7 @@ describe('"List" template', () => {
 
       it('should exist "--:--" as median if exists invalid record', () => {
         const dj = dayjs().startOf('month')
-        const recordsState: recordsTypes.RecordsState = {
+        const recordsState: RecordsState = {
           records: {},
         }
         recordsState.records[dj.format('YYYYMMDD')] = {
@@ -354,11 +349,8 @@ describe('"List" template', () => {
       })
 
       it('should exist a calculated median', () => {
-        const dj = dayjs()
-          .startOf('month')
-          .startOf('day')
-          .add(9, 'hour')
-        const recordsState: recordsTypes.RecordsState = {
+        const dj = dayjs().startOf('month').startOf('day').add(9, 'hour')
+        const recordsState: RecordsState = {
           records: {},
         }
         recordsState.records[dj.format('YYYYMMDD')] = {

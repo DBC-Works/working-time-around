@@ -16,15 +16,15 @@ import dayjs from 'dayjs'
 
 import recordsReducer, {
   INITIAL_STATE as recordsInitialState,
-  recordsTypes,
+  RecordsState,
 } from './ducks/records'
 import settingsReducer, {
   INITIAL_STATE as settingsInitialState,
-  settingsTypes,
+  SettingsState,
 } from './ducks/settings'
 import runningReducer, {
   INITIAL_STATE as runningInitialState,
-  runningTypes,
+  RunningState,
 } from './ducks/running'
 
 //
@@ -35,9 +35,9 @@ import runningReducer, {
  * App state
  */
 export interface AppState {
-  records: recordsTypes.RecordsState
-  settings: settingsTypes.SettingsState
-  running: runningTypes.RunningState
+  records: RecordsState
+  settings: SettingsState
+  running: RunningState
 }
 
 //
@@ -82,7 +82,7 @@ const setTransform = createTransform(
       case 'records':
         return JSON.parse(outboundState as string, (key, value) =>
           key === 'starts' || key === 'stops'
-            ? (value as string[]).map(v => dayjs(v).toDate())
+            ? (value as string[]).map((v) => dayjs(v).toDate())
             : value
         )
       case 'settings':

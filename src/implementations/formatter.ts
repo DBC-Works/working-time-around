@@ -3,7 +3,7 @@
  */
 import dayjs, { Dayjs } from 'dayjs'
 
-import { getLatestOf, recordsTypes } from '../state/ducks/records'
+import { getLatestOf, Records } from '../state/ducks/records'
 import { makeRecordKey, RecordsState } from '../state/ducks/records/types'
 import { SettingsState } from '../state/ducks/settings/types.js'
 
@@ -40,7 +40,7 @@ export function formatStateForExport(
  */
 export function formatSpecifiedMonthRecordsAsCsvForMail(
   firstDayOfMonth: Dayjs,
-  records: recordsTypes.Records,
+  records: Records,
   defaultBreakTimeLength: number | undefined
 ): string[] {
   return getDaysInMonth(firstDayOfMonth).map((date) => {

@@ -24,12 +24,14 @@ import assert from 'assert'
 
 import { AppState } from '../../state/store'
 import {
+  DailyLatestRecord,
+  DailyRecord,
   getDailyRecordOf,
   getLatestOf,
   KEY_RECORD,
-  recordsTypes,
-  updateMemo,
+  UpdateBreakTimeActionPayload,
   updateBreakTimeLengthMin,
+  updateMemo,
   updateStartTime,
   updateStopTime,
 } from '../../state/ducks/records'
@@ -136,7 +138,7 @@ function formatTimeUpdateMessage(
  */
 async function sendUpdateToSlack(
   target: Date,
-  initial: recordsTypes.DailyLatestRecord,
+  initial: DailyLatestRecord,
   update: UpdatePlaceHolder,
   settings: settingsTypes.SlackSettings,
   intl: IntlShape
@@ -188,10 +190,7 @@ async function sendUpdateToSlack(
  * @returns Target date including time
  */
 function translateTimeToDate(time: Date, dj: Dayjs): Date {
-  return dj
-    .hour(time.getHours())
-    .minute(time.getMinutes())
-    .toDate()
+  return dj.hour(time.getHours()).minute(time.getMinutes()).toDate()
 }
 
 /**
@@ -202,7 +201,7 @@ function translateTimeToDate(time: Date, dj: Dayjs): Date {
  */
 function getDailyRecordLatestIndexes(
   dateKey: string,
-  record: recordsTypes.DailyRecord | null
+  record: DailyRecord | null
 ): LatestIndexes {
   if (record === null) {
     return {
@@ -303,7 +302,7 @@ export default Detail
 /**
  * 'DetailForm' component
  */
-const DetailForm: React.FC<{ target: Date }> = props => {
+const DetailForm: React.FC<{ target: Date }> = (props) => {
   const dj = dayjs(props.target)
   const dateKey = dj.format(KEY_RECORD)
 
@@ -326,7 +325,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
     getDailyRecordLatestIndexes(dateKey, record)
   )
   const updateRef = useRef<{
-    initial: recordsTypes.DailyLatestRecord
+    initial: DailyLatestRecord
     updated: UpdatePlaceHolder
   }>({
     initial: latest,
@@ -361,7 +360,7 @@ const DetailForm: React.FC<{ target: Date }> = props => {
         updateRef.current.updated,
         slackSettings,
         intl
-      ).then(resultMessage => {
+      ).then((resultMessage) => {
         if (0 < resultMessage.length) {
           dispatch(showMessage(formatSendFailedMessage(intl, resultMessage)))
         }
@@ -467,7 +466,7 @@ const Time: React.FC<{
   stop: Date | null
   onChangeStartTime: (time: Date) => void
   onChangeStopTime: (time: Date) => void
-}> = props => {
+}> = (props) => {
   const intl = useIntl()
   return (
     <>
@@ -503,7 +502,7 @@ const Time: React.FC<{
 const Memo: React.FC<{
   memo: string
   onInput: React.FormEventHandler<HTMLInputElement>
-}> = props => {
+}> = (props) => {
   return (
     <>
       <Row>
@@ -531,7 +530,7 @@ const BreakTimeLength: React.FC<{
   date: Date
   lengthMin: number | null
   targetIndex: number
-}> = props => {
+}> = (props) => {
   const { date, lengthMin, targetIndex } = props
   return (
     <div data-testid="break-time-length">
@@ -549,7 +548,7 @@ const BreakTimeLength: React.FC<{
             actionCreators={{
               update: (
                 lengthMin: number
-              ): Action<recordsTypes.UpdateBreakTimeActionPayload> =>
+              ): Action<UpdateBreakTimeActionPayload> =>
                 updateBreakTimeLengthMin({
                   date,
                   breakTimeLengthMin: lengthMin,
@@ -569,7 +568,7 @@ const BreakTimeLength: React.FC<{
 const RequireUpdateButton: React.FC<{
   require: boolean
   onClick: React.MouseEventHandler<HTMLButtonElement>
-}> = props => {
+}> = (props) => {
   if (props.require === false) {
     return null
   }

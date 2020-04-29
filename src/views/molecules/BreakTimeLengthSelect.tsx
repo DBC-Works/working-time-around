@@ -9,7 +9,7 @@ import dayjs from 'dayjs'
 import Button from '@material/react-button'
 import MaterialIcon from '@material/react-material-icon'
 
-import { recordsTypes } from '../../state/ducks/records'
+import { UpdateBreakTimeActionPayload } from '../../state/ducks/records'
 
 import TimeSelect from './TimeSelect'
 
@@ -19,22 +19,17 @@ import TimeSelect from './TimeSelect'
 const BreakTimeLengthSelect: React.FC<{
   lengthMin: number | undefined | null
   actionCreators: {
-    update: (
-      lengthMin: number
-    ) => Action<number | recordsTypes.UpdateBreakTimeActionPayload>
+    update: (lengthMin: number) => Action<number | UpdateBreakTimeActionPayload>
     clear?: () => Action<void>
   }
-}> = props => {
+}> = (props) => {
   const {
     actionCreators: { update, clear },
     lengthMin,
   } = props
   const time =
     lengthMin !== undefined && lengthMin !== null
-      ? dayjs()
-          .startOf('date')
-          .add(lengthMin, 'minute')
-          .toDate()
+      ? dayjs().startOf('date').add(lengthMin, 'minute').toDate()
       : undefined
 
   const dispatch = useDispatch()

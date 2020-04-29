@@ -6,8 +6,8 @@ import { Route } from 'react-router-dom'
 import { AnyAction, Store } from 'redux'
 import dayjs from 'dayjs'
 
-import { recordsTypes, KEY_RECORD } from '../../state/ducks/records'
-import { runningTypes } from '../../state/ducks/running'
+import { RecordsState, KEY_RECORD } from '../../state/ducks/records'
+import { RunningState } from '../../state/ducks/running'
 import { AppState, INITIAL_STATE } from '../../state/store'
 import CurrentState from './CurrentState'
 
@@ -36,7 +36,7 @@ describe('"CurrentState" template', () => {
 
   it('should exist current date and time', () => {
     const now = new Date()
-    const runningState: runningTypes.RunningState = {
+    const runningState: RunningState = {
       time: now,
       onLine: true,
       message: '',
@@ -76,7 +76,7 @@ describe('"CurrentState" template', () => {
       memos: [],
       breakTimeLengthsMin: [],
     }
-    const recordsState: recordsTypes.RecordsState = {
+    const recordsState: RecordsState = {
       records: {},
     }
     recordsState.records[dj.format(KEY_RECORD)] = record
@@ -103,7 +103,7 @@ describe('"CurrentState" template', () => {
       memos: [],
       breakTimeLengthsMin: [],
     }
-    const recordsState: recordsTypes.RecordsState = {
+    const recordsState: RecordsState = {
       records: {},
     }
     const dj = dayjs(now)
@@ -146,7 +146,7 @@ describe('"CurrentState" template', () => {
     } = store.getState()
     const keys = Object.keys(records)
     expect(keys).toHaveLength(1)
-    keys.forEach(key => {
+    keys.forEach((key) => {
       expect(records[key].breakTimeLengthsMin).toHaveLength(1)
       expect((records[key].breakTimeLengthsMin as number[])[0]).toBe(
         defaultBreakTimeLengthMin
@@ -184,7 +184,7 @@ describe('"CurrentState" template', () => {
     } = store.getState()
     const keys = Object.keys(records)
     expect(keys).toHaveLength(1)
-    keys.forEach(key => {
+    keys.forEach((key) => {
       expect(records[key].breakTimeLengthsMin).toHaveLength(1)
       expect((records[key].breakTimeLengthsMin as number[])[0]).toBe(
         defaultBreakTimeLengthMin

@@ -16,18 +16,16 @@ import { Headline6 } from '@material/react-typography'
 
 import { AppState } from '../../state/store'
 import {
+  DailyLatestRecord,
   getLatestOf,
   getMonthlyRecordsOf,
-  recordsTypes,
+  makeRecordKey,
+  Records,
 } from '../../state/ducks/records'
 import {
   getDefaultBreakTimeLengthMin,
   getSendToMailAddress,
 } from '../../state/ducks/settings'
-import {
-  makeRecordKey,
-  DailyLatestRecord,
-} from '../../state/ducks/records/types'
 
 import { getDaysInMonth } from '../../implementations/utilities'
 import { formatSpecifiedMonthRecordsAsCsvForMail } from '../../implementations/formatter'
@@ -41,7 +39,7 @@ import { formatSpecifiedMonthRecordsAsCsvForMail } from '../../implementations/f
  */
 interface LatestRecord {
   date: Dayjs
-  latestRecord: recordsTypes.DailyLatestRecord | null
+  latestRecord: DailyLatestRecord | null
 }
 
 //
@@ -106,7 +104,7 @@ function makeMedianTimeStringOf(times: Date[], format: string): string {
  */
 function createMailToUri(
   firstDayOfMonth: Dayjs,
-  records: recordsTypes.Records,
+  records: Records,
   mailAddress: string,
   defaultBreakTimeLength: number | undefined
 ): string {
@@ -319,12 +317,12 @@ const DateRecordRow: React.FC<{
  * 'DateListFooter' component
  */
 const DateListFooter: React.FC<{
-  latestRecords: (recordsTypes.DailyLatestRecord | null)[]
+  latestRecords: (DailyLatestRecord | null)[]
   timeFormat: string
 }> = (props) => {
   const records = props.latestRecords.filter(
     (record) => record !== null
-  ) as recordsTypes.DailyLatestRecord[]
+  ) as DailyLatestRecord[]
   const starts = records
     .map((record) => record.start)
     .filter((start) => start !== null) as Date[]
@@ -456,7 +454,7 @@ const Statistics: React.FC<{
  */
 const Footer: React.FC<{
   target: Dayjs
-  records: recordsTypes.Records
+  records: Records
 }> = (props) => {
   const { target, records } = props
   const defaultBreakTimeLength = useSelector((state: AppState) =>
