@@ -15,6 +15,7 @@ import localizedFormat from 'dayjs/plugin/localizedFormat'
 dayjs.extend(localizedFormat)
 
 import '@material/react-button/dist/button.css'
+import '@material/react-checkbox/dist/checkbox.css'
 import '@material/react-fab/dist/fab.css'
 import '@material/react-layout-grid/dist/layout-grid.css'
 import '@material/react-list/dist/list.css'
@@ -26,7 +27,6 @@ import '@material/react-snackbar/dist/snackbar.css'
 import '@material/react-text-field/dist/text-field.css'
 import '@material/react-top-app-bar/dist/top-app-bar.css'
 import '@material/react-typography/dist/typography.css'
-
 import '@material/react-tab-bar/dist/tab-bar.css'
 import '@material/react-tab-scroller/dist/tab-scroller.css'
 import '@material/react-tab/dist/tab.css'

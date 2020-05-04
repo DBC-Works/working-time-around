@@ -7,17 +7,21 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Action } from 'typescript-fsa'
 
 import Button from '@material/react-button'
+import Checkbox from '@material/react-checkbox'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import TextField, { Input } from '@material/react-text-field'
-import { Headline6, Subtitle1 } from '@material/react-typography'
-
+import { Body1, Headline6, Subtitle1 } from '@material/react-typography'
 import Tab from '@material/react-tab'
 import TabBar from '@material/react-tab-bar'
+
+import { formatStateForExport } from '../../implementations/formatter'
+import { parseExportedState } from '../../implementations/parser'
 
 import en from '../i18n/en.json'
 import ja from '../i18n/ja.json'
 
 import { AppState } from '../../state/store'
+import { mergeExportedState as mergeExportedRecordsState } from '../../state/ducks/records'
 import {
   getExportObjectUrl,
   getOnLine,
@@ -32,6 +36,7 @@ import {
   getLang,
   getSendToMailAddress,
   getSlackSettings,
+  mergeExportedState as mergeExportedSettingsState,
   selectLanguage,
   Lang,
   updateDefaultBreakTimeLengthMin,
@@ -41,8 +46,8 @@ import {
 } from '../../state/ducks/settings'
 import Select from '../atoms/Select'
 import BreakTimeLengthSelect from '../molecules/BreakTimeLengthSelect'
+import SingleCellRow from '../molecules/SingleCellRow'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
-import { formatStateForExport } from '../../implementations/formatter'
 
 //
 // Types
@@ -116,7 +121,7 @@ const Settings: React.FC = () => {
   )
 
   return (
-    <Grid>
+    <Grid className="settings">
       <Row className="text-align-center">
         <Cell columns={12}>
           <Headline6 tag="h1">
@@ -148,7 +153,12 @@ const Settings: React.FC = () => {
           <LanguageSelection />
         </>
       )}
-      {activeTab === TabType.Record && <Export />}
+      {activeTab === TabType.Record && (
+        <div className="record">
+          <Export />
+          <Import />
+        </div>
+      )}
       {activeTab === TabType.Linkage && (
         <>
           <MailAddress />
@@ -159,6 +169,15 @@ const Settings: React.FC = () => {
   )
 }
 export default Settings
+
+/**
+ * 'Heading in tab' component
+ */
+const HeadingInTab: React.FC = (props) => (
+  <SingleCellRow>
+    <Headline6 tag="h2">{props.children}</Headline6>
+  </SingleCellRow>
+)
 
 /**
  * 'DefaultBreakTimeLength' component
@@ -429,14 +448,108 @@ const Export: React.FC = () => {
       </Row>
       <Row>
         <Cell columns={12}>
-          <a
-            href={exportObjectUrl}
-            download="working-time-around-record-data.json"
-          >
-            <FormattedMessage id="Download" />
-          </a>
+          <Body1>
+            <a
+              href={exportObjectUrl}
+              download="working-time-around-record-data.json"
+            >
+              <FormattedMessage id="Download" />
+            </a>
+          </Body1>
         </Cell>
       </Row>
+    </>
+  )
+}
+
+/**
+ * 'Import' component
+ */
+const Import: React.FC = () => {
+  const fileInputRef = React.createRef<HTMLInputElement>()
+  const [importSettings, setImportSettings] = useState(false)
+  const [resultMessage, setResultMessage] = useState('')
+
+  const intl = useIntl()
+  const dispatch = useDispatch()
+  const handleChangeImportSettings = useCallback(() => {
+    setResultMessage('')
+    setImportSettings(!importSettings)
+  }, [])
+  const handleClickBrowse = useCallback(() => {
+    if (fileInputRef.current === null) {
+      return
+    }
+    setResultMessage('')
+    fileInputRef.current.click()
+  }, [fileInputRef])
+  const handleChangeFile = useCallback(async () => {
+    if (fileInputRef.current === null || fileInputRef.current.files === null) {
+      return
+    }
+    const text = await fileInputRef.current.files[0].text()
+    const result = parseExportedState(text)
+    if (result.isErr()) {
+      const msg = intl.formatMessage(
+        {
+          id: 'Format.error.import',
+        },
+        { message: intl.formatMessage({ id: result.err().replace(/ /g, '.') }) }
+      )
+
+      setResultMessage(msg)
+      return
+    }
+
+    const importedState = result.ok()
+    dispatch(mergeExportedRecordsState(importedState.records))
+    if (importSettings !== false) {
+      dispatch(mergeExportedSettingsState(importedState.settings))
+    }
+    setResultMessage(
+      intl.formatMessage({
+        id:
+          importSettings !== false
+            ? 'Imported.records.and.settings.'
+            : 'Imported.records.',
+      })
+    )
+  }, [fileInputRef, importSettings])
+
+  return (
+    <>
+      <HeadingInTab>
+        <FormattedMessage id="Import" />
+      </HeadingInTab>
+      <SingleCellRow>
+        <div className="import-settings">
+          <Checkbox
+            nativeControlId="import-settings"
+            checked={importSettings}
+            onChange={handleChangeImportSettings}
+          />
+          <Body1>
+            <label htmlFor="import-settings">
+              <FormattedMessage id="Import.settings" />
+            </label>
+          </Body1>
+        </div>
+      </SingleCellRow>
+      <SingleCellRow className="file-upload">
+        <input
+          type="file"
+          data-testid="file-upload"
+          accept=".json,application/json"
+          ref={fileInputRef}
+          onChange={handleChangeFile}
+        />
+        <Button unelevated={true} onClick={handleClickBrowse}>
+          <FormattedMessage id="Browse..." />
+        </Button>
+      </SingleCellRow>
+      <SingleCellRow>
+        <Body1>{resultMessage}</Body1>
+      </SingleCellRow>
     </>
   )
 }

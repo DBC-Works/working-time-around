@@ -127,3 +127,23 @@ div.time-select {
     padding: 0 1em;
   }
 }
+
+.settings {
+  .record {
+    .import-settings {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .file-upload {
+      position: relative;
+
+      input[type='file'] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+      }
+    }
+  }
+}

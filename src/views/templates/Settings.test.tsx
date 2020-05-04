@@ -36,6 +36,7 @@ describe('"Settings" template', () => {
     LANGUAGE = 'Language',
 
     EXPORT = 'Export',
+    IMPORT = 'Import',
 
     SEND_TO_MAIL_ADDRESS = 'Send to mail address',
     SLACK_LINKAGE = 'Slack linkage',
@@ -180,7 +181,7 @@ describe('"Settings" template', () => {
         { value: '0', expected: '00' },
       ])(
         'should be set minute to "00" automatically when not selected and hour is selected',
-        table => {
+        (table) => {
           const [renderResult] = setup(
             makeSettingsTestState({
               ...INITIAL_STATE.settings,
@@ -210,7 +211,7 @@ describe('"Settings" template', () => {
         { value: '0', expected: ':00' },
       ])(
         'should be set hour to "00" automatically when not selected and minute is selected',
-        table => {
+        (table) => {
           const [renderResult] = setup(
             makeSettingsTestState({
               ...INITIAL_STATE.settings,
@@ -331,6 +332,65 @@ describe('"Settings" template', () => {
         expect(startDownloadAnchor).toHaveAttribute('href', 'created-url')
       })
     })
+    describe('Import', () => {
+      const ID_CHECKBOX = 'import-settings'
+
+      it('should exist when "Record" tab is selected', () => {
+        const [renderResult] = setup()
+        const { getByText } = renderResult
+        act(() => {
+          fireEvent.click(getByText(TAB.RECORD))
+        })
+
+        expect(getByText(HEADING.IMPORT)).toBeInTheDocument()
+      })
+      it('should not exist when "Record" tab is not selected', () => {
+        const [renderResult] = setup()
+        const { queryByText } = renderResult
+
+        expect(queryByText(HEADING.IMPORT)).not.toBeInTheDocument()
+      })
+      it('should exist file upload element and "Browse" button', () => {
+        const [renderResult] = setup()
+        const { getByTestId, getByText } = renderResult
+        act(() => {
+          fireEvent.click(getByText(TAB.RECORD))
+        })
+
+        expect(getByTestId('file-upload')).toBeInTheDocument()
+        expect(getByText('Browse...')).toBeInTheDocument()
+      })
+      it('should exist checkbox to import settings', () => {
+        const [renderResult] = setup()
+        const { container, getByText } = renderResult
+        act(() => {
+          fireEvent.click(getByText(TAB.RECORD))
+        })
+
+        const checkbox = container.querySelector(`input[id="${ID_CHECKBOX}"]`)
+        expect(checkbox).toBeInTheDocument()
+        expect(checkbox).not.toBeChecked()
+        const label = container.querySelector(`label[for="${ID_CHECKBOX}"]`)
+        expect(label).toBeInTheDocument()
+        expect(label).toHaveTextContent('Import settings')
+      })
+      it('should check after checkbox click', () => {
+        const [renderResult] = setup()
+        const { container, getByText } = renderResult
+        act(() => {
+          fireEvent.click(getByText(TAB.RECORD))
+        })
+        const checkbox = container.querySelector(
+          `input[id="${ID_CHECKBOX}"]`
+        ) as Element
+        act(() => {
+          fireEvent.click(checkbox)
+        })
+
+        expect(checkbox).toBeInTheDocument()
+        expect(checkbox).toBeChecked()
+      })
+    })
   })
 
   describe('"Linkage" tab', () => {
@@ -344,12 +404,14 @@ describe('"Settings" template', () => {
 
         expect(getByText(HEADING.SEND_TO_MAIL_ADDRESS)).toBeInTheDocument()
       })
-    })
-    it('should not exist when "Linkage" tab is not selected', () => {
-      const [renderResult] = setup()
-      const { queryByText } = renderResult
+      it('should not exist when "Linkage" tab is not selected', () => {
+        const [renderResult] = setup()
+        const { queryByText } = renderResult
 
-      expect(queryByText(HEADING.SEND_TO_MAIL_ADDRESS)).not.toBeInTheDocument()
+        expect(
+          queryByText(HEADING.SEND_TO_MAIL_ADDRESS)
+        ).not.toBeInTheDocument()
+      })
     })
 
     describe('Slack linkage', () => {

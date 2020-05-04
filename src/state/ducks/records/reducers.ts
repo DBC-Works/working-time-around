@@ -379,12 +379,16 @@ export function mergeStateHandler(
         const importedProperty = importedProperties.find(
           ([name]) => name === propertyName
         )
-        if (importedProperty && isEqual(value, importedProperty[1]) === false) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ;(currentRecord as any)[propertyName] = [
-            ...value,
-            ...importedProperty[1],
-          ]
+        if (importedProperty) {
+          const [, importedValue] = importedProperty
+          const mergedValue = [...value, ...importedValue]
+          if (
+            isEqual(value, importedValue) === false &&
+            isEqual(value, mergedValue) === false
+          ) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ;(currentRecord as any)[propertyName] = mergedValue
+          }
         }
       })
       merged.records[recordKey] = currentRecord
