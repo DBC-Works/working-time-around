@@ -40,11 +40,12 @@ import {
   canSendMessageToSlack,
   getDefaultBreakTimeLengthMin,
   getSlackSettings,
-  settingsTypes,
+  SlackSettings,
 } from '../../state/ducks/settings'
 
-import TimeSelect from '../molecules/TimeSelect'
 import BreakTimeLengthSelect from '../molecules/BreakTimeLengthSelect'
+import SingleCellRow from '../molecules/SingleCellRow'
+import TimeSelect from '../molecules/TimeSelect'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
 
 //
@@ -140,7 +141,7 @@ async function sendUpdateToSlack(
   target: Date,
   initial: DailyLatestRecord,
   update: UpdatePlaceHolder,
-  settings: settingsTypes.SlackSettings,
+  settings: SlackSettings,
   intl: IntlShape
 ): Promise<string> {
   assert(update.start !== null || update.stop !== null || update.memo !== null)
@@ -298,6 +299,15 @@ const Detail: React.FC = () => {
   )
 }
 export default Detail
+
+/**
+ * 'Heading in detail' component
+ */
+const HeadingInDetail: React.FC = (props) => (
+  <SingleCellRow>
+    <Headline6 tag="h2">{props.children}</Headline6>
+  </SingleCellRow>
+)
 
 /**
  * 'DetailForm' component
@@ -470,28 +480,22 @@ const Time: React.FC<{
   const intl = useIntl()
   return (
     <>
-      <Row>
-        <Cell columns={12}>
-          <Headline6 tag="h2">
-            <FormattedMessage id="Time" />
-          </Headline6>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <TimeSelect
-            time={props.start}
-            label={intl.formatMessage({ id: 'Start' })}
-            onChange={props.onChangeStartTime}
-          />
-          <span className="between">-</span>
-          <TimeSelect
-            time={props.stop}
-            label={intl.formatMessage({ id: 'Stop' })}
-            onChange={props.onChangeStopTime}
-          />
-        </Cell>
-      </Row>
+      <HeadingInDetail>
+        <FormattedMessage id="Time" />
+      </HeadingInDetail>
+      <SingleCellRow>
+        <TimeSelect
+          time={props.start}
+          label={intl.formatMessage({ id: 'Start' })}
+          onChange={props.onChangeStartTime}
+        />
+        <span className="between">-</span>
+        <TimeSelect
+          time={props.stop}
+          label={intl.formatMessage({ id: 'Stop' })}
+          onChange={props.onChangeStopTime}
+        />
+      </SingleCellRow>
     </>
   )
 }
@@ -505,20 +509,14 @@ const Memo: React.FC<{
 }> = (props) => {
   return (
     <>
-      <Row>
-        <Cell columns={12}>
-          <Headline6 tag="h2">
-            <FormattedMessage id="Memo" />
-          </Headline6>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <TextField textarea={true} fullWidth={true}>
-            <Input value={props.memo} onInput={props.onInput} />
-          </TextField>
-        </Cell>
-      </Row>
+      <HeadingInDetail>
+        <FormattedMessage id="Memo" />
+      </HeadingInDetail>
+      <SingleCellRow>
+        <TextField textarea={true} fullWidth={true}>
+          <Input value={props.memo} onInput={props.onInput} />
+        </TextField>
+      </SingleCellRow>
     </>
   )
 }
@@ -534,30 +532,22 @@ const BreakTimeLength: React.FC<{
   const { date, lengthMin, targetIndex } = props
   return (
     <div data-testid="break-time-length">
-      <Row>
-        <Cell columns={12}>
-          <Headline6 tag="h2">
-            <FormattedMessage id="Break.time.length" />
-          </Headline6>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <BreakTimeLengthSelect
-            lengthMin={lengthMin}
-            actionCreators={{
-              update: (
-                lengthMin: number
-              ): Action<UpdateBreakTimeActionPayload> =>
-                updateBreakTimeLengthMin({
-                  date,
-                  breakTimeLengthMin: lengthMin,
-                  targetIndex,
-                }),
-            }}
-          />
-        </Cell>
-      </Row>
+      <HeadingInDetail>
+        <FormattedMessage id="Break.time.length" />
+      </HeadingInDetail>
+      <SingleCellRow>
+        <BreakTimeLengthSelect
+          lengthMin={lengthMin}
+          actionCreators={{
+            update: (lengthMin: number): Action<UpdateBreakTimeActionPayload> =>
+              updateBreakTimeLengthMin({
+                date,
+                breakTimeLengthMin: lengthMin,
+                targetIndex,
+              }),
+          }}
+        />
+      </SingleCellRow>
     </div>
   )
 }
@@ -574,16 +564,10 @@ const RequireUpdateButton: React.FC<{
   }
 
   return (
-    <Row className="gutter-top">
-      <Cell columns={12}>
-        <Button
-          className="full-width"
-          unelevated={true}
-          onClick={props.onClick}
-        >
-          <FormattedMessage id="Send.update" />
-        </Button>
-      </Cell>
-    </Row>
+    <SingleCellRow className="gutter-top">
+      <Button className="full-width" unelevated={true} onClick={props.onClick}>
+        <FormattedMessage id="Send.update" />
+      </Button>
+    </SingleCellRow>
   )
 }

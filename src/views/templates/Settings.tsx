@@ -129,24 +129,22 @@ const Settings: React.FC = () => {
           </Headline6>
         </Cell>
       </Row>
-      <Row>
-        <Cell columns={12}>
-          <TabBar
-            activeIndex={activeTab}
-            handleActiveIndexUpdate={handleActiveIndexUpdate}
-          >
-            <Tab>
-              <FormattedMessage id="Operation" />
-            </Tab>
-            <Tab>
-              <FormattedMessage id="Record" />
-            </Tab>
-            <Tab>
-              <FormattedMessage id="Linkage" />
-            </Tab>
-          </TabBar>
-        </Cell>
-      </Row>
+      <SingleCellRow>
+        <TabBar
+          activeIndex={activeTab}
+          handleActiveIndexUpdate={handleActiveIndexUpdate}
+        >
+          <Tab>
+            <FormattedMessage id="Operation" />
+          </Tab>
+          <Tab>
+            <FormattedMessage id="Record" />
+          </Tab>
+          <Tab>
+            <FormattedMessage id="Linkage" />
+          </Tab>
+        </TabBar>
+      </SingleCellRow>
       {activeTab === TabType.Operation && (
         <>
           <DefaultBreakTimeLength />
@@ -188,25 +186,19 @@ const DefaultBreakTimeLength: React.FC = () => {
   )
   return (
     <div data-testid="break-time-length">
-      <Row>
-        <Cell columns={12}>
-          <Headline6 tag="h2">
-            <FormattedMessage id="Default.break.time.length" />
-          </Headline6>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <BreakTimeLengthSelect
-            lengthMin={breakTimeLength}
-            actionCreators={{
-              update: (lengthMin: number): Action<number> =>
-                updateDefaultBreakTimeLengthMin(lengthMin),
-              clear: (): Action<void> => clearDefaultBreakTimeLength(),
-            }}
-          />
-        </Cell>
-      </Row>
+      <HeadingInTab>
+        <FormattedMessage id="Default.break.time.length" />
+      </HeadingInTab>
+      <SingleCellRow>
+        <BreakTimeLengthSelect
+          lengthMin={breakTimeLength}
+          actionCreators={{
+            update: (lengthMin: number): Action<number> =>
+              updateDefaultBreakTimeLengthMin(lengthMin),
+            clear: (): Action<void> => clearDefaultBreakTimeLength(),
+          }}
+        />
+      </SingleCellRow>
     </div>
   )
 }
@@ -226,28 +218,18 @@ const MailAddress: React.FC = () => {
 
   return (
     <>
-      <Row>
-        <Cell columns={12}>
-          <Headline6 tag="h2">
-            <FormattedMessage id="Send.to.mail.address" />
-          </Headline6>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <TextField
-            textarea={false}
-            fullWidth={true}
-            label="foobar@example.com"
-          >
-            <Input
-              type="email"
-              value={mailAddress}
-              onInput={handleInputMailAddress}
-            />
-          </TextField>
-        </Cell>
-      </Row>
+      <HeadingInTab>
+        <FormattedMessage id="Send.to.mail.address" />
+      </HeadingInTab>
+      <SingleCellRow>
+        <TextField textarea={false} fullWidth={true} label="foobar@example.com">
+          <Input
+            type="email"
+            value={mailAddress}
+            onInput={handleInputMailAddress}
+          />
+        </TextField>
+      </SingleCellRow>
     </>
   )
 }
@@ -270,58 +252,44 @@ const SlackSettings: React.FC = () => {
 
   return (
     <>
-      <Row>
-        <Cell columns={12}>
-          <Headline6 tag="h2">
-            <FormattedMessage id="Slack.linkage" />
-          </Headline6>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <Subtitle1 tag="h3">
-            <FormattedMessage id="Incoming.webhook.URL" />
-          </Subtitle1>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <TextField
-            textarea={false}
-            fullWidth={true}
-            label="https://hooks.slack.com/services/..."
-          >
-            <Input
-              type="url"
-              value={slackSettings.incomingWebhookUrl}
-              onInput={handleInputUrl}
-            />
-          </TextField>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <Subtitle1 tag="h3">
-            <FormattedMessage id="Context" />
-          </Subtitle1>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <TextField textarea={false} fullWidth={true}>
-            <Input
-              type="text"
-              value={slackSettings.context}
-              onInput={handleInputContext}
-            />
-          </TextField>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12} className="gutter-top">
-          <SendTestMessageButton />
-        </Cell>
-      </Row>
+      <HeadingInTab>
+        <FormattedMessage id="Slack.linkage" />
+      </HeadingInTab>
+      <SingleCellRow>
+        <Subtitle1 tag="h3">
+          <FormattedMessage id="Incoming.webhook.URL" />
+        </Subtitle1>
+      </SingleCellRow>
+      <SingleCellRow>
+        <TextField
+          textarea={false}
+          fullWidth={true}
+          label="https://hooks.slack.com/services/..."
+        >
+          <Input
+            type="url"
+            value={slackSettings.incomingWebhookUrl}
+            onInput={handleInputUrl}
+          />
+        </TextField>
+      </SingleCellRow>
+      <SingleCellRow>
+        <Subtitle1 tag="h3">
+          <FormattedMessage id="Context" />
+        </Subtitle1>
+      </SingleCellRow>
+      <SingleCellRow>
+        <TextField textarea={false} fullWidth={true}>
+          <Input
+            type="text"
+            value={slackSettings.context}
+            onInput={handleInputContext}
+          />
+        </TextField>
+      </SingleCellRow>
+      <SingleCellRow className="gutter-top">
+        <SendTestMessageButton />
+      </SingleCellRow>
     </>
   )
 }
@@ -387,24 +355,18 @@ const LanguageSelection: React.FC = () => {
 
   return (
     <>
-      <Row>
-        <Cell columns={12}>
-          <Headline6 tag="h2">
-            <FormattedMessage id="Language" />
-          </Headline6>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <Select value={lang} className="full-width" onChange={handleChange}>
-            {Array.from(Object.keys(langs), (key: string) => (
-              <option key={key} value={key}>
-                {langs[key].literal}
-              </option>
-            ))}
-          </Select>
-        </Cell>
-      </Row>
+      <HeadingInTab>
+        <FormattedMessage id="Language" />
+      </HeadingInTab>
+      <SingleCellRow>
+        <Select value={lang} className="full-width" onChange={handleChange}>
+          {Array.from(Object.keys(langs), (key: string) => (
+            <option key={key} value={key}>
+              {langs[key].literal}
+            </option>
+          ))}
+        </Select>
+      </SingleCellRow>
     </>
   )
 }
@@ -439,25 +401,19 @@ const Export: React.FC = () => {
 
   return (
     <>
-      <Row>
-        <Cell columns={12}>
-          <Headline6 tag="h2">
-            <FormattedMessage id="Export" />
-          </Headline6>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <Body1>
-            <a
-              href={exportObjectUrl}
-              download="working-time-around-record-data.json"
-            >
-              <FormattedMessage id="Download" />
-            </a>
-          </Body1>
-        </Cell>
-      </Row>
+      <HeadingInTab>
+        <FormattedMessage id="Export" />
+      </HeadingInTab>
+      <SingleCellRow>
+        <Body1>
+          <a
+            href={exportObjectUrl}
+            download="working-time-around-record-data.json"
+          >
+            <FormattedMessage id="Download" />
+          </a>
+        </Body1>
+      </SingleCellRow>
     </>
   )
 }

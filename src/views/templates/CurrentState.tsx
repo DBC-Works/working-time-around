@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl'
 import dayjs from 'dayjs'
 
 import Button from '@material/react-button'
-import { Cell, Grid, Row } from '@material/react-layout-grid'
+import { Grid } from '@material/react-layout-grid'
 import MaterialIcon from '@material/react-material-icon'
 import TextField, { Input } from '@material/react-text-field'
 import { Headline4 } from '@material/react-typography'
@@ -33,6 +33,8 @@ import {
   getDefaultBreakTimeLengthMin,
   getSlackSettings,
 } from '../../state/ducks/settings'
+
+import SingleCellRow from '../molecules/SingleCellRow'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
 
 //
@@ -75,41 +77,31 @@ const CurrentState: React.FC = () => {
   const intl = useIntl()
   return (
     <Grid className="current-state">
-      <Row>
-        <Cell columns={12}>
-          <StartButton disabled={latest.stop !== null} time={latest.start} />
-        </Cell>
-      </Row>
-      <Row className="gutter-top">
-        <Cell columns={12}>
-          <Button className="date full-width" onClick={handleClick}>
-            <Headline4 tag="span">
-              {dj.format(intl.formatMessage({ id: 'Format.date' }))}
-            </Headline4>
-          </Button>
-        </Cell>
-      </Row>
-      <Row>
-        <Cell columns={12}>
-          <Headline4 tag="div" className="text-align-center">
-            {dj.format(intl.formatMessage({ id: 'Format.time.24' }))}
+      <SingleCellRow>
+        <StartButton disabled={latest.stop !== null} time={latest.start} />
+      </SingleCellRow>
+      <SingleCellRow className="gutter-top">
+        <Button className="date full-width" onClick={handleClick}>
+          <Headline4 tag="span">
+            {dj.format(intl.formatMessage({ id: 'Format.date' }))}
           </Headline4>
-        </Cell>
-      </Row>
-      <Row className="gutter-top">
-        <Cell columns={12}>
-          <StopButton time={latest.stop} />
-        </Cell>
-      </Row>
-      <Row className="gutter-top">
-        <Cell columns={12}>
-          <MemoTextField
-            time={time}
-            memo={latest.memo}
-            afterStopped={latest.stop !== null}
-          />
-        </Cell>
-      </Row>
+        </Button>
+      </SingleCellRow>
+      <SingleCellRow>
+        <Headline4 tag="div" className="text-align-center">
+          {dj.format(intl.formatMessage({ id: 'Format.time.24' }))}
+        </Headline4>
+      </SingleCellRow>
+      <SingleCellRow className="gutter-top">
+        <StopButton time={latest.stop} />
+      </SingleCellRow>
+      <SingleCellRow className="gutter-top">
+        <MemoTextField
+          time={time}
+          memo={latest.memo}
+          afterStopped={latest.stop !== null}
+        />
+      </SingleCellRow>
     </Grid>
   )
 }
@@ -121,7 +113,7 @@ export default CurrentState
 const StartButton: React.FC<{
   time: Date | null
   disabled: boolean
-}> = props => {
+}> = (props) => {
   const initialRef = useRef<{ time: Date | null }>({ time: props.time })
 
   const intl = useIntl()
@@ -152,7 +144,7 @@ const StartButton: React.FC<{
             sendMessageToSlack(
               slackSettings,
               `[${labelStart}] ${dayjs(props.time).format(timeFormat)}`
-            ).then(resultMessage => {
+            ).then((resultMessage) => {
               if (0 < resultMessage.length) {
                 dispatch(
                   showMessage(formatSendFailedMessage(intl, resultMessage))
@@ -190,7 +182,7 @@ const StartButton: React.FC<{
  */
 const StopButton: React.FC<{
   time: Date | null
-}> = props => {
+}> = (props) => {
   const initialRef = useRef<{ time: Date | null }>({ time: props.time })
 
   const record = useSelector((state: AppState) =>
@@ -229,7 +221,7 @@ const StopButton: React.FC<{
             sendMessageToSlack(
               slackSettings,
               `[${labelStop}] ${dayjs(props.time).format(timeFormat)}\n${memo}`
-            ).then(resultMessage => {
+            ).then((resultMessage) => {
               if (0 < resultMessage.length) {
                 dispatch(
                   showMessage(formatSendFailedMessage(intl, resultMessage))
@@ -268,7 +260,7 @@ const MemoTextField: React.FC<{
   memo: string
   time: Date
   afterStopped: boolean
-}> = props => {
+}> = (props) => {
   const updateRef = useRef<{
     initial: string | null
     updated: string | null
@@ -310,7 +302,7 @@ const MemoTextField: React.FC<{
     sendMessageToSlack(
       slackSettings,
       `[${intl.formatMessage({ id: 'Memo' })}] ${postMemo}`
-    ).then(resultMessage => {
+    ).then((resultMessage) => {
       if (0 < resultMessage.length) {
         dispatch(showMessage(formatSendFailedMessage(intl, resultMessage)))
       }
