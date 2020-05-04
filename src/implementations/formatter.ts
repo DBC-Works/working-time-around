@@ -1,5 +1,5 @@
 /**
- * @file Record formatter
+ * @file State formatter
  */
 import dayjs, { Dayjs } from 'dayjs'
 
@@ -17,7 +17,7 @@ import { getDaysInMonth } from './utilities'
  * Format state for export
  * @param records Records state
  * @param settings  Settings state
- * @returns JSON string
+ * @returns Formatted JSON string
  */
 export function formatStateForExport(
   records: RecordsState,

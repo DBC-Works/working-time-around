@@ -3,7 +3,7 @@
  */
 import actionCreatorFactory from 'typescript-fsa'
 
-import { UpdateBreakTimeActionPayload } from './types'
+import { RecordsState, UpdateBreakTimeActionPayload } from './types'
 
 const actionCreator = actionCreatorFactory('records')
 
@@ -57,3 +57,10 @@ export const updateMemo = actionCreator<{
 export const updateBreakTimeLengthMin = actionCreator<
   UpdateBreakTimeActionPayload
 >('UPDATE_BREAK_TIME_LENGTH_MIN')
+
+/**
+ * 'Merge exported state' action
+ */
+export const mergeExportedState = actionCreator<RecordsState>(
+  'MERGE_EXPORTED_STATE'
+)

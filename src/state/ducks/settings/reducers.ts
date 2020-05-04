@@ -6,6 +6,7 @@ import assert from 'assert'
 
 import {
   clearDefaultBreakTimeLength,
+  mergeExportedState,
   selectLanguage,
   updateDefaultBreakTimeLengthMin,
   updateSendToMailAddress,
@@ -51,13 +52,46 @@ function updateDefaultBreakTimeLengthMinActionHandler(
 }
 
 /**
+ * Merge exported state handler
+ * @param state Current state
+ * @param stateToImport Exported state to import
+ * @returns New state
+ */
+export function mergeStateHandler(
+  state: SettingsState,
+  stateToImport: SettingsState
+): SettingsState {
+  const merged = {
+    ...state,
+    slack: {
+      ...state.slack,
+    },
+    lang: stateToImport.lang,
+  }
+  if (0 < stateToImport.sendToMailAddress.length) {
+    merged.sendToMailAddress = stateToImport.sendToMailAddress
+  }
+  if (0 < stateToImport.slack.incomingWebhookUrl.length) {
+    merged.slack.incomingWebhookUrl = stateToImport.slack.incomingWebhookUrl
+  }
+  if (0 < stateToImport.slack.context.length) {
+    merged.slack.context = stateToImport.slack.context
+  }
+  if (stateToImport.defaultBreakTimeLengthMin !== undefined) {
+    merged.defaultBreakTimeLengthMin = stateToImport.defaultBreakTimeLengthMin
+  }
+
+  return merged
+}
+
+/**
  * Settings state reducer
  * @param state Current state
  * @param action Action
  * @returns New state
  */
 const settingsReducer = reducerWithInitialState(INITIAL_STATE)
-  .case(clearDefaultBreakTimeLength, state => ({
+  .case(clearDefaultBreakTimeLength, (state) => ({
     ...state,
     defaultBreakTimeLengthMin: undefined,
   }))
@@ -87,5 +121,6 @@ const settingsReducer = reducerWithInitialState(INITIAL_STATE)
       incomingWebhookUrl,
     },
   }))
+  .case(mergeExportedState, mergeStateHandler)
   .build()
 export default settingsReducer

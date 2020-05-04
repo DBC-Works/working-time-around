@@ -1,10 +1,14 @@
 /**
  * @file Records state reducers
  */
+import cloneDeep from 'lodash.clonedeep'
+import isEqual from 'lodash.isequal'
 import { reducerWithInitialState } from 'typescript-fsa-reducers'
+
 import assert from 'assert'
 
 import {
+  mergeExportedState,
   start,
   stop,
   updateBreakTimeLengthMin,
@@ -354,6 +358,44 @@ function updateBreakTimeLengthMinActionHandler(
 }
 
 /**
+ * Merge state action handler
+ * @param state Current state
+ * @param stateToMerge Exported state to import
+ * @returns New state
+ */
+export function mergeStateHandler(
+  current: RecordsState,
+  stateToMerge: RecordsState
+): RecordsState {
+  const merged = cloneDeep(current)
+  Object.keys(stateToMerge.records).forEach((recordKey) => {
+    if (
+      Object.prototype.hasOwnProperty.call(merged.records, recordKey) !== false
+    ) {
+      const currentRecord = merged.records[recordKey]
+      const importRecord = stateToMerge.records[recordKey]
+      const importedProperties = Object.entries(importRecord)
+      Object.entries(currentRecord).forEach(([propertyName, value]) => {
+        const importedProperty = importedProperties.find(
+          ([name]) => name === propertyName
+        )
+        if (importedProperty && isEqual(value, importedProperty[1]) === false) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ;(currentRecord as any)[propertyName] = [
+            ...value,
+            ...importedProperty[1],
+          ]
+        }
+      })
+      merged.records[recordKey] = currentRecord
+    } else {
+      merged.records[recordKey] = stateToMerge.records[recordKey]
+    }
+  })
+  return merged
+}
+
+/**
  * Records state reducer
  * @param state Current state
  * @param action Action
@@ -367,5 +409,6 @@ const recordsReducer = reducerWithInitialState(INITIAL_STATE)
   .case(updateStopTime, updateStopTimeActionHandler)
   .case(updateMemo, updateMemoActionHandler)
   .case(updateBreakTimeLengthMin, updateBreakTimeLengthMinActionHandler)
+  .case(mergeExportedState, mergeStateHandler)
   .build()
 export default recordsReducer

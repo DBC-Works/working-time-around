@@ -3,6 +3,8 @@
  */
 import actionCreatorFactory from 'typescript-fsa'
 
+import { SettingsState } from './types'
+
 const actionCreator = actionCreatorFactory('settings')
 
 //
@@ -45,4 +47,11 @@ export const updateSlackContext = actionCreator<string>('UPDATE_SLACK_CONTEXT')
  */
 export const updateSlackIncomingWebhookUrl = actionCreator<string>(
   'UPDATE_SLACK_INCOMING_WEBHOOK_URL'
+)
+
+/**
+ * 'Merge exported state' action
+ */
+export const mergeExportedState = actionCreator<SettingsState>(
+  'MERGE_EXPORTED_STATE'
 )
