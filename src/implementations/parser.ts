@@ -1,6 +1,8 @@
 /**
  * @file State parser
  */
+import dayjs from 'dayjs'
+
 import { Result, StateExchangeFormat } from './types'
 
 //
@@ -21,7 +23,20 @@ export enum ParseErrorType {
 //
 
 /**
- * Format state for export
+ * Parse state formatted as JSON
+ * @param json JSON string
+ * @returns Parsed object
+ */
+export function parseState<T>(jsonString: string): T {
+  return JSON.parse(jsonString, (key, value) =>
+    key === 'starts' || key === 'stops'
+      ? (value as string[]).map((v) => dayjs(v).toDate())
+      : value
+  )
+}
+
+/**
+ * Parse exported state formatted as JSON
  * @param json JSON string
  * @returns Result
  */
@@ -30,7 +45,7 @@ export function parseExportedState(
 ): Result<StateExchangeFormat, ParseErrorType> {
   let json: unknown
   try {
-    json = JSON.parse(jsonString)
+    json = parseState<unknown>(jsonString)
   } catch (e) {
     if (e instanceof SyntaxError) {
       return new Result({ err: ParseErrorType.InvalidText })

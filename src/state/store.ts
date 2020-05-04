@@ -12,8 +12,8 @@ import {
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { createTransform, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-import dayjs from 'dayjs'
 
+import { parseState } from '../implementations/parser'
 import recordsReducer, {
   INITIAL_STATE as recordsInitialState,
   RecordsState,
@@ -50,7 +50,7 @@ export interface AppState {
  * @returns Migrated state
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function migrateSettingsState(originalState: any): settingsTypes.SettingsState {
+function migrateSettingsState(originalState: any): SettingsState {
   const migratedState = {
     ...originalState,
   }
@@ -80,11 +80,7 @@ const setTransform = createTransform(
   (outboundState, key) => {
     switch (key) {
       case 'records':
-        return JSON.parse(outboundState as string, (key, value) =>
-          key === 'starts' || key === 'stops'
-            ? (value as string[]).map((v) => dayjs(v).toDate())
-            : value
-        )
+        return parseState<RecordsState>(outboundState as string)
       case 'settings':
         return migrateSettingsState(outboundState)
     }

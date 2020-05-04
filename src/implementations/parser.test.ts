@@ -8,13 +8,30 @@ describe('Parser', () => {
     const VALID_EXPORTED_STATE = {
       version: 202003,
       createTime: new Date(),
-      records: {},
+      records: {
+        records: {
+          '20200501': {
+            starts: [new Date()],
+            stops: [new Date()],
+            memos: [],
+          },
+        },
+      },
       settings: {},
     }
     it('should parse export state if a valid JSON is given', () => {
       const result = parseExportedState(JSON.stringify(VALID_EXPORTED_STATE))
       expect(result.isOk()).toBeTruthy()
-      expect(result.ok()).toBeDefined()
+      const state = result.ok()
+      expect(state).toBeDefined()
+      expect(
+        Object.entries(state.records.records).every(
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          ([key, record]) =>
+            record.starts.every((start) => start instanceof Date) &&
+            record.stops.every((stop) => stop instanceof Date)
+        )
+      ).toBeTruthy()
     })
     it('should return an error when a invalid text is given', () => {
       const result = parseExportedState('{')
