@@ -23,7 +23,6 @@ Access [live demo site](https://workingtimearound.z11.web.core.windows.net/)
 
 A stable release(v1.0.0) will be released if the following conditions are met:
 
-- Implement export / import function(#9)
 - Replace [Material Components for React (MDC React)](https://github.com/material-components/material-components-web-react) with [RMWC - React Material Web Components](https://rmwc.io/)(#16)
 - When releases React with error boundary Hooks api support
 
