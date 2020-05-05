@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { Action } from 'typescript-fsa'
+import assert from 'assert'
 
 import Button from '@material/react-button'
 import Checkbox from '@material/react-checkbox'
@@ -101,6 +102,17 @@ const langs: LanguageInformation = {
  */
 export function getMessageCatalogueOf(lang: Lang): Record<string, string> {
   return langs[lang].catalogue
+}
+
+/**
+ * Get upload text
+ * @description Export for mock this in a unit test.
+ * @param files Upload file list
+ * @returns Upload file content
+ */
+export function getUploadText(files: FileList): Promise<string> {
+  assert(files.length === 1)
+  return files[0].text()
 }
 
 //
@@ -443,7 +455,7 @@ const Import: React.FC = () => {
     if (fileInputRef.current === null || fileInputRef.current.files === null) {
       return
     }
-    const text = await fileInputRef.current.files[0].text()
+    const text = await getUploadText(fileInputRef.current.files)
     const result = parseExportedState(text)
     if (result.isErr()) {
       const msg = intl.formatMessage(

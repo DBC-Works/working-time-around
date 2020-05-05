@@ -27,7 +27,7 @@ import { act } from 'react-dom/test-utils'
 const Container: React.FC<{
   component: React.ReactElement
   route: string
-}> = props => {
+}> = (props) => {
   const currentLang = useSelector((app: AppState) => getLang(app.settings))
   dayjs.locale(currentLang)
   return (

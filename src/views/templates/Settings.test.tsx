@@ -7,7 +7,7 @@ import { AnyAction, Store } from 'redux'
 import { INITIAL_STATE as runningInitialState } from '../../state/ducks/running'
 import {
   INITIAL_STATE as settingsInitialState,
-  settingsTypes,
+  SettingsState,
 } from '../../state/ducks/settings'
 import { AppState, INITIAL_STATE } from '../../state/store'
 import Settings from './Settings'
@@ -48,9 +48,7 @@ describe('"Settings" template', () => {
     return renderWithProvider(<Settings />, '/settings', state)
   }
 
-  function makeSettingsTestState(
-    settings: settingsTypes.SettingsState
-  ): AppState {
+  function makeSettingsTestState(settings: SettingsState): AppState {
     return {
       ...INITIAL_STATE,
       settings,
@@ -279,6 +277,25 @@ describe('"Settings" template', () => {
 
         expect(queryByText(HEADING.LANGUAGE)).not.toBeInTheDocument()
       })
+
+      it('should change the display language to the selected language', () => {
+        const [renderResult] = setup()
+        const { getByText } = renderResult
+
+        act(() => {
+          fireEvent.change(
+            (getByText('English') as HTMLElement).closest(
+              'select'
+            ) as HTMLSelectElement,
+            {
+              target: { value: 'ja' },
+            }
+          )
+        })
+
+        expect(getByText('言語')).toBeInTheDocument()
+        expect(getByText('日本語')).toBeInTheDocument()
+      })
     })
   })
 
@@ -374,7 +391,7 @@ describe('"Settings" template', () => {
         expect(label).toBeInTheDocument()
         expect(label).toHaveTextContent('Import settings')
       })
-      it('should check after checkbox click', () => {
+      it('should check the import settings checkbox after checkbox click', () => {
         const [renderResult] = setup()
         const { container, getByText } = renderResult
         act(() => {
@@ -411,6 +428,24 @@ describe('"Settings" template', () => {
         expect(
           queryByText(HEADING.SEND_TO_MAIL_ADDRESS)
         ).not.toBeInTheDocument()
+      })
+
+      it('should update mail address to entered', () => {
+        const [renderResult] = setup()
+        const { container, getByDisplayValue, getByText } = renderResult
+        act(() => {
+          fireEvent.click(getByText(TAB.LINKAGE))
+        })
+        const mailAddress = container.querySelector(
+          'input[type="email"]'
+        ) as HTMLInputElement
+        act(() => {
+          fireEvent.input(mailAddress, {
+            target: { value: 'updated@example.com' },
+          })
+        })
+
+        expect(getByDisplayValue('updated@example.com')).toBeInTheDocument()
       })
     })
 
@@ -492,6 +527,51 @@ describe('"Settings" template', () => {
         expect(
           queryByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)
         ).not.toBeInTheDocument()
+      })
+
+      it('should update incoming webhook url to entered', () => {
+        const [renderResult] = setup()
+        const { container, getByDisplayValue, getByText } = renderResult
+        act(() => {
+          fireEvent.click(getByText(TAB.LINKAGE))
+        })
+        const url = container.querySelector(
+          'input[type="url"]'
+        ) as HTMLInputElement
+        act(() => {
+          fireEvent.input(url, {
+            target: {
+              value:
+                'https://hooks.slack.com/services/xxxxxxxxx/xxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxx',
+            },
+          })
+        })
+
+        expect(
+          getByDisplayValue(
+            'https://hooks.slack.com/services/xxxxxxxxx/xxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxx'
+          )
+        ).toBeInTheDocument()
+      })
+
+      it('should update context to entered', () => {
+        const [renderResult] = setup()
+        const { container, getByDisplayValue, getByText } = renderResult
+        act(() => {
+          fireEvent.click(getByText(TAB.LINKAGE))
+        })
+        const context = container.querySelector(
+          'input[type="text"]'
+        ) as HTMLInputElement
+        act(() => {
+          fireEvent.input(context, {
+            target: {
+              value: 'Updated slack context',
+            },
+          })
+        })
+
+        expect(getByDisplayValue('Updated slack context')).toBeInTheDocument()
       })
     })
   })
