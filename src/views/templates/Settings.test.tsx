@@ -12,13 +12,8 @@ import {
 import { AppState, INITIAL_STATE } from '../../state/store'
 import Settings from './Settings'
 
-import {
-  act,
-  cleanup,
-  fireEvent,
-  RenderResult,
-  within,
-} from '@testing-library/react'
+import { act, RenderResult, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { renderWithProvider } from '../componentTestUtilities'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -55,122 +50,105 @@ describe('"Settings" template', () => {
     }
   }
 
-  afterEach(cleanup)
-
   it('should exist "Settings" heading', () => {
-    const [renderResult] = setup()
-    const { getByText } = renderResult
-    expect(getByText('Settings')).toBeInTheDocument()
+    setup()
+    expect(screen.getByText('Settings')).toBeInTheDocument()
   })
   it('should exist "Operation", "Record" and "Linkage" tab heading', () => {
-    const [renderResult] = setup()
-    const { getByText } = renderResult
+    setup()
 
-    expect(getByText(TAB.OPERATION)).toBeInTheDocument()
-    expect(getByText(TAB.RECORD)).toBeInTheDocument()
-    expect(getByText(TAB.LINKAGE)).toBeInTheDocument()
+    expect(screen.getByText(TAB.OPERATION)).toBeInTheDocument()
+    expect(screen.getByText(TAB.RECORD)).toBeInTheDocument()
+    expect(screen.getByText(TAB.LINKAGE)).toBeInTheDocument()
   })
 
   describe('"Operation" tab', () => {
     describe('Default break time length', () => {
-      const TEST_ID_BREAK_TIME_LENGTH = 'break-time-length'
       const LITERAL_NO_SELECTION = '--'
 
       it('should exist when "Operation" tab is selected', () => {
-        const [renderResult] = setup()
-        const { getByText } = renderResult
-
-        expect(getByText(HEADING.DEFAULT_BREAK_TIME_LENGTH)).toBeInTheDocument()
+        setup()
+        expect(
+          screen.getByText(HEADING.DEFAULT_BREAK_TIME_LENGTH)
+        ).toBeInTheDocument()
       })
       it('should not exist when "Operation" tab is not selected', () => {
-        const [renderResult] = setup()
-        const { getByText, queryByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.LINKAGE))
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.LINKAGE))
 
         expect(
-          queryByText(HEADING.DEFAULT_BREAK_TIME_LENGTH)
+          screen.queryByText(HEADING.DEFAULT_BREAK_TIME_LENGTH)
         ).not.toBeInTheDocument()
       })
       it('should exist break time length select component', () => {
-        const [renderResult] = setup()
-        const { getByTestId } = within(
-          renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
-        )
-        expect(getByTestId('time-select')).toBeInTheDocument()
+        setup()
+        expect(screen.getByTestId('time-select')).toBeInTheDocument()
       })
       it('should exist clear icon button component', () => {
-        const [renderResult] = setup()
-        const { getByText } = within(
-          renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
-        )
-        const clearButton = getByText('clear')
+        setup()
+        const clearButton = screen.getByText('clear')
+
         expect(clearButton).toBeInTheDocument()
         expect(clearButton).not.toBeDisabled()
       })
       it('should not be selected if break time length is not set', () => {
-        const [renderResult] = setup(
+        setup(
           makeSettingsTestState({
             ...settingsInitialState,
             defaultBreakTimeLengthMin: undefined,
           })
         )
-        const { getAllByDisplayValue, getByText } = within(
-          renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+
+        expect(screen.getAllByDisplayValue(LITERAL_NO_SELECTION)).toHaveLength(
+          2
         )
-        expect(getAllByDisplayValue(LITERAL_NO_SELECTION)).toHaveLength(2)
-        const clearButton = getByText('clear')
+        const clearButton = screen.getByText('clear')
         expect(clearButton).toBeInTheDocument()
         expect(clearButton).toBeDisabled()
       })
       it('should be selected if break time length is set', () => {
-        const [renderResult] = setup(
+        setup(
           makeSettingsTestState({
             ...INITIAL_STATE.settings,
             defaultBreakTimeLengthMin: 95,
           })
         )
-        const { getByDisplayValue, getByText } = within(
-          renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
-        )
-        expect(getByDisplayValue('01')).toBeInTheDocument()
-        expect(getByDisplayValue(':35')).toBeInTheDocument()
-        const clearButton = getByText('clear')
+
+        expect(screen.getByDisplayValue('01')).toBeInTheDocument()
+        expect(screen.getByDisplayValue(':35')).toBeInTheDocument()
+        const clearButton = screen.getByText('clear')
         expect(clearButton).toBeInTheDocument()
         expect(clearButton).not.toBeDisabled()
       })
       it('should be able to change', () => {
-        const [renderResult] = setup()
-        const { getByDisplayValue, queryByDisplayValue, getByText } = within(
-          renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
-        )
-        expect(getByDisplayValue('01')).toBeInTheDocument()
-        expect(getByDisplayValue(':00')).toBeInTheDocument()
+        setup()
 
-        act(() => {
-          fireEvent.change(getByDisplayValue(':00') as HTMLElement, {
-            target: { value: '45' },
-          })
-        })
-        expect(getByDisplayValue('01')).toBeInTheDocument()
-        expect(getByDisplayValue(':45')).toBeInTheDocument()
+        expect(screen.getByDisplayValue('01')).toBeInTheDocument()
+        expect(screen.getByDisplayValue(':00')).toBeInTheDocument()
+
+        userEvent.selectOptions(
+          screen.getByDisplayValue(':00') as HTMLElement,
+          '45'
+        )
+
+        expect(screen.getByDisplayValue('01')).toBeInTheDocument()
+        expect(screen.getByDisplayValue(':45')).toBeInTheDocument()
         expect(
-          queryByDisplayValue(LITERAL_NO_SELECTION)
+          screen.queryByDisplayValue(LITERAL_NO_SELECTION)
         ).not.toBeInTheDocument()
-        const clearButton = getByText('clear')
+        const clearButton = screen.getByText('clear')
         expect(clearButton).toBeInTheDocument()
         expect(clearButton).not.toBeDisabled()
 
-        act(() => {
-          fireEvent.change(getByDisplayValue('01') as HTMLElement, {
-            target: { value: '0' },
-          })
-        })
-        expect(getByDisplayValue('00')).toBeInTheDocument()
-        expect(getByDisplayValue(':45')).toBeInTheDocument()
+        userEvent.selectOptions(
+          screen.getByDisplayValue('01') as HTMLElement,
+          '0'
+        )
+
+        expect(screen.getByDisplayValue('00')).toBeInTheDocument()
+        expect(screen.getByDisplayValue(':45')).toBeInTheDocument()
         expect(
-          queryByDisplayValue(LITERAL_NO_SELECTION)
+          screen.queryByDisplayValue(LITERAL_NO_SELECTION)
         ).not.toBeInTheDocument()
         expect(clearButton).not.toBeDisabled()
       })
@@ -180,26 +158,22 @@ describe('"Settings" template', () => {
       ])(
         'should be set minute to "00" automatically when not selected and hour is selected',
         (table) => {
-          const [renderResult] = setup(
+          setup(
             makeSettingsTestState({
               ...INITIAL_STATE.settings,
               defaultBreakTimeLengthMin: undefined,
             })
           )
-          const { getAllByDisplayValue, getByDisplayValue, getByText } = within(
-            renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+          userEvent.selectOptions(
+            (screen.getAllByDisplayValue(
+              LITERAL_NO_SELECTION
+            ) as HTMLElement[])[0],
+            table.value
           )
-          act(() => {
-            fireEvent.change(
-              (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[0],
-              {
-                target: { value: table.value },
-              }
-            )
-          })
-          expect(getByDisplayValue(table.expected)).toBeInTheDocument()
-          expect(getByDisplayValue(':00')).toBeInTheDocument()
-          const clearButton = getByText('clear')
+
+          expect(screen.getByDisplayValue(table.expected)).toBeInTheDocument()
+          expect(screen.getByDisplayValue(':00')).toBeInTheDocument()
+          const clearButton = screen.getByText('clear')
           expect(clearButton).toBeInTheDocument()
           expect(clearButton).not.toBeDisabled()
         }
@@ -210,49 +184,45 @@ describe('"Settings" template', () => {
       ])(
         'should be set hour to "00" automatically when not selected and minute is selected',
         (table) => {
-          const [renderResult] = setup(
+          setup(
             makeSettingsTestState({
               ...INITIAL_STATE.settings,
               defaultBreakTimeLengthMin: undefined,
             })
           )
-          const { getAllByDisplayValue, getByDisplayValue, getByText } = within(
-            renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+          userEvent.selectOptions(
+            (screen.getAllByDisplayValue(
+              LITERAL_NO_SELECTION
+            ) as HTMLElement[])[1],
+            table.value
           )
-          act(() => {
-            fireEvent.change(
-              (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[1],
-              {
-                target: { value: table.value },
-              }
-            )
-          })
-          expect(getByDisplayValue('00')).toBeInTheDocument()
-          expect(getByDisplayValue(table.expected)).toBeInTheDocument()
-          const clearButton = getByText('clear')
+
+          expect(screen.getByDisplayValue('00')).toBeInTheDocument()
+          expect(screen.getByDisplayValue(table.expected)).toBeInTheDocument()
+          const clearButton = screen.getByText('clear')
           expect(clearButton).toBeInTheDocument()
           expect(clearButton).not.toBeDisabled()
         }
       )
       it('should be clear the selection when "clear" button is selected', () => {
-        const [renderResult, store] = setup(
+        const [, store] = setup(
           makeSettingsTestState({
             ...INITIAL_STATE.settings,
             defaultBreakTimeLengthMin: 5,
           })
         )
-        const { getAllByDisplayValue, getByDisplayValue, getByText } = within(
-          renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
-        )
-        expect(getByDisplayValue('00')).toBeInTheDocument()
-        expect(getByDisplayValue(':05')).toBeInTheDocument()
-        const clearButton = getByText('clear') as HTMLElement
+        expect(screen.getByDisplayValue('00')).toBeInTheDocument()
+        expect(screen.getByDisplayValue(':05')).toBeInTheDocument()
+        const clearButton = screen.getByText('clear') as HTMLElement
         expect(clearButton).not.toBeDisabled()
 
         act(() => {
-          fireEvent.click(clearButton)
+          userEvent.click(clearButton)
         })
-        expect(getAllByDisplayValue(LITERAL_NO_SELECTION)).toHaveLength(2)
+
+        expect(screen.getAllByDisplayValue(LITERAL_NO_SELECTION)).toHaveLength(
+          2
+        )
         expect(clearButton).toBeDisabled()
         const {
           settings: { defaultBreakTimeLengthMin },
@@ -263,38 +233,26 @@ describe('"Settings" template', () => {
 
     describe('Language', () => {
       it('should exist when "Operation" tab is selected', () => {
-        const [renderResult] = setup()
-        const { getByText } = renderResult
-
-        expect(getByText(HEADING.LANGUAGE)).toBeInTheDocument()
+        setup()
+        expect(screen.getByText(HEADING.LANGUAGE)).toBeInTheDocument()
       })
       it('should not exist when "Operation" tab is not selected', () => {
-        const [renderResult] = setup()
-        const { getByText, queryByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.LINKAGE))
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.LINKAGE))
 
-        expect(queryByText(HEADING.LANGUAGE)).not.toBeInTheDocument()
+        expect(screen.queryByText(HEADING.LANGUAGE)).not.toBeInTheDocument()
       })
 
       it('should change the display language to the selected language', () => {
-        const [renderResult] = setup()
-        const { getByText } = renderResult
+        setup()
 
-        act(() => {
-          fireEvent.change(
-            (getByText('English') as HTMLElement).closest(
-              'select'
-            ) as HTMLSelectElement,
-            {
-              target: { value: 'ja' },
-            }
-          )
-        })
+        userEvent.selectOptions(
+          screen.getByDisplayValue('English') as HTMLElement,
+          'ja'
+        )
 
-        expect(getByText('言語')).toBeInTheDocument()
-        expect(getByText('日本語')).toBeInTheDocument()
+        expect(screen.getByText('言語')).toBeInTheDocument()
+        expect(screen.getByText('日本語')).toBeInTheDocument()
       })
     })
   })
@@ -318,28 +276,20 @@ describe('"Settings" template', () => {
       const LABEL_DOWNLOAD = 'Download'
 
       it('should exist when "Record" tab is selected', () => {
-        const [renderResult] = setup()
-        const { getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.RECORD))
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.RECORD))
 
-        expect(getByText(HEADING.EXPORT)).toBeInTheDocument()
+        expect(screen.getByText(HEADING.EXPORT)).toBeInTheDocument()
       })
       it('should not exist when "Record" tab is not selected', () => {
-        const [renderResult] = setup()
-        const { queryByText } = renderResult
-
-        expect(queryByText(HEADING.EXPORT)).not.toBeInTheDocument()
+        setup()
+        expect(screen.queryByText(HEADING.EXPORT)).not.toBeInTheDocument()
       })
       it('should exist "Start download" link', () => {
-        const [renderResult] = setup()
-        const { getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.RECORD))
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.RECORD))
 
-        const startDownloadAnchor = getByText(LABEL_DOWNLOAD)
+        const startDownloadAnchor = screen.getByText(LABEL_DOWNLOAD)
         expect(startDownloadAnchor).toBeInTheDocument()
         expect(startDownloadAnchor).toHaveAttribute(
           'download',
@@ -350,61 +300,39 @@ describe('"Settings" template', () => {
       })
     })
     describe('Import', () => {
-      const ID_CHECKBOX = 'import-settings'
-
       it('should exist when "Record" tab is selected', () => {
-        const [renderResult] = setup()
-        const { getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.RECORD))
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.RECORD))
 
-        expect(getByText(HEADING.IMPORT)).toBeInTheDocument()
+        expect(screen.getByText(HEADING.IMPORT)).toBeInTheDocument()
       })
       it('should not exist when "Record" tab is not selected', () => {
-        const [renderResult] = setup()
-        const { queryByText } = renderResult
-
-        expect(queryByText(HEADING.IMPORT)).not.toBeInTheDocument()
+        setup()
+        expect(screen.queryByText(HEADING.IMPORT)).not.toBeInTheDocument()
       })
       it('should exist file upload element and "Browse" button', () => {
-        const [renderResult] = setup()
-        const { getByTestId, getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.RECORD))
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.RECORD))
 
-        expect(getByTestId('file-upload')).toBeInTheDocument()
-        expect(getByText('Browse...')).toBeInTheDocument()
+        expect(screen.getByTestId('file-upload')).toBeInTheDocument()
+        expect(screen.getByText('Browse...')).toBeInTheDocument()
       })
       it('should exist checkbox to import settings', () => {
-        const [renderResult] = setup()
-        const { container, getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.RECORD))
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.RECORD))
 
-        const checkbox = container.querySelector(`input[id="${ID_CHECKBOX}"]`)
+        const checkbox = screen.getByLabelText('Import settings')
         expect(checkbox).toBeInTheDocument()
         expect(checkbox).not.toBeChecked()
-        const label = container.querySelector(`label[for="${ID_CHECKBOX}"]`)
+        const label = screen.getByText('Import settings')
         expect(label).toBeInTheDocument()
-        expect(label).toHaveTextContent('Import settings')
       })
       it('should check the import settings checkbox after checkbox click', () => {
-        const [renderResult] = setup()
-        const { container, getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.RECORD))
-        })
-        const checkbox = container.querySelector(
-          `input[id="${ID_CHECKBOX}"]`
-        ) as Element
-        act(() => {
-          fireEvent.click(checkbox)
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.RECORD))
+        const checkbox = screen.getByLabelText('Import settings')
+        userEvent.click(checkbox)
 
-        expect(checkbox).toBeInTheDocument()
         expect(checkbox).toBeChecked()
       })
     })
@@ -413,39 +341,29 @@ describe('"Settings" template', () => {
   describe('"Linkage" tab', () => {
     describe('Send to mail address', () => {
       it('should exist when "Linkage" tab is selected', () => {
-        const [renderResult] = setup()
-        const { getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.LINKAGE))
-        })
-
-        expect(getByText(HEADING.SEND_TO_MAIL_ADDRESS)).toBeInTheDocument()
-      })
-      it('should not exist when "Linkage" tab is not selected', () => {
-        const [renderResult] = setup()
-        const { queryByText } = renderResult
+        setup()
+        userEvent.click(screen.getByText(TAB.LINKAGE))
 
         expect(
-          queryByText(HEADING.SEND_TO_MAIL_ADDRESS)
+          screen.getByText(HEADING.SEND_TO_MAIL_ADDRESS)
+        ).toBeInTheDocument()
+      })
+      it('should not exist when "Linkage" tab is not selected', () => {
+        setup()
+        expect(
+          screen.queryByText(HEADING.SEND_TO_MAIL_ADDRESS)
         ).not.toBeInTheDocument()
       })
 
       it('should update mail address to entered', () => {
-        const [renderResult] = setup()
-        const { container, getByDisplayValue, getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.LINKAGE))
-        })
-        const mailAddress = container.querySelector(
-          'input[type="email"]'
-        ) as HTMLInputElement
-        act(() => {
-          fireEvent.input(mailAddress, {
-            target: { value: 'updated@example.com' },
-          })
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.LINKAGE))
+        const mailAddress = screen.getByLabelText('Send to mail address')
+        userEvent.type(mailAddress, 'updated@example.com')
 
-        expect(getByDisplayValue('updated@example.com')).toBeInTheDocument()
+        expect(
+          screen.getByDisplayValue('updated@example.com')
+        ).toBeInTheDocument()
       })
     })
 
@@ -454,45 +372,43 @@ describe('"Settings" template', () => {
       const LABEL_BUTTON_OFFLINE = '(Offline)'
 
       it('should exist when "Linkage" tab is selected', () => {
-        const [renderResult] = setup()
-        const { getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.LINKAGE))
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.LINKAGE))
 
-        expect(getByText(HEADING.SLACK_LINKAGE)).toBeInTheDocument()
-        expect(getByText('Incoming webhook URL')).toBeInTheDocument()
-        expect(getByText('Context')).toBeInTheDocument()
+        expect(screen.getByText(HEADING.SLACK_LINKAGE)).toBeInTheDocument()
+        expect(screen.getByText('Incoming webhook URL')).toBeInTheDocument()
+        expect(screen.getByText('Context')).toBeInTheDocument()
       })
       it('should not exist when "Linkage" tab is not selected', () => {
-        const [renderResult] = setup()
-        const { queryByText } = renderResult
-
-        expect(queryByText(HEADING.SLACK_LINKAGE)).not.toBeInTheDocument()
-        expect(queryByText('Incoming webhook URL')).not.toBeInTheDocument()
-        expect(queryByText('Context')).not.toBeInTheDocument()
+        setup()
+        expect(
+          screen.queryByText(HEADING.SLACK_LINKAGE)
+        ).not.toBeInTheDocument()
+        expect(
+          screen.queryByText('Incoming webhook URL')
+        ).not.toBeInTheDocument()
+        expect(screen.queryByText('Context')).not.toBeInTheDocument()
       })
       it('should exist "Send a test message" button when online', () => {
-        const [renderResult] = setup()
-        const { getByText, queryByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.LINKAGE))
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.LINKAGE))
 
-        expect(getByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)).toBeInTheDocument()
-        expect(queryByText(LABEL_BUTTON_OFFLINE)).not.toBeInTheDocument()
+        expect(
+          screen.getByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)
+        ).toBeInTheDocument()
+        expect(screen.queryByText(LABEL_BUTTON_OFFLINE)).not.toBeInTheDocument()
       })
       it('should to be disabled "Send a test message" when "Incoming webhook URL" is not set or invalid', () => {
-        const [renderResult] = setup()
-        const { getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.LINKAGE))
-        })
-        expect(getByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)).toBeDisabled()
+        setup()
+        userEvent.click(screen.getByText(TAB.LINKAGE))
+
+        expect(
+          screen.getByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)
+        ).toBeDisabled()
       })
 
       it('should to be enabled "Send a test message" when "incoming Webhook URL" is set and valid', () => {
-        const [renderResult] = setup(
+        setup(
           makeSettingsTestState({
             ...settingsInitialState,
             slack: {
@@ -502,76 +418,53 @@ describe('"Settings" template', () => {
             },
           })
         )
-        const { getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.LINKAGE))
-        })
+        userEvent.click(screen.getByText(TAB.LINKAGE))
 
-        expect(getByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)).toBeEnabled()
+        expect(screen.getByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)).toBeEnabled()
       })
 
       it('should exist disabled "(offline)" button when offline', () => {
-        const appState = {
+        setup({
           ...INITIAL_STATE,
           running: { ...runningInitialState, onLine: false },
-        }
-        const [renderResult] = setup(appState)
-        const { getByText, queryByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.LINKAGE))
         })
-        const offLineButton = getByText(LABEL_BUTTON_OFFLINE)
+        userEvent.click(screen.getByText(TAB.LINKAGE))
 
+        const offLineButton = screen.getByText(LABEL_BUTTON_OFFLINE)
         expect(offLineButton).toBeInTheDocument()
         expect(offLineButton).toBeDisabled()
         expect(
-          queryByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)
+          screen.queryByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)
         ).not.toBeInTheDocument()
       })
 
       it('should update incoming webhook url to entered', () => {
-        const [renderResult] = setup()
-        const { container, getByDisplayValue, getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.LINKAGE))
-        })
-        const url = container.querySelector(
-          'input[type="url"]'
-        ) as HTMLInputElement
-        act(() => {
-          fireEvent.input(url, {
-            target: {
-              value:
-                'https://hooks.slack.com/services/xxxxxxxxx/xxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxx',
-            },
-          })
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.LINKAGE))
+        const url = screen.getByLabelText('Incoming webhook URL')
+        userEvent.type(
+          url,
+          'https://hooks.slack.com/services/xxxxxxxxx/xxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxx'
+        )
 
         expect(
-          getByDisplayValue(
+          screen.getByDisplayValue(
             'https://hooks.slack.com/services/xxxxxxxxx/xxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxx'
           )
         ).toBeInTheDocument()
       })
 
       it('should update context to entered', () => {
-        const [renderResult] = setup()
-        const { container, getByDisplayValue, getByText } = renderResult
-        act(() => {
-          fireEvent.click(getByText(TAB.LINKAGE))
-        })
-        const context = container.querySelector(
-          'input[type="text"]'
-        ) as HTMLInputElement
-        act(() => {
-          fireEvent.input(context, {
-            target: {
-              value: 'Updated slack context',
-            },
-          })
-        })
+        setup()
+        userEvent.click(screen.getByText(TAB.LINKAGE))
+        userEvent.type(
+          screen.getByLabelText('Context'),
+          'Updated slack context'
+        )
 
-        expect(getByDisplayValue('Updated slack context')).toBeInTheDocument()
+        expect(
+          screen.getByDisplayValue('Updated slack context')
+        ).toBeInTheDocument()
       })
     })
   })

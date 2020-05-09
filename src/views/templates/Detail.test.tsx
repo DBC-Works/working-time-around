@@ -15,13 +15,8 @@ import { AppState, INITIAL_STATE } from '../../state/store'
 import List from './List'
 import Detail from './Detail'
 
-import {
-  act,
-  cleanup,
-  fireEvent,
-  RenderResult,
-  within,
-} from '@testing-library/react'
+import { RenderResult, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { renderWithProvider } from '../componentTestUtilities'
 
 describe('"Detail" template', () => {
@@ -65,60 +60,49 @@ describe('"Detail" template', () => {
     dj = dayjs(now)
   })
 
-  afterEach(cleanup)
-
   describe('Content header', () => {
-    let renderResult: RenderResult
-
     beforeEach(() => {
-      renderResult = setup(dj.format(PATH_DETAIL))[0]
+      setup(dj.format(PATH_DETAIL))[0]
     })
 
     it('should exist date text heading', () => {
-      const { getByText } = renderResult
-      expect(getByText(dj.format('ll'))).toBeInTheDocument()
+      expect(screen.getByText(dj.format('ll'))).toBeInTheDocument()
     })
 
     it('should move to the previous day when click "prev" icon link', () => {
-      const { getByText } = renderResult
-      act(() => {
-        fireEvent.click(getByText('navigate_before'))
-      })
-      expect(getByText(dj.add(-1, 'day').format('ll'))).toBeInTheDocument()
+      userEvent.click(screen.getByText('navigate_before'))
+
+      expect(
+        screen.getByText(dj.add(-1, 'day').format('ll'))
+      ).toBeInTheDocument()
     })
 
     it('should move to the next month when click "next" icon link', () => {
-      const { getByText } = renderResult
-      act(() => {
-        fireEvent.click(getByText('navigate_next'))
-      })
-      expect(getByText(dj.add(1, 'day').format('ll'))).toBeInTheDocument()
+      userEvent.click(screen.getByText('navigate_next'))
+
+      expect(
+        screen.getByText(dj.add(1, 'day').format('ll'))
+      ).toBeInTheDocument()
     })
   })
 
   describe('Time', () => {
-    let renderResult: RenderResult
-
     beforeEach(() => {
-      renderResult = setup(dj.format(PATH_DETAIL))[0]
+      setup(dj.format(PATH_DETAIL))[0]
     })
 
     it('should exist heading', () => {
-      const { getByText } = renderResult
-      expect(getByText('Time')).toBeInTheDocument()
+      expect(screen.getByText('Time')).toBeInTheDocument()
     })
   })
 
   describe('Memo', () => {
-    let renderResult: RenderResult
-
     beforeEach(() => {
-      renderResult = setup(dj.format(PATH_DETAIL))[0]
+      setup(dj.format(PATH_DETAIL))[0]
     })
 
     it('should exist heading', () => {
-      const { getByText } = renderResult
-      expect(getByText('Memo')).toBeInTheDocument()
+      expect(screen.getByText('Memo')).toBeInTheDocument()
     })
   })
 
@@ -148,35 +132,34 @@ describe('"Detail" template', () => {
     }
 
     it('should exist heading', () => {
-      const [renderResult] = setup(dj.format(PATH_DETAIL))
-      const { getByText } = renderResult
-      expect(getByText('Break time length')).toBeInTheDocument()
+      setup(dj.format(PATH_DETAIL))
+      expect(screen.getByText('Break time length')).toBeInTheDocument()
     })
 
     it('should exist break time length select component', () => {
-      const [renderResult] = setup(dj.format(PATH_DETAIL))
+      setup(dj.format(PATH_DETAIL))
       const { getByTestId } = within(
-        renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+        screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
       )
       expect(getByTestId('time-select')).toBeInTheDocument()
     })
     it('should not be selected if break time length is not set', () => {
-      const [renderResult] = setup(
+      setup(
         dj.format(PATH_DETAIL),
         makeRecordsTestState(makeTestState(dj, null))
       )
       const { getAllByDisplayValue } = within(
-        renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+        screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
       )
       expect(getAllByDisplayValue(LITERAL_NO_SELECTION)).toHaveLength(2)
     })
     it('should be selected if break time length is set', () => {
-      const [renderResult] = setup(
+      setup(
         dj.format(PATH_DETAIL),
         makeRecordsTestState(makeTestState(dj, [95]))
       )
       const { getByDisplayValue } = within(
-        renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+        screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
       )
       expect(getByDisplayValue('01')).toBeInTheDocument()
       expect(getByDisplayValue(':35')).toBeInTheDocument()
@@ -185,30 +168,23 @@ describe('"Detail" template', () => {
       { lengthsMin: [60], hour: '01', minute: ':00' },
       { lengthsMin: [60, 120], hour: '02', minute: ':00' },
     ])('should be able to change', (table) => {
-      const [renderResult] = setup(
+      setup(
         dj.format(PATH_DETAIL),
         makeRecordsTestState(makeTestState(dj, table.lengthsMin))
       )
       const { getByDisplayValue, queryByDisplayValue } = within(
-        renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+        screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
       )
       expect(getByDisplayValue(table.hour)).toBeInTheDocument()
       expect(getByDisplayValue(table.minute)).toBeInTheDocument()
 
-      act(() => {
-        fireEvent.change(getByDisplayValue(':00') as HTMLElement, {
-          target: { value: '45' },
-        })
-      })
+      userEvent.selectOptions(getByDisplayValue(':00') as HTMLElement, '45')
+
       expect(getByDisplayValue(table.hour)).toBeInTheDocument()
       expect(getByDisplayValue(':45')).toBeInTheDocument()
       expect(queryByDisplayValue(LITERAL_NO_SELECTION)).not.toBeInTheDocument()
 
-      act(() => {
-        fireEvent.change(getByDisplayValue(table.hour) as HTMLElement, {
-          target: { value: '0' },
-        })
-      })
+      userEvent.selectOptions(getByDisplayValue(table.hour) as HTMLElement, '0')
       expect(getByDisplayValue('00')).toBeInTheDocument()
       expect(getByDisplayValue(':45')).toBeInTheDocument()
       expect(queryByDisplayValue(LITERAL_NO_SELECTION)).not.toBeInTheDocument()
@@ -220,21 +196,19 @@ describe('"Detail" template', () => {
     ])(
       'should be set minute to "00" automatically when not selected and hour is selected',
       (table) => {
-        const [renderResult] = setup(
+        setup(
           dj.format(PATH_DETAIL),
           makeRecordsTestState(makeTestState(dj, null))
         )
         const { getAllByDisplayValue, getByDisplayValue } = within(
-          renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+          screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
         )
-        act(() => {
-          fireEvent.change(
-            (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[0],
-            {
-              target: { value: table.value },
-            }
-          )
-        })
+
+        userEvent.selectOptions(
+          (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[0],
+          table.value
+        )
+
         expect(getByDisplayValue(table.expected)).toBeInTheDocument()
         expect(getByDisplayValue(':00')).toBeInTheDocument()
       }
@@ -245,21 +219,18 @@ describe('"Detail" template', () => {
     ])(
       'should be set hour to "00" automatically when not selected and minute is selected',
       (table) => {
-        const [renderResult] = setup(
+        setup(
           dj.format(PATH_DETAIL),
           makeRecordsTestState(makeTestState(dj, null))
         )
         const { getAllByDisplayValue, getByDisplayValue } = within(
-          renderResult.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+          screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
         )
-        act(() => {
-          fireEvent.change(
-            (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[1],
-            {
-              target: { value: table.value },
-            }
-          )
-        })
+        userEvent.selectOptions(
+          (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[1],
+          table.value
+        )
+
         expect(getByDisplayValue('00')).toBeInTheDocument()
         expect(getByDisplayValue(table.expected)).toBeInTheDocument()
       }
@@ -267,18 +238,14 @@ describe('"Detail" template', () => {
   })
 
   describe('Floating action button', () => {
-    let renderResult: RenderResult
-
     beforeEach(() => {
-      renderResult = setup(dj.format(PATH_DETAIL))[0]
+      setup(dj.format(PATH_DETAIL))[0]
     })
 
     it('should move to list of month including the day when click "Back to list" fab link', () => {
-      const { getByText } = renderResult
-      act(() => {
-        fireEvent.click(getByText('list'))
-      })
-      expect(getByText(dj.format('MMM YYYY'))).toBeInTheDocument()
+      userEvent.click(screen.getByText('list'))
+
+      expect(screen.getByText(dj.format('MMM YYYY'))).toBeInTheDocument()
     })
   })
 })

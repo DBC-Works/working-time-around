@@ -12,7 +12,7 @@ const Select: React.FC<{
   testId?: string
   value?: string
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void
-}> = props => (
+}> = (props) => (
   <div
     className={
       'mdc-select mdc-select--outlined' +

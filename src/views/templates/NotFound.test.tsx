@@ -7,7 +7,7 @@ import { AnyAction, Store } from 'redux'
 import { AppState } from '../../state/store'
 import NotFound from './NotFound'
 
-import { cleanup, RenderResult } from '@testing-library/react'
+import { RenderResult, screen } from '@testing-library/react'
 import { renderWithProvider } from '../componentTestUtilities'
 
 describe('"NotFound" template', () => {
@@ -15,11 +15,8 @@ describe('"NotFound" template', () => {
     return renderWithProvider(<NotFound />, '/not-exist')
   }
 
-  afterEach(cleanup)
-
   it('should report "Not found"', () => {
-    const [renderResult] = setup()
-    const { getByText } = renderResult
-    expect(getByText('Not found')).toBeInTheDocument()
+    setup()
+    expect(screen.getByText('Not found')).toBeInTheDocument()
   })
 })

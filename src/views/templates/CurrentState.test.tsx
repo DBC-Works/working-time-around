@@ -11,7 +11,8 @@ import { RunningState } from '../../state/ducks/running'
 import { AppState, INITIAL_STATE } from '../../state/store'
 import CurrentState from './CurrentState'
 
-import { act, cleanup, fireEvent, RenderResult } from '@testing-library/react'
+import { RenderResult, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { renderWithProvider } from '../componentTestUtilities'
 
 describe('"CurrentState" template', () => {
@@ -32,8 +33,6 @@ describe('"CurrentState" template', () => {
     jest.useRealTimers()
   })
 
-  afterEach(cleanup)
-
   it('should exist current date and time', () => {
     const now = new Date()
     const runningState: RunningState = {
@@ -43,28 +42,23 @@ describe('"CurrentState" template', () => {
       window: {} as Window,
       downloadObjectUrl: '#',
     }
-    const appState = {
+    setup({
       ...INITIAL_STATE,
       running: runningState,
-    }
-    const [renderResult] = setup(appState)
-    const { getByText } = renderResult
+    })
 
     const dj = dayjs(now)
-    expect(getByText(dj.format('ll'))).toBeInTheDocument()
-    expect(getByText(dj.format('HH:mm'))).toBeInTheDocument()
+    expect(screen.getByText(dj.format('ll'))).toBeInTheDocument()
+    expect(screen.getByText(dj.format('HH:mm'))).toBeInTheDocument()
   })
 
   it("should enable start and stop buttons when today's record does not exist", () => {
-    const [renderResult] = setup()
-    const { getByTestId } = renderResult
+    setup()
 
-    const startButton = getByTestId('start')
+    const startButton = screen.getByRole('button', { name: 'Start' })
     expect(startButton).toBeEnabled()
-    expect(startButton).toHaveTextContent('Start')
-    const stopButton = getByTestId('stop')
+    const stopButton = screen.getByRole('button', { name: 'Stop' })
     expect(stopButton).toBeEnabled()
-    expect(stopButton).toHaveTextContent('Stop')
   })
 
   it("should disable start button and enable stop button when today's record exist, start time was recorded and stop time is not record", () => {
@@ -80,60 +74,52 @@ describe('"CurrentState" template', () => {
       records: {},
     }
     recordsState.records[dj.format(KEY_RECORD)] = record
-    const appState = {
+    setup({
       ...INITIAL_STATE,
       records: recordsState,
-    }
-    const [renderResult] = setup(appState)
-    const { getByTestId } = renderResult
+    })
 
-    const startButton = getByTestId('start')
+    const startButton = screen.getByRole('button', { name: dj.format('HH:mm') })
     expect(startButton).toBeDisabled()
-    expect(startButton).toHaveTextContent(dj.format('HH:mm'))
-    const stopButton = getByTestId('stop')
+    const stopButton = screen.getByRole('button', { name: 'Stop' })
     expect(stopButton).toBeEnabled()
-    expect(stopButton).toHaveTextContent('Stop')
   })
 
   it("should disable start and stop buttons when today's record exist, start and stop time was recorded", () => {
-    const now = new Date()
+    const djStartTime = dayjs()
+    const djStopTime = djStartTime.add(8, 'hour')
     const record = {
-      starts: [now],
-      stops: [now],
+      starts: [djStartTime.toDate()],
+      stops: [djStopTime.toDate()],
       memos: [],
       breakTimeLengthsMin: [],
     }
     const recordsState: RecordsState = {
       records: {},
     }
-    const dj = dayjs(now)
-    recordsState.records[dj.format(KEY_RECORD)] = record
-    const appState = {
+    recordsState.records[djStartTime.format(KEY_RECORD)] = record
+    setup({
       ...INITIAL_STATE,
       records: recordsState,
-    }
-    const [renderResult] = setup(appState)
-    const { getByTestId } = renderResult
+    })
 
-    const startButton = getByTestId('start')
+    const startButton = screen.getByRole('button', {
+      name: djStartTime.format('HH:mm'),
+    })
     expect(startButton).toBeDisabled()
-    expect(startButton).toHaveTextContent(dj.format('HH:mm'))
-    const stopButton = getByTestId('stop')
+    const stopButton = screen.getByRole('button', {
+      name: djStopTime.format('HH:mm'),
+    })
     expect(stopButton).toBeDisabled()
-    expect(stopButton).toHaveTextContent(dj.format('HH:mm'))
   })
 
   it('should change the start button to be disabled and update text to clicked time when the button is clicked', () => {
-    const [renderResult, store] = setup()
-    const { getByTestId } = renderResult
+    const [, store] = setup()
 
-    const startButton = getByTestId('start')
+    const startButton = screen.getByRole('button', { name: 'Start' })
     expect(startButton).toBeEnabled()
-    expect(startButton).toHaveTextContent('Start')
 
-    act(() => {
-      fireEvent.click(startButton)
-    })
+    userEvent.click(startButton)
 
     expect(startButton).toBeDisabled()
     expect(startButton).not.toHaveTextContent('Start')
@@ -155,19 +141,14 @@ describe('"CurrentState" template', () => {
   })
 
   it('should change buttons to be disabled and update text of the stop button to clicked time when the stop button is clicked', () => {
-    const [renderResult, store] = setup()
-    const { getByTestId } = renderResult
+    const [, store] = setup()
 
-    const startButton = getByTestId('start')
+    const startButton = screen.getByRole('button', { name: 'Start' })
     expect(startButton).toBeEnabled()
-    expect(startButton).toHaveTextContent('Start')
-    const stopButton = getByTestId('stop')
+    const stopButton = screen.getByRole('button', { name: 'Stop' })
     expect(stopButton).toBeEnabled()
-    expect(stopButton).toHaveTextContent('Stop')
 
-    act(() => {
-      fireEvent.click(stopButton)
-    })
+    userEvent.click(stopButton)
 
     expect(startButton).toBeDisabled()
     expect(startButton).toHaveTextContent('Start')

@@ -15,7 +15,8 @@ import { getMessageCatalogueOf } from './templates/settings'
 
 import '@testing-library/jest-dom/extend-expect'
 import { render, RenderResult } from '@testing-library/react'
-import { act } from 'react-dom/test-utils'
+import IntlPolyfill from 'intl'
+import 'intl/locale-data/jsonp/pt'
 
 //
 // Components
@@ -57,14 +58,31 @@ export function renderWithProvider(
 ): [RenderResult, Store<AppState, AnyAction>] {
   dayjs.extend(localizedFormat)
   const store = createStore(createRootReducer(), state, applyMiddleware())
-  let result: RenderResult
-  act(() => {
-    result = render(
-      <Provider store={store}>
-        <Container component={component} route={route} />
-      </Provider>
-    )
-  })
+  const result = render(
+    <Provider store={store}>
+      <Container component={component} route={route} />
+    </Provider>
+  )
   /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
   return [result!, store]
 }
+
+/**
+ * Setup tests
+ * https://testing-library.com/docs/example-react-intl
+ */
+function setupTests(): void {
+  // https://formatjs.io/guides/runtime-environments/#server
+  if (global.Intl) {
+    Intl.NumberFormat = IntlPolyfill.NumberFormat
+    Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat
+  } else {
+    global.Intl = IntlPolyfill
+  }
+}
+
+//
+// Entry
+//
+
+setupTests()

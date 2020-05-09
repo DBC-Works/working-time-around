@@ -167,7 +167,6 @@ const StartButton: React.FC<{
   return (
     <Button
       className="full-width"
-      data-testid="start"
       unelevated={true}
       disabled={props.disabled !== false || props.time !== null}
       onClick={handleClick}
@@ -243,7 +242,6 @@ const StopButton: React.FC<{
   return (
     <Button
       className="full-width"
-      data-testid="stop"
       unelevated={true}
       disabled={props.time !== null}
       onClick={handleClick}

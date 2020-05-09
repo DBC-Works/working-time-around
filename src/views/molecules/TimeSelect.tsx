@@ -19,7 +19,7 @@ const TimeSelect: React.FC<{
   onChange?: (time: Date) => void
   onChangeHour?: (e: ChangeEvent<HTMLSelectElement>) => void
   onChangeMinute?: (e: ChangeEvent<HTMLSelectElement>) => void
-}> = props => {
+}> = (props) => {
   const dj = dayjs(props.time ? props.time : new Date())
 
   const [hour, setHour] = useState(props.time ? `${props.time.getHours()}` : '')

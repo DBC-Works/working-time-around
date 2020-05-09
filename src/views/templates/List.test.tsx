@@ -10,13 +10,8 @@ import { AppState, INITIAL_STATE } from '../../state/store'
 import { RecordsState } from '../../state/ducks/records'
 import List from './List'
 
-import {
-  act,
-  cleanup,
-  fireEvent,
-  RenderResult,
-  within,
-} from '@testing-library/react'
+import { RenderResult, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { renderWithProvider } from '../componentTestUtilities'
 
 describe('"List" template', () => {
@@ -35,8 +30,6 @@ describe('"List" template', () => {
     )
   }
 
-  afterEach(cleanup)
-
   describe('header', () => {
     // eslint-disable-next-line prettier/prettier
     it.each([
@@ -46,40 +39,34 @@ describe('"List" template', () => {
       'should exist an formatted year %i and month %i heading',
       (year, month) => {
         const target = dayjs(new Date(year, month - 1, 1))
-        const [renderResult] = setup(target.format('/YYYY/M'))
-        const { getByText } = renderResult
-        expect(getByText(target.format('MMM YYYY'))).toBeInTheDocument()
+        setup(target.format('/YYYY/M'))
+        expect(screen.getByText(target.format('MMM YYYY'))).toBeInTheDocument()
       }
     )
 
     it('should exist "prev" and "next" icon links', () => {
-      const [renderResult] = setup()
-      const { getByText } = renderResult
-      expect(getByText('navigate_before')).toBeInTheDocument()
-      expect(getByText('navigate_next')).toBeInTheDocument()
+      setup()
+      expect(screen.getByText('navigate_before')).toBeInTheDocument()
+      expect(screen.getByText('navigate_next')).toBeInTheDocument()
     })
 
     it('should move to the previous month when click "prev" icon link', () => {
       const dj = dayjs()
-      const [renderResult] = setup(dj.format('/YYYY/M'))
-      const { getByText } = renderResult
-      act(() => {
-        fireEvent.click(getByText('navigate_before'))
-      })
+      setup(dj.format('/YYYY/M'))
+      userEvent.click(screen.getByText('navigate_before'))
+
       expect(
-        getByText(dj.add(-1, 'month').format('MMM YYYY'))
+        screen.getByText(dj.add(-1, 'month').format('MMM YYYY'))
       ).toBeInTheDocument()
     })
 
     it('should move to the next month when click "next" icon link', () => {
       const dj = dayjs()
-      const [renderResult] = setup(dj.format('/YYYY/M'))
-      const { getByText } = renderResult
-      act(() => {
-        fireEvent.click(getByText('navigate_next'))
-      })
+      setup(dj.format('/YYYY/M'))
+      userEvent.click(screen.getByText('navigate_next'))
+
       expect(
-        getByText(dj.add(1, 'month').format('MMM YYYY'))
+        screen.getByText(dj.add(1, 'month').format('MMM YYYY'))
       ).toBeInTheDocument()
     })
   })
@@ -92,36 +79,33 @@ describe('"List" template', () => {
       'should exist date rows for that month(%i)',
       (monthIndex) => {
         const target = dayjs(new Date()).month(monthIndex).startOf('month')
-        const [renderResult] = setup(target.format('/YYYY/M'))
-        const { getByText } = renderResult
+        setup(target.format('/YYYY/M'))
 
         Array.from(Array(target.daysInMonth()), (_, i) =>
           target.set('date', i + 1)
         ).forEach((date) => {
-          expect(getByText(date.format('D(ddd)'))).toBeInTheDocument()
+          expect(screen.getByText(date.format('D(ddd)'))).toBeInTheDocument()
         })
       }
     )
 
     it('should exist a button to that date page in each date rows', () => {
       const dj = dayjs(new Date())
-      const [renderResult] = setup(dj.format('/YYYY/M'))
-      const { getAllByText } = renderResult
-      expect(getAllByText('…')).toHaveLength(dj.daysInMonth())
+      setup(dj.format('/YYYY/M'))
+      expect(screen.getAllByText('…')).toHaveLength(dj.daysInMonth())
     })
 
     it('should exist "Median" row heading', () => {
-      const [renderResult] = setup()
+      setup()
       const { getByText } = within(
-        renderResult.getByTestId('data-list-footer-median')
+        screen.getByTestId('data-list-footer-median')
       )
       expect(getByText('Median')).toBeInTheDocument()
     })
 
     it('should be empty the median start time when the start time list is empty', () => {
-      const [renderResult] = setup()
-      const { getByTestId } = renderResult
-      expect(getByTestId(TESTID_MEDIAN_START)).toHaveTextContent('')
+      setup()
+      expect(screen.getByTestId(TESTID_MEDIAN_START)).toHaveTextContent('')
     })
 
     it.each([
@@ -152,23 +136,19 @@ describe('"List" template', () => {
           }
         })
 
-        const state: AppState = {
+        setup(table.month, {
           ...INITIAL_STATE,
           records: recordsState,
-        }
-
-        const [renderResult] = setup(table.month, state)
-        const { getByTestId } = renderResult
-        expect(getByTestId(TESTID_MEDIAN_START)).toHaveTextContent(
+        })
+        expect(screen.getByTestId(TESTID_MEDIAN_START)).toHaveTextContent(
           table.expected
         )
       }
     )
 
     it('should be empty the median stop time when the stop time list is empty', () => {
-      const [renderResult] = setup()
-      const { getByTestId } = renderResult
-      expect(getByTestId(TESTID_MEDIAN_STOP)).toHaveTextContent('')
+      setup()
+      expect(screen.getByTestId(TESTID_MEDIAN_STOP)).toHaveTextContent('')
     })
 
     it.each([
@@ -199,14 +179,11 @@ describe('"List" template', () => {
           }
         })
 
-        const state: AppState = {
+        setup(table.month, {
           ...INITIAL_STATE,
           records: recordsState,
-        }
-
-        const [renderResult] = setup(table.month, state)
-        const { getByTestId } = renderResult
-        expect(getByTestId(TESTID_MEDIAN_STOP)).toHaveTextContent(
+        })
+        expect(screen.getByTestId(TESTID_MEDIAN_STOP)).toHaveTextContent(
           table.expected
         )
       }
@@ -220,17 +197,17 @@ describe('"List" template', () => {
       const TESTID_STATISTICS_TOTAL = 'statistics-total'
 
       it('should exist "Total work time" row heading', () => {
-        const [renderResult] = setup()
+        setup()
         const { getByText } = within(
-          renderResult.getByTestId(TESTID_STATISTICS_TOTAL)
+          screen.getByTestId(TESTID_STATISTICS_TOTAL)
         )
         expect(getByText('Total working time')).toBeInTheDocument()
       })
 
       it('should exist "--:--" as total work time if no record', () => {
-        const [renderResult] = setup()
+        setup()
         const { getByText } = within(
-          renderResult.getByTestId(TESTID_STATISTICS_TOTAL)
+          screen.getByTestId(TESTID_STATISTICS_TOTAL)
         )
         expect(getByText(NO_RESULT)).toBeInTheDocument()
       })
@@ -254,14 +231,12 @@ describe('"List" template', () => {
           breakTimeLengthsMin: [60],
         }
 
-        const state: AppState = {
+        setup(dj.format('/YYYY/M'), {
           ...INITIAL_STATE,
           records: recordsState,
-        }
-
-        const [renderResult] = setup(dj.format('/YYYY/M'), state)
+        })
         const { getByText } = within(
-          renderResult.getByTestId(TESTID_STATISTICS_TOTAL)
+          screen.getByTestId(TESTID_STATISTICS_TOTAL)
         )
         expect(getByText(NO_RESULT)).toBeInTheDocument()
       })
@@ -285,14 +260,12 @@ describe('"List" template', () => {
           breakTimeLengthsMin: [30],
         }
 
-        const state: AppState = {
+        setup(dj.format('/YYYY/M'), {
           ...INITIAL_STATE,
           records: recordsState,
-        }
-
-        const [renderResult] = setup(dj.format('/YYYY/M'), state)
+        })
         const { getByText } = within(
-          renderResult.getByTestId(TESTID_STATISTICS_TOTAL)
+          screen.getByTestId(TESTID_STATISTICS_TOTAL)
         )
         expect(getByText('2:30')).toBeInTheDocument()
       })
@@ -302,17 +275,17 @@ describe('"List" template', () => {
       const TESTID_STATISTICS_MEDIAN = 'statistics-median'
 
       it('should exist "Median" row heading', () => {
-        const [renderResult] = setup()
+        setup()
         const { getByText } = within(
-          renderResult.getByTestId(TESTID_STATISTICS_MEDIAN)
+          screen.getByTestId(TESTID_STATISTICS_MEDIAN)
         )
         expect(getByText('Median')).toBeInTheDocument()
       })
 
       it('should exist "--:--" as median if no record', () => {
-        const [renderResult] = setup()
+        setup()
         const { getByText } = within(
-          renderResult.getByTestId(TESTID_STATISTICS_MEDIAN)
+          screen.getByTestId(TESTID_STATISTICS_MEDIAN)
         )
         expect(getByText(NO_RESULT)).toBeInTheDocument()
       })
@@ -336,14 +309,12 @@ describe('"List" template', () => {
           breakTimeLengthsMin: [60],
         }
 
-        const state: AppState = {
+        setup(dj.format('/YYYY/M'), {
           ...INITIAL_STATE,
           records: recordsState,
-        }
-
-        const [renderResult] = setup(dj.format('/YYYY/M'), state)
+        })
         const { getByText } = within(
-          renderResult.getByTestId(TESTID_STATISTICS_MEDIAN)
+          screen.getByTestId(TESTID_STATISTICS_MEDIAN)
         )
         expect(getByText(NO_RESULT)).toBeInTheDocument()
       })
@@ -367,14 +338,12 @@ describe('"List" template', () => {
           breakTimeLengthsMin: [30],
         }
 
-        const state: AppState = {
+        setup(dj.format('/YYYY/M'), {
           ...INITIAL_STATE,
           records: recordsState,
-        }
-
-        const [renderResult] = setup(dj.format('/YYYY/M'), state)
+        })
         const { getByText } = within(
-          renderResult.getByTestId(TESTID_STATISTICS_MEDIAN)
+          screen.getByTestId(TESTID_STATISTICS_MEDIAN)
         )
         expect(getByText('1:15')).toBeInTheDocument()
       })
@@ -383,9 +352,8 @@ describe('"List" template', () => {
 
   describe('footer', () => {
     it('should exist a "Send mail" button', () => {
-      const [renderResult] = setup()
-      const { getByText } = renderResult
-      expect(getByText('Send mail')).toBeInTheDocument()
+      setup()
+      expect(screen.getByText('Send mail')).toBeInTheDocument()
     })
   })
 })

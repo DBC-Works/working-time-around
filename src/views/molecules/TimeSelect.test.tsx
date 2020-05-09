@@ -9,91 +9,79 @@ import en from '../i18n/en.json'
 
 import TimeSelect from './TimeSelect'
 
-import {
-  act,
-  cleanup,
-  fireEvent,
-  render,
-  RenderResult,
-} from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
+import { render, RenderResult, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 describe('"TimeSelect" molecule', () => {
   function setup(arg: {
     time?: Date
     onChange?: (time: Date) => void
   }): RenderResult {
-    let result: RenderResult | null = null
-    act(() => {
-      result = render(
-        <IntlProvider locale={'en'} messages={en}>
-          <TimeSelect time={arg.time} onChange={arg.onChange} />
-        </IntlProvider>
-      )
-    })
-    /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
-    return result!
+    return render(
+      <IntlProvider locale={'en'} messages={en}>
+        <TimeSelect time={arg.time} onChange={arg.onChange} />
+      </IntlProvider>
+    )
   }
 
-  afterEach(cleanup)
-
   it('should be no selection when there is no initial value', () => {
-    const { getByTestId } = setup({})
-    expect(getByTestId('hour')).toHaveProperty('value', '')
-    expect(getByTestId('minute')).toHaveProperty('value', '')
+    setup({})
+
+    const hourSelector = screen.getByDisplayValue('')
+    expect(hourSelector).toBeInTheDocument()
+    expect(hourSelector).toHaveProperty('value', '')
+    const minuteSelector = screen.getByDisplayValue('--')
+    expect(minuteSelector).toBeInTheDocument()
+    expect(minuteSelector).toHaveProperty('value', '')
   })
 
   it('should be selected time when there is an initial value', () => {
     const time = new Date(2019, 0, 1, 1, 2, 0)
-    const { getByTestId } = setup({ time })
-    expect(getByTestId('hour')).toHaveProperty('value', `${time.getHours()}`)
-    expect(getByTestId('minute')).toHaveProperty(
-      'value',
-      `${time.getMinutes()}`
-    )
+    setup({ time })
+
+    const hourSelector = screen.getByDisplayValue(`0${time.getHours()}`)
+    expect(hourSelector).toBeInTheDocument()
+    expect(hourSelector).toHaveProperty('value', `${time.getHours()}`)
+    const minuteSelector = screen.getByDisplayValue(`:0${time.getMinutes()}`)
+    expect(minuteSelector).toBeInTheDocument()
+    expect(minuteSelector).toHaveProperty('value', `${time.getMinutes()}`)
   })
 
   it('should not call callback property when only hour is selected', () => {
     const mockOnChange = jest.fn()
-    const { getByTestId } = setup({ onChange: mockOnChange })
-    const hourSelector = getByTestId('hour')
-    const minuteSelector = getByTestId('minute')
+    setup({ onChange: mockOnChange })
+    const hourSelector = screen.getByDisplayValue('')
 
-    act(() => {
-      fireEvent.change(hourSelector, {
-        target: { value: '1' },
-      })
-    })
+    userEvent.selectOptions(hourSelector, '1')
+
+    expect(screen.getByDisplayValue('01')).toBeInTheDocument()
     expect(hourSelector).toHaveProperty('value', '1')
     expect(mockOnChange).not.toHaveBeenCalled()
 
-    act(() => {
-      fireEvent.change(minuteSelector, {
-        target: { value: '34' },
-      })
-    })
+    const minuteSelector = screen.getByDisplayValue('--')
+    userEvent.selectOptions(minuteSelector, '34')
+
+    expect(screen.getByDisplayValue(':34')).toBeInTheDocument()
     expect(minuteSelector).toHaveProperty('value', '34')
     expect(mockOnChange).toHaveBeenCalled()
   })
 
   it('should not call callback property when only minute is selected', () => {
     const mockOnChange = jest.fn()
-    const { getByTestId } = setup({ onChange: mockOnChange })
-    const hourSelector = getByTestId('hour')
-    const minuteSelector = getByTestId('minute')
+    setup({ onChange: mockOnChange })
+    const minuteSelector = screen.getByDisplayValue('--')
 
-    act(() => {
-      fireEvent.change(minuteSelector, {
-        target: { value: '34' },
-      })
-    })
+    userEvent.selectOptions(minuteSelector, '34')
+
+    expect(screen.getByDisplayValue(':34')).toBeInTheDocument()
     expect(minuteSelector).toHaveProperty('value', '34')
     expect(mockOnChange).not.toHaveBeenCalled()
 
-    act(() => {
-      fireEvent.change(hourSelector, {
-        target: { value: '1' },
-      })
-    })
+    const hourSelector = screen.getByDisplayValue('')
+    userEvent.selectOptions(hourSelector, '1')
+
+    expect(screen.getByDisplayValue('01')).toBeInTheDocument()
     expect(hourSelector).toHaveProperty('value', '1')
     expect(mockOnChange).toHaveBeenCalled()
   })
@@ -101,38 +89,34 @@ describe('"TimeSelect" molecule', () => {
   it('should call callback property when there is an initial value and hour is changed', () => {
     const time = new Date(2019, 0, 1, 1, 2, 0)
     const mockOnChange = jest.fn()
-    const { getByTestId } = setup({ time, onChange: mockOnChange })
-    const hourSelector = getByTestId('hour')
+    setup({ time, onChange: mockOnChange })
+    const hourSelector = screen.getByDisplayValue('01')
 
-    act(() => {
-      fireEvent.change(hourSelector, {
-        target: { value: `${time.getHours() + 1}` },
-      })
-    })
+    userEvent.selectOptions(hourSelector, `${time.getHours() + 1}`)
+
+    expect(
+      screen.getByDisplayValue(`0${time.getHours() + 1}`)
+    ).toBeInTheDocument()
     expect(hourSelector).toHaveProperty('value', `${time.getHours() + 1}`)
     expect(mockOnChange).toHaveBeenCalledWith(
-      dayjs(time)
-        .add(1, 'hour')
-        .toDate()
+      dayjs(time).add(1, 'hour').toDate()
     )
   })
 
   it('should call callback property when there is an initial value and minute is changed', () => {
     const time = new Date(2019, 0, 1, 1, 35, 0)
     const mockOnChange = jest.fn()
-    const { getByTestId } = setup({ time, onChange: mockOnChange })
-    const minuteSelector = getByTestId('minute')
+    setup({ time, onChange: mockOnChange })
+    const minuteSelector = screen.getByDisplayValue(`:${time.getMinutes()}`)
 
-    act(() => {
-      fireEvent.change(minuteSelector, {
-        target: { value: `${time.getMinutes() - 8}` },
-      })
-    })
+    userEvent.selectOptions(minuteSelector, `${time.getMinutes() - 8}`)
+
+    expect(
+      screen.getByDisplayValue(`:${time.getMinutes() - 8}`)
+    ).toBeInTheDocument()
     expect(minuteSelector).toHaveProperty('value', `${time.getMinutes() - 8}`)
     expect(mockOnChange).toHaveBeenCalledWith(
-      dayjs(time)
-        .add(-8, 'minute')
-        .toDate()
+      dayjs(time).add(-8, 'minute').toDate()
     )
   })
 })

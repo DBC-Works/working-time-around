@@ -197,7 +197,7 @@ const DefaultBreakTimeLength: React.FC = () => {
     getDefaultBreakTimeLengthMin(state.settings)
   )
   return (
-    <div data-testid="break-time-length">
+    <>
       <HeadingInTab>
         <FormattedMessage id="Default.break.time.length" />
       </HeadingInTab>
@@ -211,7 +211,7 @@ const DefaultBreakTimeLength: React.FC = () => {
           }}
         />
       </SingleCellRow>
-    </div>
+    </>
   )
 }
 
@@ -231,12 +231,15 @@ const MailAddress: React.FC = () => {
   return (
     <>
       <HeadingInTab>
-        <FormattedMessage id="Send.to.mail.address" />
+        <label htmlFor="mail-address">
+          <FormattedMessage id="Send.to.mail.address" />
+        </label>
       </HeadingInTab>
       <SingleCellRow>
         <TextField textarea={false} fullWidth={true} label="foobar@example.com">
           <Input
             type="email"
+            id="mail-address"
             value={mailAddress}
             onInput={handleInputMailAddress}
           />
@@ -269,7 +272,9 @@ const SlackSettings: React.FC = () => {
       </HeadingInTab>
       <SingleCellRow>
         <Subtitle1 tag="h3">
-          <FormattedMessage id="Incoming.webhook.URL" />
+          <label htmlFor="incoming-webhook-url">
+            <FormattedMessage id="Incoming.webhook.URL" />
+          </label>
         </Subtitle1>
       </SingleCellRow>
       <SingleCellRow>
@@ -280,6 +285,7 @@ const SlackSettings: React.FC = () => {
         >
           <Input
             type="url"
+            id="incoming-webhook-url"
             value={slackSettings.incomingWebhookUrl}
             onInput={handleInputUrl}
           />
@@ -287,13 +293,16 @@ const SlackSettings: React.FC = () => {
       </SingleCellRow>
       <SingleCellRow>
         <Subtitle1 tag="h3">
-          <FormattedMessage id="Context" />
+          <label htmlFor="context">
+            <FormattedMessage id="Context" />
+          </label>
         </Subtitle1>
       </SingleCellRow>
       <SingleCellRow>
         <TextField textarea={false} fullWidth={true}>
           <Input
             type="text"
+            id="context"
             value={slackSettings.context}
             onInput={handleInputContext}
           />
