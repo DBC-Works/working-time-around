@@ -7,9 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2020-05-09
+
+### Updated
+
+- Optimize unit tests
+  - [Common mistakes with React Testing Library](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library)
+
 ## [0.8.0] - 2020-05-05
 
-### Add
+### Added
 
 - Import function(#9)
 
@@ -121,7 +128,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial project files.
 
-[unreleased]: https://github.com/DBC-Works/SoundVisualShaderBase/compare/v0.8.0...HEAD
+[unreleased]: https://github.com/DBC-Works/SoundVisualShaderBase/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.8.1
 [0.8.0]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.8.0
 [0.7.2]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.7.2
 [0.7.1]: https://github.com/DBC-Works/SoundVisualShaderBase/releases/tag/v0.7.1
