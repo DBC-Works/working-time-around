@@ -45,11 +45,7 @@ describe('Record state selector', () => {
       expect(Object.keys(records)).toHaveLength(1)
       expect(records[dayjs(date).format('YYYYMMDD')]).toBeDefined()
       expect(
-        records[
-          dayjs(date)
-            .endOf('month')
-            .format('YYYYMMDD')
-        ]
+        records[dayjs(date).endOf('month').format('YYYYMMDD')]
       ).not.toBeDefined()
     })
   })

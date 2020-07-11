@@ -111,8 +111,8 @@ export function getMonthlyRecordsOf(month: Date, state: RecordsState): Records {
 
   const monthKey = dayjs(month).format('YYYYMM')
   Object.keys(state.records)
-    .filter(key => key.startsWith(monthKey))
-    .forEach(key => {
+    .filter((key) => key.startsWith(monthKey))
+    .forEach((key) => {
       monthlyRecords[key] = state.records[key]
     })
 
