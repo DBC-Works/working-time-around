@@ -38,10 +38,10 @@ export const INITIAL_STATE: RunningState = {
  * @returns New state
  */
 const runningReducer = reducerWithInitialState(INITIAL_STATE)
-  .case(clearMessage, state => ({ ...state, message: '' }))
+  .case(clearMessage, (state) => ({ ...state, message: '' }))
   .case(showMessage, (state, message) => ({ ...state, message }))
   .case(updateOnLine, (state, onLine) => ({ ...state, onLine }))
-  .case(updateTime, state => ({ ...state, time: new Date() }))
+  .case(updateTime, (state) => ({ ...state, time: new Date() }))
   .case(setExportObjectUrl, (state, exportObjectUrl) => ({
     ...state,
     downloadObjectUrl: exportObjectUrl,
