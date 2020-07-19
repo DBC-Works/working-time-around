@@ -26,7 +26,7 @@
     "@typescript-eslint/eslint-plugin": "^3.6.1",
     "@typescript-eslint/parser": "^3.6.1",
     "babel-plugin-unassert": "^3.0.1",
-    "caniuse-lite": "^1.0.30001102",
+    "caniuse-lite": "^1.0.30001103",
     "eslint": "^7.5.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-jest-dom": "^3.1.4",
