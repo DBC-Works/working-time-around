@@ -102,7 +102,7 @@ describe('"Settings" template', () => {
         expect(screen.getAllByDisplayValue(LITERAL_NO_SELECTION)).toHaveLength(
           2
         )
-        const clearButton = screen.getByText('clear')
+        const clearButton = screen.getByRole('button', { name: 'clear' })
         expect(clearButton).toBeInTheDocument()
         expect(clearButton).toBeDisabled()
       })
@@ -213,7 +213,9 @@ describe('"Settings" template', () => {
         )
         expect(screen.getByDisplayValue('00')).toBeInTheDocument()
         expect(screen.getByDisplayValue(':05')).toBeInTheDocument()
-        const clearButton = screen.getByText('clear') as HTMLElement
+        const clearButton = screen.getByRole('button', {
+          name: 'clear',
+        })
         expect(clearButton).not.toBeDisabled()
 
         act(() => {
@@ -403,7 +405,7 @@ describe('"Settings" template', () => {
         userEvent.click(screen.getByText(TAB.LINKAGE))
 
         expect(
-          screen.getByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)
+          screen.getByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE).parentElement
         ).toBeDisabled()
       })
 
@@ -430,11 +432,15 @@ describe('"Settings" template', () => {
         })
         userEvent.click(screen.getByText(TAB.LINKAGE))
 
-        const offLineButton = screen.getByText(LABEL_BUTTON_OFFLINE)
+        const offLineButton = screen.getByRole('button', {
+          name: LABEL_BUTTON_OFFLINE,
+        })
         expect(offLineButton).toBeInTheDocument()
         expect(offLineButton).toBeDisabled()
         expect(
-          screen.queryByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)
+          screen.queryByRole('button', {
+            name: LABEL_BUTTON_SEND_A_TEST_MESSAGE,
+          })
         ).not.toBeInTheDocument()
       })
 
