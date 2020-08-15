@@ -10,8 +10,8 @@ import dayjs, { Dayjs } from 'dayjs'
 
 import { Button } from '@rmwc/button'
 import '@rmwc/button/styles'
-
-import Fab from '@material/react-fab'
+import { Fab } from '@rmwc/fab'
+import '@rmwc/fab/styles'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import MaterialIcon from '@material/react-material-icon'
 import { Headline6 } from '@material/react-typography'
@@ -479,7 +479,7 @@ const Footer: React.FC<{
         >
           <Fab
             icon={<i className="material-icons">mail</i>}
-            textLabel={useIntl().formatMessage({ id: 'Send.mail' })}
+            label={useIntl().formatMessage({ id: 'Send.mail' })}
           />
         </a>
       </Cell>

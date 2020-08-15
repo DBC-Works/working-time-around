@@ -16,7 +16,8 @@ import dayjs, { Dayjs } from 'dayjs'
 
 import { Button } from '@rmwc/button'
 import '@rmwc/button/styles'
-import Fab from '@material/react-fab'
+import { Fab } from '@rmwc/fab'
+import '@rmwc/fab/styles'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import MaterialIcon from '@material/react-material-icon'
 import TextField, { Input } from '@material/react-text-field'
@@ -291,7 +292,7 @@ const Detail: React.FC = () => {
           <Link to={dj.format('/YYYY/M')}>
             <Fab
               icon={<i className="material-icons">list</i>}
-              textLabel={intl.formatMessage({ id: 'Back.to.list' })}
+              label={intl.formatMessage({ id: 'Back.to.list' })}
             />
           </Link>
         </Cell>
