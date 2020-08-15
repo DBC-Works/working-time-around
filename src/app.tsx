@@ -14,7 +14,6 @@ import 'dayjs/locale/ja'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 dayjs.extend(localizedFormat)
 
-import '@material/react-checkbox/dist/checkbox.css'
 import '@material/react-layout-grid/dist/layout-grid.css'
 import '@material/react-list/dist/list.css'
 import '@material/react-material-icon/dist/material-icon.css'

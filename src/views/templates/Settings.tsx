@@ -9,8 +9,8 @@ import assert from 'assert'
 
 import { Button } from '@rmwc/button'
 import '@rmwc/button/styles'
-
-import Checkbox from '@material/react-checkbox'
+import { Checkbox } from '@rmwc/checkbox'
+import '@rmwc/checkbox/styles'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import TextField, { Input } from '@material/react-text-field'
 import { Body1, Headline6, Subtitle1 } from '@material/react-typography'
@@ -454,7 +454,7 @@ const Import: React.FC = () => {
   const handleChangeImportSettings = useCallback(() => {
     setResultMessage('')
     setImportSettings(!importSettings)
-  }, [])
+  }, [importSettings])
   const handleClickBrowse = useCallback(() => {
     if (fileInputRef.current === null) {
       return
@@ -503,7 +503,7 @@ const Import: React.FC = () => {
       <SingleCellRow>
         <div className="import-settings">
           <Checkbox
-            nativeControlId="import-settings"
+            id="import-settings"
             checked={importSettings}
             onChange={handleChangeImportSettings}
           />
