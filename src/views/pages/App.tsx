@@ -9,13 +9,15 @@ import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
 import MaterialIcon from '@material/react-material-icon'
 import { Snackbar } from '@rmwc/snackbar'
 import '@rmwc/snackbar/styles'
-import TopAppBar, {
+import {
+  TopAppBar,
   TopAppBarFixedAdjust,
-  TopAppBarIcon,
+  TopAppBarNavigationIcon,
   TopAppBarRow,
   TopAppBarSection,
   TopAppBarTitle,
-} from '@material/react-top-app-bar'
+} from '@rmwc/top-app-bar'
+import '@rmwc/top-app-bar/styles'
 
 import { AppState } from '../../state/store'
 import {
@@ -184,39 +186,31 @@ const AppBar: React.FC = () => {
   return (
     <TopAppBar>
       <TopAppBarRow>
-        <TopAppBarSection align="start">
-          <TopAppBarIcon>
-            <MaterialIcon icon="timer" />
-          </TopAppBarIcon>
+        <TopAppBarSection alignStart={true}>
+          <MaterialIcon icon="timer" />
           <TopAppBarTitle>
             <FormattedMessage id="Working.time.around" />
           </TopAppBarTitle>
         </TopAppBarSection>
-        <TopAppBarSection align="end" role="toolbar">
-          <TopAppBarIcon navIcon={true}>
-            <NavLink to="/">
-              <MaterialIcon
-                aria-label={intl.formatMessage({ id: 'Top' })}
-                icon="today"
-              />
-            </NavLink>
-          </TopAppBarIcon>
-          <TopAppBarIcon navIcon={true}>
-            <NavLink to={`/${time.getFullYear()}/${time.getMonth() + 1}`}>
-              <MaterialIcon
-                aria-label={intl.formatMessage({ id: 'List' })}
-                icon="list"
-              />
-            </NavLink>
-          </TopAppBarIcon>
-          <TopAppBarIcon navIcon={true}>
-            <NavLink to="/settings">
-              <MaterialIcon
-                aria-label={intl.formatMessage({ id: 'Settings' })}
-                icon="settings"
-              />
-            </NavLink>
-          </TopAppBarIcon>
+        <TopAppBarSection alignEnd={true} role="toolbar">
+          <NavLink to="/">
+            <TopAppBarNavigationIcon
+              icon="today"
+              label={intl.formatMessage({ id: 'Top' })}
+            />
+          </NavLink>
+          <NavLink to={`/${time.getFullYear()}/${time.getMonth() + 1}`}>
+            <TopAppBarNavigationIcon
+              icon="list"
+              label={intl.formatMessage({ id: 'List' })}
+            />
+          </NavLink>
+          <NavLink to="/settings">
+            <TopAppBarNavigationIcon
+              icon="settings"
+              label={intl.formatMessage({ id: 'Settings' })}
+            />
+          </NavLink>
         </TopAppBarSection>
       </TopAppBarRow>
     </TopAppBar>
