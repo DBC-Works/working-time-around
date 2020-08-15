@@ -7,7 +7,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Action } from 'typescript-fsa'
 import assert from 'assert'
 
-import Button from '@material/react-button'
+import { Button } from '@rmwc/button'
+import '@rmwc/button/styles'
+
 import Checkbox from '@material/react-checkbox'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import TextField, { Input } from '@material/react-text-field'

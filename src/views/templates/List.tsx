@@ -8,7 +8,9 @@ import { FormattedMessage, useIntl } from 'react-intl'
 import assert from 'assert'
 import dayjs, { Dayjs } from 'dayjs'
 
-import Button from '@material/react-button'
+import { Button } from '@rmwc/button'
+import '@rmwc/button/styles'
+
 import Fab from '@material/react-fab'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import MaterialIcon from '@material/react-material-icon'

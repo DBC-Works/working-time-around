@@ -6,7 +6,9 @@ import { useDispatch } from 'react-redux'
 import { Action } from 'typescript-fsa'
 import dayjs from 'dayjs'
 
-import Button from '@material/react-button'
+import { Button } from '@rmwc/button'
+import '@rmwc/button/styles'
+
 import MaterialIcon from '@material/react-material-icon'
 
 import { UpdateBreakTimeActionPayload } from '../../state/ducks/records'
