@@ -7,7 +7,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
 
 import MaterialIcon from '@material/react-material-icon'
-import { Snackbar } from '@material/react-snackbar'
+import { Snackbar } from '@rmwc/snackbar'
+import '@rmwc/snackbar/styles'
 import TopAppBar, {
   TopAppBarFixedAdjust,
   TopAppBarIcon,
@@ -24,7 +25,7 @@ import {
   getWindow,
   updateOnLine,
 } from '../../state/ducks/running'
-import { settingsTypes } from '../../state/ducks/settings'
+import { SlackSettings } from '../../state/ducks/settings'
 
 import CurrentState from '../templates/CurrentState'
 import List from '../templates/List'
@@ -61,7 +62,7 @@ export function formatSendFailedMessage(
  * @returns Result message(success if empty)
  */
 export async function sendMessageToSlack(
-  settings: settingsTypes.SlackSettings,
+  settings: SlackSettings,
   message: string
 ): Promise<string> {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -163,9 +164,11 @@ const App: React.FC = () => {
           <Route component={NotFound} />
         </Switch>
       </TopAppBarFixedAdjust>
-      {0 < message.length && (
-        <Snackbar message={message} onClose={handleCloseSnackbar} />
-      )}
+      <Snackbar
+        open={0 < message.length}
+        message={message}
+        onClose={handleCloseSnackbar}
+      />
     </div>
   )
 }
