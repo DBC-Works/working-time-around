@@ -12,7 +12,8 @@ import '@rmwc/button/styles'
 import { Checkbox } from '@rmwc/checkbox'
 import '@rmwc/checkbox/styles'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
-import TextField, { Input } from '@material/react-text-field'
+import { TextField } from '@rmwc/textfield'
+import '@rmwc/textfield/styles'
 import { Typography } from '@rmwc/typography'
 import '@rmwc/typography/styles'
 import Tab from '@material/react-tab'
@@ -241,14 +242,14 @@ const MailAddress: React.FC = () => {
         </label>
       </HeadingInTab>
       <SingleCellRow>
-        <TextField textarea={false} fullWidth={true} label="foobar@example.com">
-          <Input
-            type="email"
-            id="mail-address"
-            value={mailAddress}
-            onInput={handleInputMailAddress}
-          />
-        </TextField>
+        <TextField
+          type="email"
+          id="mail-address"
+          fullwidth={true}
+          placeholder="foobar@example.com"
+          value={mailAddress}
+          onInput={handleInputMailAddress}
+        />
       </SingleCellRow>
     </>
   )
@@ -284,17 +285,13 @@ const SlackSettings: React.FC = () => {
       </SingleCellRow>
       <SingleCellRow>
         <TextField
-          textarea={false}
-          fullWidth={true}
-          label="https://hooks.slack.com/services/..."
-        >
-          <Input
-            type="url"
-            id="incoming-webhook-url"
-            value={slackSettings.incomingWebhookUrl}
-            onInput={handleInputUrl}
-          />
-        </TextField>
+          type="url"
+          id="incoming-webhook-url"
+          fullwidth={true}
+          placeholder="https://hooks.slack.com/services/..."
+          value={slackSettings.incomingWebhookUrl}
+          onInput={handleInputUrl}
+        />
       </SingleCellRow>
       <SingleCellRow>
         <Typography use="subtitle1" tag="h3">
@@ -304,14 +301,13 @@ const SlackSettings: React.FC = () => {
         </Typography>
       </SingleCellRow>
       <SingleCellRow>
-        <TextField textarea={false} fullWidth={true}>
-          <Input
-            type="text"
-            id="context"
-            value={slackSettings.context}
-            onInput={handleInputContext}
-          />
-        </TextField>
+        <TextField
+          type="test"
+          id="context"
+          fullwidth={true}
+          value={slackSettings.context}
+          onInput={handleInputContext}
+        />
       </SingleCellRow>
       <SingleCellRow className="gutter-top">
         <SendTestMessageButton />

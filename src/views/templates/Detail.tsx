@@ -21,7 +21,8 @@ import '@rmwc/fab/styles'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import { Icon } from '@rmwc/icon'
 import '@rmwc/icon/styles'
-import TextField, { Input } from '@material/react-text-field'
+import { TextField } from '@rmwc/textfield'
+import '@rmwc/textfield/styles'
 import { Typography } from '@rmwc/typography'
 import '@rmwc/typography/styles'
 import assert from 'assert'
@@ -519,9 +520,13 @@ const Memo: React.FC<{
         <FormattedMessage id="Memo" />
       </HeadingInDetail>
       <SingleCellRow>
-        <TextField textarea={true} fullWidth={true}>
-          <Input value={props.memo} onInput={props.onInput} />
-        </TextField>
+        <TextField
+          textarea={true}
+          outlined={true}
+          fullwidth={true}
+          value={props.memo}
+          onInput={props.onInput}
+        />
       </SingleCellRow>
     </>
   )

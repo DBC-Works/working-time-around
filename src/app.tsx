@@ -16,7 +16,6 @@ dayjs.extend(localizedFormat)
 
 import '@material/react-layout-grid/dist/layout-grid.css'
 import '@material/react-select/dist/select.css'
-import '@material/react-text-field/dist/text-field.css'
 import '@material/react-tab-bar/dist/tab-bar.css'
 import '@material/react-tab-scroller/dist/tab-scroller.css'
 import '@material/react-tab/dist/tab.css'

@@ -10,9 +10,10 @@ import dayjs from 'dayjs'
 import { Button } from '@rmwc/button'
 import '@rmwc/button/styles'
 import { Grid } from '@material/react-layout-grid'
-import { Icon } from '@rmwc/icon'
-import '@rmwc/icon/styles'
-import TextField, { Input } from '@material/react-text-field'
+import { TextField } from '@rmwc/textfield'
+import '@rmwc/textfield/styles'
+import { Fab } from '@rmwc/fab'
+import '@rmwc/fab/styles'
 import { Typography } from '@rmwc/typography'
 import '@rmwc/typography/styles'
 
@@ -340,16 +341,7 @@ const MemoTextField: React.FC<{
     [requirePost]
   )
 
-  const trailingIcon =
-    requirePost !== false ? (
-      <Icon
-        aria-label={intl.formatMessage({ id: 'Send.update' })}
-        icon="send"
-      />
-    ) : (
-      <></>
-    )
-  const handleTrailingIconSelect =
+  const handleClickSendUpdate =
     requirePost !== false
       ? (): void => {
           postUpdate()
@@ -364,14 +356,24 @@ const MemoTextField: React.FC<{
   }, [])
 
   return (
-    <TextField
-      textarea={true}
-      fullWidth={true}
-      trailingIcon={trailingIcon}
-      onTrailingIconSelect={handleTrailingIconSelect}
-      disabled={tomorrow.diff(dj, 'm') < 5}
-    >
-      <Input value={props.memo} onInput={handleInput} />
-    </TextField>
+    <>
+      <TextField
+        textarea={true}
+        outlined={true}
+        fullwidth={true}
+        disabled={tomorrow.diff(dj, 'm') < 5}
+        value={props.memo}
+        onInput={handleInput}
+      />
+      {requirePost !== false && (
+        <div className="app-fab--absolute">
+          <Fab
+            icon={<i className="material-icons">send</i>}
+            label={intl.formatMessage({ id: 'Send.update' })}
+            onClick={handleClickSendUpdate}
+          />
+        </div>
+      )}
+    </>
   )
 }
