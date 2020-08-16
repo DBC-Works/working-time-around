@@ -15,7 +15,6 @@ import localizedFormat from 'dayjs/plugin/localizedFormat'
 dayjs.extend(localizedFormat)
 
 import '@material/react-layout-grid/dist/layout-grid.css'
-import '@material/react-material-icon/dist/material-icon.css'
 import '@material/react-select/dist/select.css'
 import '@material/react-text-field/dist/text-field.css'
 import '@material/react-tab-bar/dist/tab-bar.css'

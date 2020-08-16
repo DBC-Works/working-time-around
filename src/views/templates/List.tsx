@@ -13,7 +13,8 @@ import '@rmwc/button/styles'
 import { Fab } from '@rmwc/fab'
 import '@rmwc/fab/styles'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
-import MaterialIcon from '@material/react-material-icon'
+import { Icon } from '@rmwc/icon'
+import '@rmwc/icon/styles'
 import { Typography } from '@rmwc/typography'
 import '@rmwc/typography/styles'
 
@@ -194,7 +195,7 @@ const MonthHeading: React.FC<{ target: Dayjs }> = (props) => {
         className="navigation-before"
       >
         <Link to={props.target.add(-1, 'month').format('/YYYY/M')}>
-          <MaterialIcon
+          <Icon
             aria-label={intl.formatMessage({ id: 'Prev.month' })}
             icon="navigate_before"
           />
@@ -212,7 +213,7 @@ const MonthHeading: React.FC<{ target: Dayjs }> = (props) => {
         className="navigation-next"
       >
         <Link to={props.target.add(1, 'month').format('/YYYY/M')}>
-          <MaterialIcon
+          <Icon
             aria-label={intl.formatMessage({ id: 'Next.month' })}
             icon="navigate_next"
           />

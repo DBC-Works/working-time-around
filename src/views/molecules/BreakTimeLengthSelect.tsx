@@ -9,7 +9,8 @@ import dayjs from 'dayjs'
 import { Button } from '@rmwc/button'
 import '@rmwc/button/styles'
 
-import MaterialIcon from '@material/react-material-icon'
+import { Icon } from '@rmwc/icon'
+import '@rmwc/icon/styles'
 
 import { UpdateBreakTimeActionPayload } from '../../state/ducks/records'
 
@@ -76,7 +77,7 @@ const BreakTimeLengthSelect: React.FC<{
       />
       {clear !== undefined && (
         <Button disabled={time === undefined} onClick={handleClickClear}>
-          <MaterialIcon icon="clear" />
+          <Icon icon="clear" />
         </Button>
       )}
     </>

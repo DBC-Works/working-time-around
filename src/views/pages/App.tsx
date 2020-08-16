@@ -6,7 +6,8 @@ import { NavLink, Route, Switch } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
 
-import MaterialIcon from '@material/react-material-icon'
+import { Icon } from '@rmwc/icon'
+import '@rmwc/icon/styles'
 import { Snackbar } from '@rmwc/snackbar'
 import '@rmwc/snackbar/styles'
 import {
@@ -187,7 +188,7 @@ const AppBar: React.FC = () => {
     <TopAppBar>
       <TopAppBarRow>
         <TopAppBarSection alignStart={true}>
-          <MaterialIcon icon="timer" />
+          <Icon icon="timer" />
           <TopAppBarTitle>
             <FormattedMessage id="Working.time.around" />
           </TopAppBarTitle>

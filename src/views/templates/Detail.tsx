@@ -19,7 +19,8 @@ import '@rmwc/button/styles'
 import { Fab } from '@rmwc/fab'
 import '@rmwc/fab/styles'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
-import MaterialIcon from '@material/react-material-icon'
+import { Icon } from '@rmwc/icon'
+import '@rmwc/icon/styles'
 import TextField, { Input } from '@material/react-text-field'
 import { Typography } from '@rmwc/typography'
 import '@rmwc/typography/styles'
@@ -262,7 +263,7 @@ const Detail: React.FC = () => {
           className="navigation-before"
         >
           <Link to={dj.add(-1, 'day').format('/YYYY/M/D')}>
-            <MaterialIcon
+            <Icon
               aria-label={intl.formatMessage({ id: 'Prev.day' })}
               icon="navigate_before"
             />
@@ -280,7 +281,7 @@ const Detail: React.FC = () => {
           className="navigation-next"
         >
           <Link to={dj.add(1, 'day').format('/YYYY/M/D')}>
-            <MaterialIcon
+            <Icon
               aria-label={intl.formatMessage({ id: 'Next.day' })}
               icon="navigate_next"
             />

@@ -10,7 +10,8 @@ import dayjs from 'dayjs'
 import { Button } from '@rmwc/button'
 import '@rmwc/button/styles'
 import { Grid } from '@material/react-layout-grid'
-import MaterialIcon from '@material/react-material-icon'
+import { Icon } from '@rmwc/icon'
+import '@rmwc/icon/styles'
 import TextField, { Input } from '@material/react-text-field'
 import { Typography } from '@rmwc/typography'
 import '@rmwc/typography/styles'
@@ -341,7 +342,7 @@ const MemoTextField: React.FC<{
 
   const trailingIcon =
     requirePost !== false ? (
-      <MaterialIcon
+      <Icon
         aria-label={intl.formatMessage({ id: 'Send.update' })}
         icon="send"
       />
