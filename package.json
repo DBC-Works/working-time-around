@@ -52,8 +52,6 @@
   "dependencies": {
     "@material/react-layout-grid": "^0.15.0",
     "@material/react-material-icon": "^0.15.0",
-    "@material/react-menu": "^0.15.0",
-    "@material/react-menu-surface": "^0.15.0",
     "@material/react-select": "^0.15.0",
     "@material/react-tab": "^0.15.0",
     "@material/react-tab-bar": "^0.15.0",
