@@ -13,7 +13,8 @@ import { Checkbox } from '@rmwc/checkbox'
 import '@rmwc/checkbox/styles'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import TextField, { Input } from '@material/react-text-field'
-import { Body1, Headline6, Subtitle1 } from '@material/react-typography'
+import { Typography } from '@rmwc/typography'
+import '@rmwc/typography/styles'
 import Tab from '@material/react-tab'
 import TabBar from '@material/react-tab-bar'
 
@@ -138,9 +139,9 @@ const Settings: React.FC = () => {
     <Grid className="settings">
       <Row className="text-align-center">
         <Cell columns={12}>
-          <Headline6 tag="h1">
+          <Typography use="headline6" tag="h1">
             <FormattedMessage id="Settings" />
-          </Headline6>
+          </Typography>
         </Cell>
       </Row>
       <SingleCellRow>
@@ -187,7 +188,9 @@ export default Settings
  */
 const HeadingInTab: React.FC = (props) => (
   <SingleCellRow>
-    <Headline6 tag="h2">{props.children}</Headline6>
+    <Typography use="headline6" tag="h2">
+      {props.children}
+    </Typography>
   </SingleCellRow>
 )
 
@@ -273,11 +276,11 @@ const SlackSettings: React.FC = () => {
         <FormattedMessage id="Slack.linkage" />
       </HeadingInTab>
       <SingleCellRow>
-        <Subtitle1 tag="h3">
+        <Typography use="subtitle1" tag="h3">
           <label htmlFor="incoming-webhook-url">
             <FormattedMessage id="Incoming.webhook.URL" />
           </label>
-        </Subtitle1>
+        </Typography>
       </SingleCellRow>
       <SingleCellRow>
         <TextField
@@ -294,11 +297,11 @@ const SlackSettings: React.FC = () => {
         </TextField>
       </SingleCellRow>
       <SingleCellRow>
-        <Subtitle1 tag="h3">
+        <Typography use="subtitle1" tag="h3">
           <label htmlFor="context">
             <FormattedMessage id="Context" />
           </label>
-        </Subtitle1>
+        </Typography>
       </SingleCellRow>
       <SingleCellRow>
         <TextField textarea={false} fullWidth={true}>
@@ -428,14 +431,14 @@ const Export: React.FC = () => {
         <FormattedMessage id="Export" />
       </HeadingInTab>
       <SingleCellRow>
-        <Body1>
+        <Typography use="body1">
           <a
             href={exportObjectUrl}
             download="working-time-around-record-data.json"
           >
             <FormattedMessage id="Download" />
           </a>
-        </Body1>
+        </Typography>
       </SingleCellRow>
     </>
   )
@@ -507,11 +510,11 @@ const Import: React.FC = () => {
             checked={importSettings}
             onChange={handleChangeImportSettings}
           />
-          <Body1>
+          <Typography use="body1">
             <label htmlFor="import-settings">
               <FormattedMessage id="Import.settings" />
             </label>
-          </Body1>
+          </Typography>
         </div>
       </SingleCellRow>
       <SingleCellRow className="file-upload">
@@ -527,7 +530,7 @@ const Import: React.FC = () => {
         </Button>
       </SingleCellRow>
       <SingleCellRow>
-        <Body1>{resultMessage}</Body1>
+        <Typography use="body1">{resultMessage}</Typography>
       </SingleCellRow>
     </>
   )

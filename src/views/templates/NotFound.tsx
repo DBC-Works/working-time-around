@@ -5,7 +5,8 @@ import React from 'react'
 import { FormattedMessage } from 'react-intl'
 
 import { Grid } from '@material/react-layout-grid'
-import { Headline4 } from '@material/react-typography'
+import { Typography } from '@rmwc/typography'
+import '@rmwc/typography/styles'
 
 import SingleCellRow from '../molecules/SingleCellRow'
 
@@ -15,9 +16,9 @@ import SingleCellRow from '../molecules/SingleCellRow'
 const NotFound: React.FC = () => (
   <Grid>
     <SingleCellRow>
-      <Headline4 tag="h1">
+      <Typography use="headline4" tag="h1">
         <FormattedMessage id="Not.found" />
-      </Headline4>
+      </Typography>
     </SingleCellRow>
   </Grid>
 )

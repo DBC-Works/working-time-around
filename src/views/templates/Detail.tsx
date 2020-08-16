@@ -21,7 +21,8 @@ import '@rmwc/fab/styles'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import MaterialIcon from '@material/react-material-icon'
 import TextField, { Input } from '@material/react-text-field'
-import { Headline6 } from '@material/react-typography'
+import { Typography } from '@rmwc/typography'
+import '@rmwc/typography/styles'
 import assert from 'assert'
 
 import { AppState } from '../../state/store'
@@ -268,9 +269,9 @@ const Detail: React.FC = () => {
           </Link>
         </Cell>
         <Cell desktopColumns={10} tabletColumns={6} phoneColumns={2}>
-          <Headline6 tag="h1" className={headingClassName}>
+          <Typography use="headline6" tag="h1" className={headingClassName}>
             {dj.format(intl.formatMessage({ id: 'Format.date' }))}
-          </Headline6>
+          </Typography>
         </Cell>
         <Cell
           desktopColumns={1}
@@ -307,7 +308,9 @@ export default Detail
  */
 const HeadingInDetail: React.FC = (props) => (
   <SingleCellRow>
-    <Headline6 tag="h2">{props.children}</Headline6>
+    <Typography use="headline6" tag="h2">
+      {props.children}
+    </Typography>
   </SingleCellRow>
 )
 

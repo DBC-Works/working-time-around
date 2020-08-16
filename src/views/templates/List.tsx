@@ -14,7 +14,8 @@ import { Fab } from '@rmwc/fab'
 import '@rmwc/fab/styles'
 import { Cell, Grid, Row } from '@material/react-layout-grid'
 import MaterialIcon from '@material/react-material-icon'
-import { Headline6 } from '@material/react-typography'
+import { Typography } from '@rmwc/typography'
+import '@rmwc/typography/styles'
 
 import { AppState } from '../../state/store'
 import {
@@ -200,9 +201,9 @@ const MonthHeading: React.FC<{ target: Dayjs }> = (props) => {
         </Link>
       </Cell>
       <Cell desktopColumns={10} tabletColumns={6} phoneColumns={2}>
-        <Headline6 tag="h2">
+        <Typography use="headline6" tag="h2">
           {props.target.format(intl.formatMessage({ id: 'Format.month' }))}
-        </Headline6>
+        </Typography>
       </Cell>
       <Cell
         desktopColumns={1}

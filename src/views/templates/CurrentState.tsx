@@ -12,7 +12,8 @@ import '@rmwc/button/styles'
 import { Grid } from '@material/react-layout-grid'
 import MaterialIcon from '@material/react-material-icon'
 import TextField, { Input } from '@material/react-text-field'
-import { Headline4 } from '@material/react-typography'
+import { Typography } from '@rmwc/typography'
+import '@rmwc/typography/styles'
 
 import { AppState } from '../../state/store'
 import {
@@ -83,15 +84,15 @@ const CurrentState: React.FC = () => {
       </SingleCellRow>
       <SingleCellRow className="gutter-top">
         <Button className="date full-width" onClick={handleClick}>
-          <Headline4 tag="span">
+          <Typography use="headline4" tag="span">
             {dj.format(intl.formatMessage({ id: 'Format.date' }))}
-          </Headline4>
+          </Typography>
         </Button>
       </SingleCellRow>
       <SingleCellRow>
-        <Headline4 tag="div" className="text-align-center">
+        <Typography use="headline4" tag="div" className="text-align-center">
           {dj.format(intl.formatMessage({ id: 'Format.time.24' }))}
-        </Headline4>
+        </Typography>
       </SingleCellRow>
       <SingleCellRow className="gutter-top">
         <StopButton time={latest.stop} />
