@@ -18,7 +18,8 @@ import { Button } from '@rmwc/button'
 import '@rmwc/button/styles'
 import { Fab } from '@rmwc/fab'
 import '@rmwc/fab/styles'
-import { Cell, Grid, Row } from '@material/react-layout-grid'
+import { Grid, GridCell, GridRow } from '@rmwc/grid'
+import '@rmwc/grid/styles'
 import { Icon } from '@rmwc/icon'
 import '@rmwc/icon/styles'
 import { TextField } from '@rmwc/textfield'
@@ -256,50 +257,38 @@ const Detail: React.FC = () => {
   const intl = useIntl()
   return (
     <Grid className="detail">
-      <Row className="text-align-center">
-        <Cell
-          desktopColumns={1}
-          tabletColumns={1}
-          phoneColumns={1}
-          className="navigation-before"
-        >
+      <GridRow className="text-align-center">
+        <GridCell className="navigation-before" span={1}>
           <Link to={dj.add(-1, 'day').format('/YYYY/M/D')}>
             <Icon
               aria-label={intl.formatMessage({ id: 'Prev.day' })}
               icon="navigate_before"
             />
           </Link>
-        </Cell>
-        <Cell desktopColumns={10} tabletColumns={6} phoneColumns={2}>
+        </GridCell>
+        <GridCell desktop={10} tablet={6} phone={2}>
           <Typography use="headline6" tag="h1" className={headingClassName}>
             {dj.format(intl.formatMessage({ id: 'Format.date' }))}
           </Typography>
-        </Cell>
-        <Cell
-          desktopColumns={1}
-          tabletColumns={1}
-          phoneColumns={1}
-          className="navigation-next"
-        >
+        </GridCell>
+        <GridCell className="navigation-next" span={1}>
           <Link to={dj.add(1, 'day').format('/YYYY/M/D')}>
             <Icon
               aria-label={intl.formatMessage({ id: 'Next.day' })}
               icon="navigate_next"
             />
           </Link>
-        </Cell>
-      </Row>
+        </GridCell>
+      </GridRow>
       <DetailForm target={target} />
-      <Row>
-        <Cell columns={12} className="app-fab--absolute">
-          <Link to={dj.format('/YYYY/M')}>
-            <Fab
-              icon={<i className="material-icons">list</i>}
-              label={intl.formatMessage({ id: 'Back.to.list' })}
-            />
-          </Link>
-        </Cell>
-      </Row>
+      <SingleCellRow cellClassName="app-fab--absolute">
+        <Link to={dj.format('/YYYY/M')}>
+          <Fab
+            icon={<i className="material-icons">list</i>}
+            label={intl.formatMessage({ id: 'Back.to.list' })}
+          />
+        </Link>
+      </SingleCellRow>
     </Grid>
   )
 }
@@ -309,11 +298,13 @@ export default Detail
  * 'Heading in detail' component
  */
 const HeadingInDetail: React.FC = (props) => (
-  <SingleCellRow>
-    <Typography use="headline6" tag="h2">
-      {props.children}
-    </Typography>
-  </SingleCellRow>
+  <GridRow>
+    <GridCell span={12}>
+      <Typography use="headline6" tag="h2">
+        {props.children}
+      </Typography>
+    </GridCell>
+  </GridRow>
 )
 
 /**
@@ -575,7 +566,7 @@ const RequireUpdateButton: React.FC<{
   }
 
   return (
-    <SingleCellRow className="gutter-top">
+    <SingleCellRow rowClassName="gutter-top">
       <Button className="full-width" unelevated={true} onClick={props.onClick}>
         <FormattedMessage id="Send.update" />
       </Button>

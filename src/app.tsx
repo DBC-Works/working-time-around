@@ -14,7 +14,6 @@ import 'dayjs/locale/ja'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 dayjs.extend(localizedFormat)
 
-import '@material/react-layout-grid/dist/layout-grid.css'
 import '@material/react-select/dist/select.css'
 import '@material/react-tab-bar/dist/tab-bar.css'
 import '@material/react-tab-scroller/dist/tab-scroller.css'

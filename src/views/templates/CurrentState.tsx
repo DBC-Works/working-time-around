@@ -9,7 +9,8 @@ import dayjs from 'dayjs'
 
 import { Button } from '@rmwc/button'
 import '@rmwc/button/styles'
-import { Grid } from '@material/react-layout-grid'
+import { Grid, GridCell, GridRow } from '@rmwc/grid'
+import '@rmwc/grid/styles'
 import { TextField } from '@rmwc/textfield'
 import '@rmwc/textfield/styles'
 import { Fab } from '@rmwc/fab'
@@ -81,10 +82,12 @@ const CurrentState: React.FC = () => {
   const intl = useIntl()
   return (
     <Grid className="current-state">
-      <SingleCellRow>
-        <StartButton disabled={latest.stop !== null} time={latest.start} />
-      </SingleCellRow>
-      <SingleCellRow className="gutter-top">
+      <GridRow>
+        <GridCell span={12}>
+          <StartButton disabled={latest.stop !== null} time={latest.start} />
+        </GridCell>
+      </GridRow>
+      <SingleCellRow rowClassName="gutter-top">
         <Button className="date full-width" onClick={handleClick}>
           <Typography use="headline4" tag="span">
             {dj.format(intl.formatMessage({ id: 'Format.date' }))}
@@ -96,10 +99,10 @@ const CurrentState: React.FC = () => {
           {dj.format(intl.formatMessage({ id: 'Format.time.24' }))}
         </Typography>
       </SingleCellRow>
-      <SingleCellRow className="gutter-top">
+      <SingleCellRow rowClassName="gutter-top">
         <StopButton time={latest.stop} />
       </SingleCellRow>
-      <SingleCellRow className="gutter-top">
+      <SingleCellRow rowClassName="gutter-top">
         <MemoTextField
           time={time}
           memo={latest.memo}

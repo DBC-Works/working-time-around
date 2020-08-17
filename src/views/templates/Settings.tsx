@@ -11,7 +11,8 @@ import { Button } from '@rmwc/button'
 import '@rmwc/button/styles'
 import { Checkbox } from '@rmwc/checkbox'
 import '@rmwc/checkbox/styles'
-import { Cell, Grid, Row } from '@material/react-layout-grid'
+import { Grid, GridCell, GridRow } from '@rmwc/grid'
+import '@rmwc/grid/styles'
 import { TextField } from '@rmwc/textfield'
 import '@rmwc/textfield/styles'
 import { Typography } from '@rmwc/typography'
@@ -138,13 +139,13 @@ const Settings: React.FC = () => {
 
   return (
     <Grid className="settings">
-      <Row className="text-align-center">
-        <Cell columns={12}>
+      <GridRow className="text-align-center">
+        <GridCell span={12}>
           <Typography use="headline6" tag="h1">
             <FormattedMessage id="Settings" />
           </Typography>
-        </Cell>
-      </Row>
+        </GridCell>
+      </GridRow>
       <SingleCellRow>
         <TabBar
           activeIndex={activeTab}
@@ -161,24 +162,26 @@ const Settings: React.FC = () => {
           </Tab>
         </TabBar>
       </SingleCellRow>
-      {activeTab === TabType.Operation && (
-        <>
-          <DefaultBreakTimeLength />
-          <LanguageSelection />
-        </>
-      )}
-      {activeTab === TabType.Record && (
-        <div className="record">
-          <Export />
-          <Import />
-        </div>
-      )}
-      {activeTab === TabType.Linkage && (
-        <>
-          <MailAddress />
-          <SlackSettings />
-        </>
-      )}
+      <SingleCellRow>
+        {activeTab === TabType.Operation && (
+          <>
+            <DefaultBreakTimeLength />
+            <LanguageSelection />
+          </>
+        )}
+        {activeTab === TabType.Record && (
+          <div className="record">
+            <Export />
+            <Import />
+          </div>
+        )}
+        {activeTab === TabType.Linkage && (
+          <>
+            <MailAddress />
+            <SlackSettings />
+          </>
+        )}
+      </SingleCellRow>
     </Grid>
   )
 }
@@ -309,7 +312,7 @@ const SlackSettings: React.FC = () => {
           onInput={handleInputContext}
         />
       </SingleCellRow>
-      <SingleCellRow className="gutter-top">
+      <SingleCellRow rowClassName="gutter-top">
         <SendTestMessageButton />
       </SingleCellRow>
     </>
@@ -513,7 +516,7 @@ const Import: React.FC = () => {
           </Typography>
         </div>
       </SingleCellRow>
-      <SingleCellRow className="file-upload">
+      <SingleCellRow rowClassName="file-upload">
         <input
           type="file"
           data-testid="file-upload"
