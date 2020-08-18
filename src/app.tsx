@@ -15,10 +15,6 @@ import localizedFormat from 'dayjs/plugin/localizedFormat'
 dayjs.extend(localizedFormat)
 
 import '@material/react-select/dist/select.css'
-import '@material/react-tab-bar/dist/tab-bar.css'
-import '@material/react-tab-scroller/dist/tab-scroller.css'
-import '@material/react-tab/dist/tab.css'
-import '@material/react-tab-indicator/dist/tab-indicator.css'
 
 import configureStore, { AppState } from './state/store'
 import { getLang } from './state/ducks/settings'

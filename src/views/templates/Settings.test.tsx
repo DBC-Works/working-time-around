@@ -50,6 +50,10 @@ describe('"Settings" template', () => {
     }
   }
 
+  beforeAll(() => {
+    window.scrollTo = jest.fn()
+  })
+
   it('should exist "Settings" heading', () => {
     setup()
     expect(screen.getByText('Settings')).toBeInTheDocument()

@@ -426,7 +426,7 @@ const DetailForm: React.FC<{ target: Date }> = (props) => {
       })
     )
   }, [])
-  const handleInputMemo = useCallback(
+  const handleChangeMemo = useCallback(
     (e: FormEvent<HTMLInputElement>) => {
       updateRef.current.updated.memo = e.currentTarget.value
       dispatch(
@@ -452,7 +452,7 @@ const DetailForm: React.FC<{ target: Date }> = (props) => {
         onChangeStartTime={handleChangeStartTime}
         onChangeStopTime={handleChangeStopTime}
       />
-      <Memo memo={latest.memo} onInput={handleInputMemo} />
+      <Memo memo={latest.memo} onChange={handleChangeMemo} />
       <BreakTimeLength
         date={props.target}
         lengthMin={latest.breakTimeLengthMin}
@@ -503,7 +503,7 @@ const Time: React.FC<{
  */
 const Memo: React.FC<{
   memo: string
-  onInput: React.FormEventHandler<HTMLInputElement>
+  onChange: React.FormEventHandler<HTMLInputElement>
 }> = (props) => {
   return (
     <>
@@ -516,7 +516,7 @@ const Memo: React.FC<{
           outlined={true}
           fullwidth={true}
           value={props.memo}
-          onInput={props.onInput}
+          onChange={props.onChange}
         />
       </SingleCellRow>
     </>

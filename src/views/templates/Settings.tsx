@@ -17,8 +17,8 @@ import { TextField } from '@rmwc/textfield'
 import '@rmwc/textfield/styles'
 import { Typography } from '@rmwc/typography'
 import '@rmwc/typography/styles'
-import Tab from '@material/react-tab'
-import TabBar from '@material/react-tab-bar'
+import { Tab, TabBar } from '@rmwc/tabs'
+import '@rmwc/tabs/styles'
 
 import { formatStateForExport } from '../../implementations/formatter'
 import { parseExportedState } from '../../implementations/parser'
@@ -130,13 +130,6 @@ export function getUploadText(files: FileList): Promise<string> {
 const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState(TabType.Operation)
 
-  const handleActiveIndexUpdate = useCallback(
-    (index) => {
-      setActiveTab(index)
-    },
-    [setActiveTab]
-  )
-
   return (
     <Grid className="settings">
       <GridRow className="text-align-center">
@@ -147,17 +140,14 @@ const Settings: React.FC = () => {
         </GridCell>
       </GridRow>
       <SingleCellRow>
-        <TabBar
-          activeIndex={activeTab}
-          handleActiveIndexUpdate={handleActiveIndexUpdate}
-        >
-          <Tab>
+        <TabBar>
+          <Tab onInteraction={() => setActiveTab(TabType.Operation)}>
             <FormattedMessage id="Operation" />
           </Tab>
-          <Tab>
+          <Tab onInteraction={() => setActiveTab(TabType.Record)}>
             <FormattedMessage id="Record" />
           </Tab>
-          <Tab>
+          <Tab onInteraction={() => setActiveTab(TabType.Linkage)}>
             <FormattedMessage id="Linkage" />
           </Tab>
         </TabBar>
@@ -233,7 +223,7 @@ const MailAddress: React.FC = () => {
   )
 
   const dispatch = useDispatch()
-  const handleInputMailAddress = useCallback((e) => {
+  const handleChangeMailAddress = useCallback((e) => {
     dispatch(updateSendToMailAddress(e.currentTarget.value))
   }, [])
 
@@ -251,7 +241,7 @@ const MailAddress: React.FC = () => {
           fullwidth={true}
           placeholder="foobar@example.com"
           value={mailAddress}
-          onInput={handleInputMailAddress}
+          onChange={handleChangeMailAddress}
         />
       </SingleCellRow>
     </>
@@ -267,10 +257,10 @@ const SlackSettings: React.FC = () => {
   )
 
   const dispatch = useDispatch()
-  const handleInputUrl = useCallback((e) => {
+  const handleChangeUrl = useCallback((e) => {
     dispatch(updateSlackIncomingWebhookUrl(e.currentTarget.value))
   }, [])
-  const handleInputContext = useCallback((e) => {
+  const handleChangeContext = useCallback((e) => {
     dispatch(updateSlackContext(e.currentTarget.value))
   }, [])
 
@@ -293,7 +283,7 @@ const SlackSettings: React.FC = () => {
           fullwidth={true}
           placeholder="https://hooks.slack.com/services/..."
           value={slackSettings.incomingWebhookUrl}
-          onInput={handleInputUrl}
+          onChange={handleChangeUrl}
         />
       </SingleCellRow>
       <SingleCellRow>
@@ -309,7 +299,7 @@ const SlackSettings: React.FC = () => {
           id="context"
           fullwidth={true}
           value={slackSettings.context}
-          onInput={handleInputContext}
+          onChange={handleChangeContext}
         />
       </SingleCellRow>
       <SingleCellRow rowClassName="gutter-top">

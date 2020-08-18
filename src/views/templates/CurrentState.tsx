@@ -353,7 +353,7 @@ const MemoTextField: React.FC<{
         }
       : undefined
 
-  const handleInput = useCallback((e: FormEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: FormEvent<HTMLInputElement>) => {
     updateRef.current.updated = e.currentTarget.value
     dispatch(updateLatestMemo(e.currentTarget.value))
   }, [])
@@ -366,7 +366,7 @@ const MemoTextField: React.FC<{
         fullwidth={true}
         disabled={tomorrow.diff(dj, 'm') < 5}
         value={props.memo}
-        onInput={handleInput}
+        onChange={handleChange}
       />
       {requirePost !== false && (
         <div className="app-fab--absolute">
