@@ -7,11 +7,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import dayjs from 'dayjs'
 
-import Button from '@material/react-button'
-import { Grid } from '@material/react-layout-grid'
-import MaterialIcon from '@material/react-material-icon'
-import TextField, { Input } from '@material/react-text-field'
-import { Headline4 } from '@material/react-typography'
+import { Button } from '@rmwc/button'
+import '@rmwc/button/styles'
+import { Grid, GridCell, GridRow } from '@rmwc/grid'
+import '@rmwc/grid/styles'
+import { TextField } from '@rmwc/textfield'
+import '@rmwc/textfield/styles'
+import { Fab } from '@rmwc/fab'
+import '@rmwc/fab/styles'
+import { Typography } from '@rmwc/typography'
+import '@rmwc/typography/styles'
 
 import { AppState } from '../../state/store'
 import {
@@ -77,25 +82,27 @@ const CurrentState: React.FC = () => {
   const intl = useIntl()
   return (
     <Grid className="current-state">
-      <SingleCellRow>
-        <StartButton disabled={latest.stop !== null} time={latest.start} />
-      </SingleCellRow>
-      <SingleCellRow className="gutter-top">
+      <GridRow>
+        <GridCell span={12}>
+          <StartButton disabled={latest.stop !== null} time={latest.start} />
+        </GridCell>
+      </GridRow>
+      <SingleCellRow rowClassName="gutter-top">
         <Button className="date full-width" onClick={handleClick}>
-          <Headline4 tag="span">
+          <Typography use="headline4" tag="span">
             {dj.format(intl.formatMessage({ id: 'Format.date' }))}
-          </Headline4>
+          </Typography>
         </Button>
       </SingleCellRow>
       <SingleCellRow>
-        <Headline4 tag="div" className="text-align-center">
+        <Typography use="headline4" tag="div" className="text-align-center">
           {dj.format(intl.formatMessage({ id: 'Format.time.24' }))}
-        </Headline4>
+        </Typography>
       </SingleCellRow>
-      <SingleCellRow className="gutter-top">
+      <SingleCellRow rowClassName="gutter-top">
         <StopButton time={latest.stop} />
       </SingleCellRow>
-      <SingleCellRow className="gutter-top">
+      <SingleCellRow rowClassName="gutter-top">
         <MemoTextField
           time={time}
           memo={latest.memo}
@@ -337,16 +344,7 @@ const MemoTextField: React.FC<{
     [requirePost]
   )
 
-  const trailingIcon =
-    requirePost !== false ? (
-      <MaterialIcon
-        aria-label={intl.formatMessage({ id: 'Send.update' })}
-        icon="send"
-      />
-    ) : (
-      <></>
-    )
-  const handleTrailingIconSelect =
+  const handleClickSendUpdate =
     requirePost !== false
       ? (): void => {
           postUpdate()
@@ -355,20 +353,30 @@ const MemoTextField: React.FC<{
         }
       : undefined
 
-  const handleInput = useCallback((e: FormEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: FormEvent<HTMLInputElement>) => {
     updateRef.current.updated = e.currentTarget.value
     dispatch(updateLatestMemo(e.currentTarget.value))
   }, [])
 
   return (
-    <TextField
-      textarea={true}
-      fullWidth={true}
-      trailingIcon={trailingIcon}
-      onTrailingIconSelect={handleTrailingIconSelect}
-      disabled={tomorrow.diff(dj, 'm') < 5}
-    >
-      <Input value={props.memo} onInput={handleInput} />
-    </TextField>
+    <>
+      <TextField
+        textarea={true}
+        outlined={true}
+        fullwidth={true}
+        disabled={tomorrow.diff(dj, 'm') < 5}
+        value={props.memo}
+        onChange={handleChange}
+      />
+      {requirePost !== false && (
+        <div className="app-fab--absolute">
+          <Fab
+            icon={<i className="material-icons">send</i>}
+            label={intl.formatMessage({ id: 'Send.update' })}
+            onClick={handleClickSendUpdate}
+          />
+        </div>
+      )}
+    </>
   )
 }

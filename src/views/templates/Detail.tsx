@@ -14,12 +14,18 @@ import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
 import { Action } from 'typescript-fsa'
 import dayjs, { Dayjs } from 'dayjs'
 
-import Button from '@material/react-button'
-import Fab from '@material/react-fab'
-import { Cell, Grid, Row } from '@material/react-layout-grid'
-import MaterialIcon from '@material/react-material-icon'
-import TextField, { Input } from '@material/react-text-field'
-import { Headline6 } from '@material/react-typography'
+import { Button } from '@rmwc/button'
+import '@rmwc/button/styles'
+import { Fab } from '@rmwc/fab'
+import '@rmwc/fab/styles'
+import { Grid, GridCell, GridRow } from '@rmwc/grid'
+import '@rmwc/grid/styles'
+import { Icon } from '@rmwc/icon'
+import '@rmwc/icon/styles'
+import { TextField } from '@rmwc/textfield'
+import '@rmwc/textfield/styles'
+import { Typography } from '@rmwc/typography'
+import '@rmwc/typography/styles'
 import assert from 'assert'
 
 import { AppState } from '../../state/store'
@@ -251,50 +257,38 @@ const Detail: React.FC = () => {
   const intl = useIntl()
   return (
     <Grid className="detail">
-      <Row className="text-align-center">
-        <Cell
-          desktopColumns={1}
-          tabletColumns={1}
-          phoneColumns={1}
-          className="navigation-before"
-        >
+      <GridRow className="text-align-center">
+        <GridCell className="navigation-before" span={1}>
           <Link to={dj.add(-1, 'day').format('/YYYY/M/D')}>
-            <MaterialIcon
+            <Icon
               aria-label={intl.formatMessage({ id: 'Prev.day' })}
               icon="navigate_before"
             />
           </Link>
-        </Cell>
-        <Cell desktopColumns={10} tabletColumns={6} phoneColumns={2}>
-          <Headline6 tag="h1" className={headingClassName}>
+        </GridCell>
+        <GridCell desktop={10} tablet={6} phone={2}>
+          <Typography use="headline6" tag="h1" className={headingClassName}>
             {dj.format(intl.formatMessage({ id: 'Format.date' }))}
-          </Headline6>
-        </Cell>
-        <Cell
-          desktopColumns={1}
-          tabletColumns={1}
-          phoneColumns={1}
-          className="navigation-next"
-        >
+          </Typography>
+        </GridCell>
+        <GridCell className="navigation-next" span={1}>
           <Link to={dj.add(1, 'day').format('/YYYY/M/D')}>
-            <MaterialIcon
+            <Icon
               aria-label={intl.formatMessage({ id: 'Next.day' })}
               icon="navigate_next"
             />
           </Link>
-        </Cell>
-      </Row>
+        </GridCell>
+      </GridRow>
       <DetailForm target={target} />
-      <Row>
-        <Cell columns={12} className="app-fab--absolute">
-          <Link to={dj.format('/YYYY/M')}>
-            <Fab
-              icon={<i className="material-icons">list</i>}
-              textLabel={intl.formatMessage({ id: 'Back.to.list' })}
-            />
-          </Link>
-        </Cell>
-      </Row>
+      <SingleCellRow cellClassName="app-fab--absolute">
+        <Link to={dj.format('/YYYY/M')}>
+          <Fab
+            icon={<i className="material-icons">list</i>}
+            label={intl.formatMessage({ id: 'Back.to.list' })}
+          />
+        </Link>
+      </SingleCellRow>
     </Grid>
   )
 }
@@ -304,9 +298,13 @@ export default Detail
  * 'Heading in detail' component
  */
 const HeadingInDetail: React.FC = (props) => (
-  <SingleCellRow>
-    <Headline6 tag="h2">{props.children}</Headline6>
-  </SingleCellRow>
+  <GridRow>
+    <GridCell span={12}>
+      <Typography use="headline6" tag="h2">
+        {props.children}
+      </Typography>
+    </GridCell>
+  </GridRow>
 )
 
 /**
@@ -428,7 +426,7 @@ const DetailForm: React.FC<{ target: Date }> = (props) => {
       })
     )
   }, [])
-  const handleInputMemo = useCallback(
+  const handleChangeMemo = useCallback(
     (e: FormEvent<HTMLInputElement>) => {
       updateRef.current.updated.memo = e.currentTarget.value
       dispatch(
@@ -454,7 +452,7 @@ const DetailForm: React.FC<{ target: Date }> = (props) => {
         onChangeStartTime={handleChangeStartTime}
         onChangeStopTime={handleChangeStopTime}
       />
-      <Memo memo={latest.memo} onInput={handleInputMemo} />
+      <Memo memo={latest.memo} onChange={handleChangeMemo} />
       <BreakTimeLength
         date={props.target}
         lengthMin={latest.breakTimeLengthMin}
@@ -505,7 +503,7 @@ const Time: React.FC<{
  */
 const Memo: React.FC<{
   memo: string
-  onInput: React.FormEventHandler<HTMLInputElement>
+  onChange: React.FormEventHandler<HTMLInputElement>
 }> = (props) => {
   return (
     <>
@@ -513,9 +511,13 @@ const Memo: React.FC<{
         <FormattedMessage id="Memo" />
       </HeadingInDetail>
       <SingleCellRow>
-        <TextField textarea={true} fullWidth={true}>
-          <Input value={props.memo} onInput={props.onInput} />
-        </TextField>
+        <TextField
+          textarea={true}
+          outlined={true}
+          fullwidth={true}
+          value={props.memo}
+          onChange={props.onChange}
+        />
       </SingleCellRow>
     </>
   )
@@ -564,7 +566,7 @@ const RequireUpdateButton: React.FC<{
   }
 
   return (
-    <SingleCellRow className="gutter-top">
+    <SingleCellRow rowClassName="gutter-top">
       <Button className="full-width" unelevated={true} onClick={props.onClick}>
         <FormattedMessage id="Send.update" />
       </Button>

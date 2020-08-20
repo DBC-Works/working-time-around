@@ -8,11 +8,16 @@ import { FormattedMessage, useIntl } from 'react-intl'
 import assert from 'assert'
 import dayjs, { Dayjs } from 'dayjs'
 
-import Button from '@material/react-button'
-import Fab from '@material/react-fab'
-import { Cell, Grid, Row } from '@material/react-layout-grid'
-import MaterialIcon from '@material/react-material-icon'
-import { Headline6 } from '@material/react-typography'
+import { Button } from '@rmwc/button'
+import '@rmwc/button/styles'
+import { Fab } from '@rmwc/fab'
+import '@rmwc/fab/styles'
+import { Grid, GridCell, GridRow } from '@rmwc/grid'
+import '@rmwc/grid/styles'
+import { Icon } from '@rmwc/icon'
+import '@rmwc/icon/styles'
+import { Typography } from '@rmwc/typography'
+import '@rmwc/typography/styles'
 
 import { AppState } from '../../state/store'
 import {
@@ -27,6 +32,7 @@ import {
   getSendToMailAddress,
 } from '../../state/ducks/settings'
 
+import SingleCellRow from '../molecules/SingleCellRow'
 import { getDaysInMonth } from '../../implementations/utilities'
 import { formatSpecifiedMonthRecordsAsCsvForMail } from '../../implementations/formatter'
 
@@ -167,7 +173,9 @@ const List: React.FC = () => {
   })
   return (
     <Grid className="list">
-      <MonthHeading target={dj} />
+      <GridRow className="text-align-center">
+        <MonthHeading target={dj} />
+      </GridRow>
       <DateList latestRecords={latestRecords} />
       <Statistics latestRecords={latestRecords} />
       <Footer target={dj} records={records} />
@@ -183,39 +191,29 @@ const MonthHeading: React.FC<{ target: Dayjs }> = (props) => {
   const intl = useIntl()
 
   return (
-    <Row className="text-align-center">
-      <Cell
-        desktopColumns={1}
-        tabletColumns={1}
-        phoneColumns={1}
-        className="navigation-before"
-      >
+    <>
+      <GridCell className="navigation-before" desktop={1} tablet={1} phone={1}>
         <Link to={props.target.add(-1, 'month').format('/YYYY/M')}>
-          <MaterialIcon
+          <Icon
             aria-label={intl.formatMessage({ id: 'Prev.month' })}
             icon="navigate_before"
           />
         </Link>
-      </Cell>
-      <Cell desktopColumns={10} tabletColumns={6} phoneColumns={2}>
-        <Headline6 tag="h2">
+      </GridCell>
+      <GridCell desktop={10} tablet={6} phone={2}>
+        <Typography use="headline6" tag="h2">
           {props.target.format(intl.formatMessage({ id: 'Format.month' }))}
-        </Headline6>
-      </Cell>
-      <Cell
-        desktopColumns={1}
-        tabletColumns={1}
-        phoneColumns={1}
-        className="navigation-next"
-      >
+        </Typography>
+      </GridCell>
+      <GridCell className="navigation-next" desktop={1} tablet={1} phone={1}>
         <Link to={props.target.add(1, 'month').format('/YYYY/M')}>
-          <MaterialIcon
+          <Icon
             aria-label={intl.formatMessage({ id: 'Next.month' })}
             icon="navigate_next"
           />
         </Link>
-      </Cell>
-    </Row>
+      </GridCell>
+    </>
   )
 }
 
@@ -228,25 +226,25 @@ const DateList: React.FC<{
   const { latestRecords } = props
   const timeFormat = useIntl().formatMessage({ id: 'Format.time.24' })
   return (
-    <Row>
-      <Cell columns={12}>
-        <Grid className="date-list">
+    <SingleCellRow>
+      <Grid className="date-list">
+        <GridRow className="date-list-header date-list-row">
           <DateListHeader />
-          {latestRecords.map((record) => (
-            <DateRecordRow
-              key={record.date.format()}
-              date={record.date}
-              latest={record.latestRecord}
-              timeFormat={timeFormat}
-            />
-          ))}
-          <DateListFooter
-            latestRecords={latestRecords.map((record) => record.latestRecord)}
+        </GridRow>
+        {latestRecords.map((record) => (
+          <DateRecordRow
+            key={record.date.format()}
+            date={record.date}
+            latest={record.latestRecord}
             timeFormat={timeFormat}
           />
-        </Grid>
-      </Cell>
-    </Row>
+        ))}
+        <DateListFooter
+          latestRecords={latestRecords.map((record) => record.latestRecord)}
+          timeFormat={timeFormat}
+        />
+      </Grid>
+    </SingleCellRow>
   )
 }
 
@@ -254,7 +252,7 @@ const DateList: React.FC<{
  * 'DateListHeader' component
  */
 const DateListHeader: React.FC = () => (
-  <Row className="date-list-header date-list-row">
+  <>
     <DateListCell>
       <FormattedMessage id="Date" />
     </DateListCell>
@@ -267,7 +265,7 @@ const DateListHeader: React.FC = () => (
     <DateListCell>
       <FormattedMessage id="Edit" />
     </DateListCell>
-  </Row>
+  </>
 )
 
 /**
@@ -290,7 +288,7 @@ const DateRecordRow: React.FC<{
   }, [props.date])
 
   return (
-    <Row className="date-list-row">
+    <GridRow className="date-list-row">
       <DateListCell className={dayKind}>
         {props.date.format('D(ddd)')}
       </DateListCell>
@@ -309,7 +307,7 @@ const DateRecordRow: React.FC<{
           <span dangerouslySetInnerHTML={{ __html: '&hellip;' }} />
         </Button>
       </DateListCell>
-    </Row>
+    </GridRow>
   )
 }
 
@@ -331,7 +329,7 @@ const DateListFooter: React.FC<{
     .filter((stop) => stop !== null) as Date[]
 
   return (
-    <Row
+    <GridRow
       className="date-list-footer date-list-row"
       data-testid="data-list-footer-median"
     >
@@ -349,7 +347,7 @@ const DateListFooter: React.FC<{
         </span>
       </DateListCell>
       <DateListCell />
-    </Row>
+    </GridRow>
   )
 }
 
@@ -357,14 +355,9 @@ const DateListFooter: React.FC<{
  * 'DateListCell' component
  */
 const DateListCell: React.FC<{ className?: string }> = (props) => (
-  <Cell
-    desktopColumns={3}
-    tabletColumns={2}
-    phoneColumns={1}
-    className={props.className}
-  >
+  <GridCell className={props.className} desktop={3} tablet={2} phone={1}>
     {props.children}
-  </Cell>
+  </GridCell>
 )
 
 /**
@@ -404,48 +397,49 @@ const Statistics: React.FC<{
   }
 
   return (
-    <Row>
-      <Cell columns={12}>
-        <Grid className="statistics-list">
-          <Row className="statistics-list-row" data-testid="statistics-total">
-            <Cell
-              className="statistics-list-cell"
-              desktopColumns={9}
-              tabletColumns={6}
-              phoneColumns={3}
-            >
-              <FormattedMessage id="Total.working.time" />
-            </Cell>
-            <Cell
-              className="statistics-list-cell"
-              desktopColumns={3}
-              tabletColumns={2}
-              phoneColumns={1}
-            >
-              {totalWorkingTimeString}
-            </Cell>
-          </Row>
-          <Row className="statistics-list-row" data-testid="statistics-median">
-            <Cell
-              className="statistics-list-cell"
-              desktopColumns={9}
-              tabletColumns={6}
-              phoneColumns={3}
-            >
-              <FormattedMessage id="Median" />
-            </Cell>
-            <Cell
-              className="statistics-list-cell"
-              desktopColumns={3}
-              tabletColumns={2}
-              phoneColumns={1}
-            >
-              {medianWorkingTimeString}
-            </Cell>
-          </Row>
-        </Grid>
-      </Cell>
-    </Row>
+    <SingleCellRow>
+      <Grid className="statistics-list">
+        <GridRow className="statistics-list-row" data-testid="statistics-total">
+          <GridCell
+            className="statistics-list-cell"
+            desktop={9}
+            tablet={6}
+            phone={3}
+          >
+            <FormattedMessage id="Total.working.time" />
+          </GridCell>
+          <GridCell
+            className="statistics-list-cell"
+            desktop={3}
+            tablet={2}
+            phone={1}
+          >
+            {totalWorkingTimeString}
+          </GridCell>
+        </GridRow>
+        <GridRow
+          className="statistics-list-row"
+          data-testid="statistics-median"
+        >
+          <GridCell
+            className="statistics-list-cell"
+            desktop={9}
+            tablet={6}
+            phone={3}
+          >
+            <FormattedMessage id="Median" />
+          </GridCell>
+          <GridCell
+            className="statistics-list-cell"
+            desktop={3}
+            tablet={2}
+            phone={1}
+          >
+            {medianWorkingTimeString}
+          </GridCell>
+        </GridRow>
+      </Grid>
+    </SingleCellRow>
   )
 }
 
@@ -464,23 +458,21 @@ const Footer: React.FC<{
     getSendToMailAddress(state.settings)
   )
   return (
-    <Row>
-      <Cell columns={12}>
-        <a
-          className="app-fab--absolute"
-          href={createMailToUri(
-            target,
-            records,
-            mailAddress,
-            defaultBreakTimeLength
-          )}
-        >
-          <Fab
-            icon={<i className="material-icons">mail</i>}
-            textLabel={useIntl().formatMessage({ id: 'Send.mail' })}
-          />
-        </a>
-      </Cell>
-    </Row>
+    <SingleCellRow>
+      <a
+        className="app-fab--absolute"
+        href={createMailToUri(
+          target,
+          records,
+          mailAddress,
+          defaultBreakTimeLength
+        )}
+      >
+        <Fab
+          icon={<i className="material-icons">mail</i>}
+          label={useIntl().formatMessage({ id: 'Send.mail' })}
+        />
+      </a>
+    </SingleCellRow>
   )
 }

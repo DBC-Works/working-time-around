@@ -23,6 +23,10 @@ describe('App', () => {
     )
   }
 
+  beforeAll(() => {
+    window.scrollTo = jest.fn()
+  })
+
   it('should have an application name.', () => {
     setup()
     expect(screen.getByText('Working time around')).toBeInTheDocument()

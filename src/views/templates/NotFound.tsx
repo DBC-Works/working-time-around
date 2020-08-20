@@ -4,21 +4,21 @@
 import React from 'react'
 import { FormattedMessage } from 'react-intl'
 
-import { Grid } from '@material/react-layout-grid'
-import { Headline4 } from '@material/react-typography'
-
-import SingleCellRow from '../molecules/SingleCellRow'
+import { Grid, GridCell } from '@rmwc/grid'
+import '@rmwc/grid/styles'
+import { Typography } from '@rmwc/typography'
+import '@rmwc/typography/styles'
 
 /**
  * 'NotFound' component
  */
 const NotFound: React.FC = () => (
   <Grid>
-    <SingleCellRow>
-      <Headline4 tag="h1">
+    <GridCell span={12}>
+      <Typography use="headline4" tag="h1">
         <FormattedMessage id="Not.found" />
-      </Headline4>
-    </SingleCellRow>
+      </Typography>
+    </GridCell>
   </Grid>
 )
 export default NotFound

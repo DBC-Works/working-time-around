@@ -7,13 +7,20 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Action } from 'typescript-fsa'
 import assert from 'assert'
 
-import Button from '@material/react-button'
-import Checkbox from '@material/react-checkbox'
-import { Cell, Grid, Row } from '@material/react-layout-grid'
-import TextField, { Input } from '@material/react-text-field'
-import { Body1, Headline6, Subtitle1 } from '@material/react-typography'
-import Tab from '@material/react-tab'
-import TabBar from '@material/react-tab-bar'
+import { Button } from '@rmwc/button'
+import '@rmwc/button/styles'
+import { Checkbox } from '@rmwc/checkbox'
+import '@rmwc/checkbox/styles'
+import { Grid, GridCell, GridRow } from '@rmwc/grid'
+import '@rmwc/grid/styles'
+import { Select } from '@rmwc/Select'
+import '@rmwc/select/styles'
+import { TextField } from '@rmwc/textfield'
+import '@rmwc/textfield/styles'
+import { Typography } from '@rmwc/typography'
+import '@rmwc/typography/styles'
+import { Tab, TabBar } from '@rmwc/tabs'
+import '@rmwc/tabs/styles'
 
 import { formatStateForExport } from '../../implementations/formatter'
 import { parseExportedState } from '../../implementations/parser'
@@ -45,7 +52,6 @@ import {
   updateSlackContext,
   updateSlackIncomingWebhookUrl,
 } from '../../state/ducks/settings'
-import Select from '../atoms/Select'
 import BreakTimeLengthSelect from '../molecules/BreakTimeLengthSelect'
 import SingleCellRow from '../molecules/SingleCellRow'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
@@ -125,56 +131,48 @@ export function getUploadText(files: FileList): Promise<string> {
 const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState(TabType.Operation)
 
-  const handleActiveIndexUpdate = useCallback(
-    (index) => {
-      setActiveTab(index)
-    },
-    [setActiveTab]
-  )
-
   return (
     <Grid className="settings">
-      <Row className="text-align-center">
-        <Cell columns={12}>
-          <Headline6 tag="h1">
+      <GridRow className="text-align-center">
+        <GridCell span={12}>
+          <Typography use="headline6" tag="h1">
             <FormattedMessage id="Settings" />
-          </Headline6>
-        </Cell>
-      </Row>
+          </Typography>
+        </GridCell>
+      </GridRow>
       <SingleCellRow>
-        <TabBar
-          activeIndex={activeTab}
-          handleActiveIndexUpdate={handleActiveIndexUpdate}
-        >
-          <Tab>
+        <TabBar>
+          <Tab onInteraction={() => setActiveTab(TabType.Operation)}>
             <FormattedMessage id="Operation" />
           </Tab>
-          <Tab>
+          <Tab onInteraction={() => setActiveTab(TabType.Record)}>
             <FormattedMessage id="Record" />
           </Tab>
-          <Tab>
+          <Tab onInteraction={() => setActiveTab(TabType.Linkage)}>
             <FormattedMessage id="Linkage" />
           </Tab>
         </TabBar>
       </SingleCellRow>
-      {activeTab === TabType.Operation && (
-        <>
-          <DefaultBreakTimeLength />
-          <LanguageSelection />
-        </>
-      )}
-      {activeTab === TabType.Record && (
-        <div className="record">
-          <Export />
-          <Import />
-        </div>
-      )}
-      {activeTab === TabType.Linkage && (
-        <>
-          <MailAddress />
-          <SlackSettings />
-        </>
-      )}
+      <SingleCellRow>
+        {activeTab === TabType.Operation && (
+          <>
+            <DefaultBreakTimeLength />
+            <LanguageSelection />
+          </>
+        )}
+        {activeTab === TabType.Record && (
+          <div className="record">
+            <Export />
+            <Import />
+          </div>
+        )}
+        {activeTab === TabType.Linkage && (
+          <>
+            <MailAddress />
+            <SlackSettings />
+          </>
+        )}
+      </SingleCellRow>
     </Grid>
   )
 }
@@ -185,7 +183,9 @@ export default Settings
  */
 const HeadingInTab: React.FC = (props) => (
   <SingleCellRow>
-    <Headline6 tag="h2">{props.children}</Headline6>
+    <Typography use="headline6" tag="h2">
+      {props.children}
+    </Typography>
   </SingleCellRow>
 )
 
@@ -224,7 +224,7 @@ const MailAddress: React.FC = () => {
   )
 
   const dispatch = useDispatch()
-  const handleInputMailAddress = useCallback((e) => {
+  const handleChangeMailAddress = useCallback((e) => {
     dispatch(updateSendToMailAddress(e.currentTarget.value))
   }, [])
 
@@ -236,14 +236,14 @@ const MailAddress: React.FC = () => {
         </label>
       </HeadingInTab>
       <SingleCellRow>
-        <TextField textarea={false} fullWidth={true} label="foobar@example.com">
-          <Input
-            type="email"
-            id="mail-address"
-            value={mailAddress}
-            onInput={handleInputMailAddress}
-          />
-        </TextField>
+        <TextField
+          type="email"
+          id="mail-address"
+          fullwidth={true}
+          placeholder="foobar@example.com"
+          value={mailAddress}
+          onChange={handleChangeMailAddress}
+        />
       </SingleCellRow>
     </>
   )
@@ -258,10 +258,10 @@ const SlackSettings: React.FC = () => {
   )
 
   const dispatch = useDispatch()
-  const handleInputUrl = useCallback((e) => {
+  const handleChangeUrl = useCallback((e) => {
     dispatch(updateSlackIncomingWebhookUrl(e.currentTarget.value))
   }, [])
-  const handleInputContext = useCallback((e) => {
+  const handleChangeContext = useCallback((e) => {
     dispatch(updateSlackContext(e.currentTarget.value))
   }, [])
 
@@ -271,44 +271,39 @@ const SlackSettings: React.FC = () => {
         <FormattedMessage id="Slack.linkage" />
       </HeadingInTab>
       <SingleCellRow>
-        <Subtitle1 tag="h3">
+        <Typography use="subtitle1" tag="h3">
           <label htmlFor="incoming-webhook-url">
             <FormattedMessage id="Incoming.webhook.URL" />
           </label>
-        </Subtitle1>
+        </Typography>
       </SingleCellRow>
       <SingleCellRow>
         <TextField
-          textarea={false}
-          fullWidth={true}
-          label="https://hooks.slack.com/services/..."
-        >
-          <Input
-            type="url"
-            id="incoming-webhook-url"
-            value={slackSettings.incomingWebhookUrl}
-            onInput={handleInputUrl}
-          />
-        </TextField>
+          type="url"
+          id="incoming-webhook-url"
+          fullwidth={true}
+          placeholder="https://hooks.slack.com/services/..."
+          value={slackSettings.incomingWebhookUrl}
+          onChange={handleChangeUrl}
+        />
       </SingleCellRow>
       <SingleCellRow>
-        <Subtitle1 tag="h3">
+        <Typography use="subtitle1" tag="h3">
           <label htmlFor="context">
             <FormattedMessage id="Context" />
           </label>
-        </Subtitle1>
+        </Typography>
       </SingleCellRow>
       <SingleCellRow>
-        <TextField textarea={false} fullWidth={true}>
-          <Input
-            type="text"
-            id="context"
-            value={slackSettings.context}
-            onInput={handleInputContext}
-          />
-        </TextField>
+        <TextField
+          type="test"
+          id="context"
+          fullwidth={true}
+          value={slackSettings.context}
+          onChange={handleChangeContext}
+        />
       </SingleCellRow>
-      <SingleCellRow className="gutter-top">
+      <SingleCellRow rowClassName="gutter-top">
         <SendTestMessageButton />
       </SingleCellRow>
     </>
@@ -380,13 +375,16 @@ const LanguageSelection: React.FC = () => {
         <FormattedMessage id="Language" />
       </HeadingInTab>
       <SingleCellRow>
-        <Select value={lang} className="full-width" onChange={handleChange}>
-          {Array.from(Object.keys(langs), (key: string) => (
-            <option key={key} value={key}>
-              {langs[key].literal}
-            </option>
-          ))}
-        </Select>
+        <Select
+          className="full-width"
+          outlined
+          options={Array.from(Object.keys(langs), (key: string) => ({
+            label: langs[key].literal,
+            value: key,
+          }))}
+          value={lang}
+          onChange={handleChange}
+        />
       </SingleCellRow>
     </>
   )
@@ -426,14 +424,14 @@ const Export: React.FC = () => {
         <FormattedMessage id="Export" />
       </HeadingInTab>
       <SingleCellRow>
-        <Body1>
+        <Typography use="body1">
           <a
             href={exportObjectUrl}
             download="working-time-around-record-data.json"
           >
             <FormattedMessage id="Download" />
           </a>
-        </Body1>
+        </Typography>
       </SingleCellRow>
     </>
   )
@@ -452,7 +450,7 @@ const Import: React.FC = () => {
   const handleChangeImportSettings = useCallback(() => {
     setResultMessage('')
     setImportSettings(!importSettings)
-  }, [])
+  }, [importSettings])
   const handleClickBrowse = useCallback(() => {
     if (fileInputRef.current === null) {
       return
@@ -501,18 +499,18 @@ const Import: React.FC = () => {
       <SingleCellRow>
         <div className="import-settings">
           <Checkbox
-            nativeControlId="import-settings"
+            id="import-settings"
             checked={importSettings}
             onChange={handleChangeImportSettings}
           />
-          <Body1>
+          <Typography use="body1">
             <label htmlFor="import-settings">
               <FormattedMessage id="Import.settings" />
             </label>
-          </Body1>
+          </Typography>
         </div>
       </SingleCellRow>
-      <SingleCellRow className="file-upload">
+      <SingleCellRow rowClassName="file-upload">
         <input
           type="file"
           data-testid="file-upload"
@@ -525,7 +523,7 @@ const Import: React.FC = () => {
         </Button>
       </SingleCellRow>
       <SingleCellRow>
-        <Body1>{resultMessage}</Body1>
+        <Typography use="body1">{resultMessage}</Typography>
       </SingleCellRow>
     </>
   )
