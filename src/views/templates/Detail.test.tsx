@@ -15,13 +15,34 @@ import { AppState, INITIAL_STATE } from '../../state/store'
 import List from './List'
 import Detail from './Detail'
 
-import { RenderResult, screen, within } from '@testing-library/react'
+import { act, RenderResult, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProvider } from '../componentTestUtilities'
 
 describe('"Detail" template', () => {
   const PATH_DETAIL = '/YYYY/M/D'
   const KEY_RECORD = 'YYYYMMDD'
+
+  type TestRecord = {
+    starts?: Date[]
+    stops?: Date[]
+    breakTimeLengthsMin?: number[]
+  }
+
+  function makeTestRecord(record: TestRecord): DailyRecord {
+    return {
+      starts: record.starts ?? [],
+      stops: record.stops ?? [],
+      memos: [],
+      breakTimeLengthsMin: record.breakTimeLengthsMin ?? [],
+    }
+  }
+
+  function makeTestState(dj: Dayjs, record: TestRecord): RecordsState {
+    const testState = { ...recordsInitialState }
+    testState.records[dj.format(KEY_RECORD)] = makeTestRecord(record)
+    return testState
+  }
 
   function setup(
     route = '/2019/1/1',
@@ -62,7 +83,7 @@ describe('"Detail" template', () => {
 
   describe('Content header', () => {
     beforeEach(() => {
-      setup(dj.format(PATH_DETAIL))[0]
+      setup(dj.format(PATH_DETAIL))
     })
 
     it('should exist date text heading', () => {
@@ -87,18 +108,113 @@ describe('"Detail" template', () => {
   })
 
   describe('Time', () => {
-    beforeEach(() => {
-      setup(dj.format(PATH_DETAIL))[0]
+    it('should exist heading', () => {
+      setup(dj.format(PATH_DETAIL))
+      expect(screen.getByText('Time')).toBeInTheDocument()
     })
 
-    it('should exist heading', () => {
-      expect(screen.getByText('Time')).toBeInTheDocument()
+    it('should not be selected start time if start time is not set', () => {
+      setup(dj.format(PATH_DETAIL))
+      expect(screen.getByDisplayValue('Start')).toBeInTheDocument()
+    })
+    it('should be selected start time if start time is set', () => {
+      setup(
+        dj.format(PATH_DETAIL),
+        makeRecordsTestState(
+          makeTestState(dj, { starts: [dj.hour(9).minute(47).toDate()] })
+        )
+      )
+      expect(screen.getByDisplayValue('09')).toBeInTheDocument()
+      expect(screen.getByDisplayValue(':47')).toBeInTheDocument()
+      expect(screen.queryByDisplayValue('Start')).not.toBeInTheDocument()
+    })
+    it('should be able to change start time', (done) => {
+      setup(
+        dj.format(PATH_DETAIL),
+        makeRecordsTestState(
+          makeTestState(dj, { starts: [dj.hour(9).minute(33).toDate()] })
+        )
+      )
+      expect(screen.getByDisplayValue('09')).toBeInTheDocument()
+      expect(screen.getByDisplayValue(':33')).toBeInTheDocument()
+      expect(screen.queryByDisplayValue('Start')).not.toBeInTheDocument()
+
+      act(() => {
+        window.requestAnimationFrame(() => {
+          userEvent.selectOptions(
+            screen.getByDisplayValue(':33') as HTMLElement,
+            '45'
+          )
+
+          expect(screen.getByDisplayValue('09')).toBeInTheDocument()
+          expect(screen.getByDisplayValue(':45')).toBeInTheDocument()
+
+          userEvent.selectOptions(
+            screen.getByDisplayValue('09') as HTMLElement,
+            '0'
+          )
+          expect(screen.getByDisplayValue('00')).toBeInTheDocument()
+          expect(screen.getByDisplayValue(':45')).toBeInTheDocument()
+          expect(screen.queryByDisplayValue('Start')).not.toBeInTheDocument()
+
+          done()
+        })
+      })
+    })
+
+    it('should not be selected stop if stop time is not set', () => {
+      setup(dj.format(PATH_DETAIL))
+      expect(screen.getByDisplayValue('Stop')).toBeInTheDocument()
+    })
+    it('should be selected stop time if stop time is set', () => {
+      setup(
+        dj.format(PATH_DETAIL),
+        makeRecordsTestState(
+          makeTestState(dj, { stops: [dj.hour(19).minute(32).toDate()] })
+        )
+      )
+      expect(screen.getByDisplayValue('19')).toBeInTheDocument()
+      expect(screen.getByDisplayValue(':32')).toBeInTheDocument()
+      expect(screen.queryByDisplayValue('Stop')).not.toBeInTheDocument()
+    })
+    it('should be able to change stop time', (done) => {
+      setup(
+        dj.format(PATH_DETAIL),
+        makeRecordsTestState(
+          makeTestState(dj, { stops: [dj.hour(21).minute(59).toDate()] })
+        )
+      )
+      expect(screen.getByDisplayValue('21')).toBeInTheDocument()
+      expect(screen.getByDisplayValue(':59')).toBeInTheDocument()
+      expect(screen.queryByDisplayValue('Stop')).not.toBeInTheDocument()
+
+      act(() => {
+        window.requestAnimationFrame(() => {
+          userEvent.selectOptions(
+            screen.getByDisplayValue(':59') as HTMLElement,
+            '58'
+          )
+
+          expect(screen.getByDisplayValue('21')).toBeInTheDocument()
+          expect(screen.getByDisplayValue(':58')).toBeInTheDocument()
+
+          userEvent.selectOptions(
+            screen.getByDisplayValue('21') as HTMLElement,
+            '22'
+          )
+          expect(screen.getByDisplayValue('22')).toBeInTheDocument()
+          expect(screen.getByDisplayValue(':58')).toBeInTheDocument()
+          expect(screen.queryByDisplayValue('Stop')).not.toBeInTheDocument()
+
+          done()
+        })
+      })
     })
   })
 
   describe('Memo', () => {
     beforeEach(() => {
-      setup(dj.format(PATH_DETAIL))[0]
+      setup(dj.format(PATH_DETAIL))
     })
 
     it('should exist heading', () => {
@@ -109,27 +225,6 @@ describe('"Detail" template', () => {
   describe('Break time length', () => {
     const TEST_ID_BREAK_TIME_LENGTH = 'break-time-length'
     const LITERAL_NO_SELECTION = '--'
-
-    function makeTestRecord(breakTimeLengthsMin: number[] | null): DailyRecord {
-      return {
-        starts: [],
-        stops: [],
-        memos: [],
-        breakTimeLengthsMin:
-          breakTimeLengthsMin !== null ? breakTimeLengthsMin : [],
-      }
-    }
-
-    function makeTestState(
-      dj: Dayjs,
-      breakTimeLengthsMin: number[] | null
-    ): RecordsState {
-      const testState = { ...recordsInitialState }
-      testState.records[dj.format(KEY_RECORD)] = makeTestRecord(
-        breakTimeLengthsMin
-      )
-      return testState
-    }
 
     it('should exist heading', () => {
       setup(dj.format(PATH_DETAIL))
@@ -144,10 +239,7 @@ describe('"Detail" template', () => {
       expect(getByTestId('time-select')).toBeInTheDocument()
     })
     it('should not be selected if break time length is not set', () => {
-      setup(
-        dj.format(PATH_DETAIL),
-        makeRecordsTestState(makeTestState(dj, null))
-      )
+      setup(dj.format(PATH_DETAIL), makeRecordsTestState(makeTestState(dj, {})))
       const { getAllByDisplayValue } = within(
         screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
       )
@@ -156,7 +248,7 @@ describe('"Detail" template', () => {
     it('should be selected if break time length is set', () => {
       setup(
         dj.format(PATH_DETAIL),
-        makeRecordsTestState(makeTestState(dj, [95]))
+        makeRecordsTestState(makeTestState(dj, { breakTimeLengthsMin: [95] }))
       )
       const { getByDisplayValue } = within(
         screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
@@ -164,13 +256,20 @@ describe('"Detail" template', () => {
       expect(getByDisplayValue('01')).toBeInTheDocument()
       expect(getByDisplayValue(':35')).toBeInTheDocument()
     })
-    it.each([
-      { lengthsMin: [60], hour: '01', minute: ':00' },
-      { lengthsMin: [60, 120], hour: '02', minute: ':00' },
-    ])('should be able to change', (table) => {
+    it('should be able to change', (done) => {
+      const tables = [
+        { lengthsMin: [60], hour: '01', minute: ':00' },
+        { lengthsMin: [60, 120], hour: '02', minute: ':00' },
+      ]
+      const table = tables[1]
+
       setup(
         dj.format(PATH_DETAIL),
-        makeRecordsTestState(makeTestState(dj, table.lengthsMin))
+        makeRecordsTestState(
+          makeTestState(dj, {
+            breakTimeLengthsMin: table.lengthsMin,
+          })
+        )
       )
       const { getByDisplayValue, queryByDisplayValue } = within(
         screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
@@ -178,68 +277,88 @@ describe('"Detail" template', () => {
       expect(getByDisplayValue(table.hour)).toBeInTheDocument()
       expect(getByDisplayValue(table.minute)).toBeInTheDocument()
 
-      userEvent.selectOptions(getByDisplayValue(':00') as HTMLElement, '45')
+      act(() => {
+        window.requestAnimationFrame(() => {
+          userEvent.selectOptions(getByDisplayValue(':00') as HTMLElement, '45')
 
-      expect(getByDisplayValue(table.hour)).toBeInTheDocument()
-      expect(getByDisplayValue(':45')).toBeInTheDocument()
-      expect(queryByDisplayValue(LITERAL_NO_SELECTION)).not.toBeInTheDocument()
+          expect(getByDisplayValue(table.hour)).toBeInTheDocument()
+          expect(getByDisplayValue(':45')).toBeInTheDocument()
+          expect(
+            queryByDisplayValue(LITERAL_NO_SELECTION)
+          ).not.toBeInTheDocument()
 
-      userEvent.selectOptions(getByDisplayValue(table.hour) as HTMLElement, '0')
-      expect(getByDisplayValue('00')).toBeInTheDocument()
-      expect(getByDisplayValue(':45')).toBeInTheDocument()
-      expect(queryByDisplayValue(LITERAL_NO_SELECTION)).not.toBeInTheDocument()
+          userEvent.selectOptions(
+            getByDisplayValue(table.hour) as HTMLElement,
+            '0'
+          )
+          expect(getByDisplayValue('00')).toBeInTheDocument()
+          expect(getByDisplayValue(':45')).toBeInTheDocument()
+          expect(
+            queryByDisplayValue(LITERAL_NO_SELECTION)
+          ).not.toBeInTheDocument()
+
+          done()
+        })
+      })
     })
     // eslint-disable-next-line prettier/prettier
-    it.each([
-      { value: '1', expected: '01' },
-      { value: '0', expected: '00' },
-    ])(
-      'should be set minute to "00" automatically when not selected and hour is selected',
-      (table) => {
-        setup(
-          dj.format(PATH_DETAIL),
-          makeRecordsTestState(makeTestState(dj, null))
-        )
-        const { getAllByDisplayValue, getByDisplayValue } = within(
-          screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
-        )
+    it('should be set minute to "00" automatically when not selected and hour is selected', (done) => {
+      const tables = [
+        { value: '1', expected: '01' },
+        { value: '0', expected: '00' },
+      ]
+      const table = tables[0]
 
-        userEvent.selectOptions(
-          (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[0],
-          table.value
-        )
+      setup(dj.format(PATH_DETAIL), makeRecordsTestState(makeTestState(dj, {})))
+      const { getAllByDisplayValue, getByDisplayValue } = within(
+        screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+      )
 
-        expect(getByDisplayValue(table.expected)).toBeInTheDocument()
-        expect(getByDisplayValue(':00')).toBeInTheDocument()
-      }
-    )
-    it.each([
-      { value: '45', expected: ':45' },
-      { value: '0', expected: ':00' },
-    ])(
-      'should be set hour to "00" automatically when not selected and minute is selected',
-      (table) => {
-        setup(
-          dj.format(PATH_DETAIL),
-          makeRecordsTestState(makeTestState(dj, null))
-        )
-        const { getAllByDisplayValue, getByDisplayValue } = within(
-          screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
-        )
-        userEvent.selectOptions(
-          (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[1],
-          table.value
-        )
+      act(() => {
+        window.requestAnimationFrame(() => {
+          userEvent.selectOptions(
+            (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[0],
+            table.value
+          )
 
-        expect(getByDisplayValue('00')).toBeInTheDocument()
-        expect(getByDisplayValue(table.expected)).toBeInTheDocument()
-      }
-    )
+          expect(getByDisplayValue(table.expected)).toBeInTheDocument()
+          expect(getByDisplayValue(':00')).toBeInTheDocument()
+
+          done()
+        })
+      })
+    })
+    it('should be set hour to "00" automatically when not selected and minute is selected', (done) => {
+      const tables = [
+        { value: '45', expected: ':45' },
+        { value: '0', expected: ':00' },
+      ]
+      const table = tables[0]
+
+      setup(dj.format(PATH_DETAIL), makeRecordsTestState(makeTestState(dj, {})))
+      const { getAllByDisplayValue, getByDisplayValue } = within(
+        screen.getByTestId(TEST_ID_BREAK_TIME_LENGTH)
+      )
+
+      act(() => {
+        window.requestAnimationFrame(() => {
+          userEvent.selectOptions(
+            (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[1],
+            table.value
+          )
+
+          expect(getByDisplayValue('00')).toBeInTheDocument()
+          expect(getByDisplayValue(table.expected)).toBeInTheDocument()
+
+          done()
+        })
+      })
+    })
   })
 
   describe('Floating action button', () => {
     beforeEach(() => {
-      setup(dj.format(PATH_DETAIL))[0]
+      setup(dj.format(PATH_DETAIL))
     })
 
     it('should move to list of month including the day when click "Back to list" fab link', () => {

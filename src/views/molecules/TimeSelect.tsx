@@ -4,7 +4,8 @@
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 
-import Select from '../atoms/Select'
+import { Select } from '@rmwc/Select'
+import '@rmwc/select/styles'
 
 //
 // Components
@@ -71,26 +72,28 @@ const TimeSelect: React.FC<{
   return (
     <div className="time-select" data-testid="time-select">
       <div className="container">
-        <Select testId="hour" value={hour} onChange={handleChangeHour}>
-          <>
-            {!hour && <option value="">{props.label}</option>}
-            {Array.from(Array(24), (_, i) => (
-              <option key={i} value={i}>
-                {dj.hour(i).format('HH')}
-              </option>
-            ))}
-          </>
-        </Select>
-        <Select testId="minute" value={minute} onChange={handleChangeMinute}>
-          <>
-            {!minute && <option value="">--</option>}
-            {Array.from(Array(60), (_, i) => (
-              <option key={i} value={i}>
-                :{dj.minute(i).format('mm')}
-              </option>
-            ))}
-          </>
-        </Select>
+        <Select
+          data-testid="hour"
+          outlined
+          placeholder={!hour ? props.label : undefined}
+          options={Array.from(Array(24), (_, i) => ({
+            label: `${dj.hour(i).format('HH')}`,
+            value: `${i}`,
+          }))}
+          value={hour}
+          onChange={handleChangeHour}
+        />
+        <Select
+          data-testid="minute"
+          outlined
+          placeholder={!minute ? '--' : undefined}
+          value={minute}
+          options={Array.from(Array(60), (_, i) => ({
+            label: `:${dj.minute(i).format('mm')}`,
+            value: `${i}`,
+          }))}
+          onChange={handleChangeMinute}
+        />
       </div>
     </div>
   )

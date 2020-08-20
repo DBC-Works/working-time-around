@@ -124,90 +124,104 @@ describe('"Settings" template', () => {
         expect(clearButton).toBeInTheDocument()
         expect(clearButton).not.toBeDisabled()
       })
-      it('should be able to change', () => {
+      it('should be able to change', (done) => {
         setup()
-
+        const clearButton = screen.getByText('clear')
         expect(screen.getByDisplayValue('01')).toBeInTheDocument()
         expect(screen.getByDisplayValue(':00')).toBeInTheDocument()
 
-        userEvent.selectOptions(
-          screen.getByDisplayValue(':00') as HTMLElement,
-          '45'
-        )
+        act(() => {
+          window.requestAnimationFrame(() => {
+            userEvent.selectOptions(
+              screen.getByDisplayValue(':00') as HTMLElement,
+              '45'
+            )
 
-        expect(screen.getByDisplayValue('01')).toBeInTheDocument()
-        expect(screen.getByDisplayValue(':45')).toBeInTheDocument()
-        expect(
-          screen.queryByDisplayValue(LITERAL_NO_SELECTION)
-        ).not.toBeInTheDocument()
+            expect(screen.getByDisplayValue('01')).toBeInTheDocument()
+            expect(screen.getByDisplayValue(':45')).toBeInTheDocument()
+            expect(
+              screen.queryByDisplayValue(LITERAL_NO_SELECTION)
+            ).not.toBeInTheDocument()
+            expect(clearButton).toBeInTheDocument()
+            expect(clearButton).not.toBeDisabled()
+
+            userEvent.selectOptions(
+              screen.getByDisplayValue('01') as HTMLElement,
+              '0'
+            )
+
+            expect(screen.getByDisplayValue('00')).toBeInTheDocument()
+            expect(screen.getByDisplayValue(':45')).toBeInTheDocument()
+            expect(
+              screen.queryByDisplayValue(LITERAL_NO_SELECTION)
+            ).not.toBeInTheDocument()
+            expect(clearButton).not.toBeDisabled()
+
+            done()
+          })
+        })
+      })
+      it('should be set minute to "00" automatically when not selected and hour is selected', (done) => {
+        const tables = [
+          { value: '1', expected: '01' },
+          { value: '0', expected: '00' },
+        ]
+        const table = tables[0]
+
+        setup(
+          makeSettingsTestState({
+            ...INITIAL_STATE.settings,
+            defaultBreakTimeLengthMin: undefined,
+          })
+        )
+        const clearButton = screen.getByText('clear')
+
+        act(() => {
+          window.requestAnimationFrame(() => {
+            userEvent.selectOptions(
+              screen.getAllByDisplayValue(LITERAL_NO_SELECTION)[0],
+              table.value
+            )
+
+            expect(screen.getByDisplayValue(table.expected)).toBeInTheDocument()
+            expect(screen.getByDisplayValue(':00')).toBeInTheDocument()
+            expect(clearButton).toBeInTheDocument()
+            expect(clearButton).not.toBeDisabled()
+
+            done()
+          })
+        })
+      })
+      it('should be set hour to "00" automatically when not selected and minute is selected', (done) => {
+        const tables = [
+          { value: '45', expected: ':45' },
+          { value: '0', expected: ':00' },
+        ]
+        const table = tables[1]
+        setup(
+          makeSettingsTestState({
+            ...INITIAL_STATE.settings,
+            defaultBreakTimeLengthMin: undefined,
+          })
+        )
         const clearButton = screen.getByText('clear')
         expect(clearButton).toBeInTheDocument()
-        expect(clearButton).not.toBeDisabled()
 
-        userEvent.selectOptions(
-          screen.getByDisplayValue('01') as HTMLElement,
-          '0'
-        )
+        act(() => {
+          window.requestAnimationFrame(() => {
+            userEvent.selectOptions(
+              screen.getAllByDisplayValue(LITERAL_NO_SELECTION)[1],
+              table.value
+            )
 
-        expect(screen.getByDisplayValue('00')).toBeInTheDocument()
-        expect(screen.getByDisplayValue(':45')).toBeInTheDocument()
-        expect(
-          screen.queryByDisplayValue(LITERAL_NO_SELECTION)
-        ).not.toBeInTheDocument()
-        expect(clearButton).not.toBeDisabled()
+            expect(screen.getByDisplayValue('00')).toBeInTheDocument()
+            expect(screen.getByDisplayValue(table.expected)).toBeInTheDocument()
+            expect(clearButton).not.toBeDisabled()
+
+            done()
+          })
+        })
       })
-      it.each([
-        { value: '1', expected: '01' },
-        { value: '0', expected: '00' },
-      ])(
-        'should be set minute to "00" automatically when not selected and hour is selected',
-        (table) => {
-          setup(
-            makeSettingsTestState({
-              ...INITIAL_STATE.settings,
-              defaultBreakTimeLengthMin: undefined,
-            })
-          )
-          userEvent.selectOptions(
-            (screen.getAllByDisplayValue(
-              LITERAL_NO_SELECTION
-            ) as HTMLElement[])[0],
-            table.value
-          )
-
-          expect(screen.getByDisplayValue(table.expected)).toBeInTheDocument()
-          expect(screen.getByDisplayValue(':00')).toBeInTheDocument()
-          const clearButton = screen.getByText('clear')
-          expect(clearButton).toBeInTheDocument()
-          expect(clearButton).not.toBeDisabled()
-        }
-      )
-      it.each([
-        { value: '45', expected: ':45' },
-        { value: '0', expected: ':00' },
-      ])(
-        'should be set hour to "00" automatically when not selected and minute is selected',
-        (table) => {
-          setup(
-            makeSettingsTestState({
-              ...INITIAL_STATE.settings,
-              defaultBreakTimeLengthMin: undefined,
-            })
-          )
-          userEvent.selectOptions(
-            (screen.getAllByDisplayValue(
-              LITERAL_NO_SELECTION
-            ) as HTMLElement[])[1],
-            table.value
-          )
-
-          expect(screen.getByDisplayValue('00')).toBeInTheDocument()
-          expect(screen.getByDisplayValue(table.expected)).toBeInTheDocument()
-          const clearButton = screen.getByText('clear')
-          expect(clearButton).toBeInTheDocument()
-          expect(clearButton).not.toBeDisabled()
-        }
-      )
       it('should be clear the selection when "clear" button is selected', () => {
         const [, store] = setup(
           makeSettingsTestState({
@@ -249,16 +263,22 @@ describe('"Settings" template', () => {
         expect(screen.queryByText(HEADING.LANGUAGE)).not.toBeInTheDocument()
       })
 
-      it('should change the display language to the selected language', () => {
+      it('should change the display language to the selected language', (done) => {
         setup()
 
-        userEvent.selectOptions(
-          screen.getByDisplayValue('English') as HTMLElement,
-          'ja'
-        )
+        act(() => {
+          window.requestAnimationFrame(() => {
+            userEvent.selectOptions(
+              screen.getByDisplayValue('English') as HTMLElement,
+              'ja'
+            )
 
-        expect(screen.getByText('言語')).toBeInTheDocument()
-        expect(screen.getByText('日本語')).toBeInTheDocument()
+            expect(screen.getByText('言語')).toBeInTheDocument()
+            expect(screen.getByDisplayValue('日本語')).toBeInTheDocument()
+
+            done()
+          })
+        })
       })
     })
   })

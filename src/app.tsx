@@ -14,8 +14,6 @@ import 'dayjs/locale/ja'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 dayjs.extend(localizedFormat)
 
-import '@material/react-select/dist/select.css'
-
 import configureStore, { AppState } from './state/store'
 import { getLang } from './state/ducks/settings'
 import AppPage from './views/pages/App'

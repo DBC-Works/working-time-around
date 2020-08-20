@@ -13,6 +13,8 @@ import { Checkbox } from '@rmwc/checkbox'
 import '@rmwc/checkbox/styles'
 import { Grid, GridCell, GridRow } from '@rmwc/grid'
 import '@rmwc/grid/styles'
+import { Select } from '@rmwc/Select'
+import '@rmwc/select/styles'
 import { TextField } from '@rmwc/textfield'
 import '@rmwc/textfield/styles'
 import { Typography } from '@rmwc/typography'
@@ -50,7 +52,6 @@ import {
   updateSlackContext,
   updateSlackIncomingWebhookUrl,
 } from '../../state/ducks/settings'
-import Select from '../atoms/Select'
 import BreakTimeLengthSelect from '../molecules/BreakTimeLengthSelect'
 import SingleCellRow from '../molecules/SingleCellRow'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
@@ -374,13 +375,16 @@ const LanguageSelection: React.FC = () => {
         <FormattedMessage id="Language" />
       </HeadingInTab>
       <SingleCellRow>
-        <Select value={lang} className="full-width" onChange={handleChange}>
-          {Array.from(Object.keys(langs), (key: string) => (
-            <option key={key} value={key}>
-              {langs[key].literal}
-            </option>
-          ))}
-        </Select>
+        <Select
+          className="full-width"
+          outlined
+          options={Array.from(Object.keys(langs), (key: string) => ({
+            label: langs[key].literal,
+            value: key,
+          }))}
+          value={lang}
+          onChange={handleChange}
+        />
       </SingleCellRow>
     </>
   )
