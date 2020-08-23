@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2020-08-23
 
-- [Material Components for React (MDC React)](https://github.com/material-components/material-components-web-react) with [RMWC - React Material Web Components](https://rmwc.io/)(#16)
+### Update
+
+- Replace [Material Components for React (MDC React)](https://github.com/material-components/material-components-web-react) with [RMWC - React Material Web Components](https://rmwc.io/)(#16)
 - Fix some bugs
 - Update package references
 
