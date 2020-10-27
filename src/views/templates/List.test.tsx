@@ -191,7 +191,46 @@ describe('"List" template', () => {
   })
 
   describe('statistics', () => {
-    const NO_RESULT = '--:--'
+    const NO_RESULT_TIME = '--:--'
+
+    describe('Working day', () => {
+      const TESTID_STATISTICS_DAY = 'statistics-day'
+      const NO_RESULT_DAY = '-'
+
+      it('should exist "Total work day" row heading', () => {
+        setup()
+        const { getByText } = within(screen.getByTestId(TESTID_STATISTICS_DAY))
+        expect(getByText('Total working day')).toBeInTheDocument()
+      })
+
+      it('should exist "- as total work day if no record', () => {
+        setup()
+        const { getByText } = within(screen.getByTestId(TESTID_STATISTICS_DAY))
+        expect(getByText(NO_RESULT_DAY)).toBeInTheDocument()
+      })
+
+      it('should exist a calculated total work day', () => {
+        const recordsState: RecordsState = {
+          records: {},
+        }
+        let date = dayjs().startOf('month').startOf('day').add(9, 'hour')
+        for (let day = 0; day < 10; ++day) {
+          recordsState.records[date.format('YYYYMMDD')] = {
+            starts: [date.toDate()],
+            stops: [date.add(2, 'hour').toDate()],
+            memos: [],
+            breakTimeLengthsMin: [60],
+          }
+          date = date.add(1, 'day')
+        }
+        setup(date.format('/YYYY/M'), {
+          ...INITIAL_STATE,
+          records: recordsState,
+        })
+        const { getByText } = within(screen.getByTestId(TESTID_STATISTICS_DAY))
+        expect(getByText('10')).toBeInTheDocument()
+      })
+    })
 
     describe('Total working time', () => {
       const TESTID_STATISTICS_TOTAL = 'statistics-total'
@@ -209,7 +248,7 @@ describe('"List" template', () => {
         const { getByText } = within(
           screen.getByTestId(TESTID_STATISTICS_TOTAL)
         )
-        expect(getByText(NO_RESULT)).toBeInTheDocument()
+        expect(getByText(NO_RESULT_TIME)).toBeInTheDocument()
       })
 
       it('should exist "--:--" as total work time if exists invalid record', () => {
@@ -238,7 +277,7 @@ describe('"List" template', () => {
         const { getByText } = within(
           screen.getByTestId(TESTID_STATISTICS_TOTAL)
         )
-        expect(getByText(NO_RESULT)).toBeInTheDocument()
+        expect(getByText(NO_RESULT_TIME)).toBeInTheDocument()
       })
 
       it('should exist a calculated total work time', () => {
@@ -287,7 +326,7 @@ describe('"List" template', () => {
         const { getByText } = within(
           screen.getByTestId(TESTID_STATISTICS_MEDIAN)
         )
-        expect(getByText(NO_RESULT)).toBeInTheDocument()
+        expect(getByText(NO_RESULT_TIME)).toBeInTheDocument()
       })
 
       it('should exist "--:--" as median if exists invalid record', () => {
@@ -316,7 +355,7 @@ describe('"List" template', () => {
         const { getByText } = within(
           screen.getByTestId(TESTID_STATISTICS_MEDIAN)
         )
-        expect(getByText(NO_RESULT)).toBeInTheDocument()
+        expect(getByText(NO_RESULT_TIME)).toBeInTheDocument()
       })
 
       it('should exist a calculated median', () => {

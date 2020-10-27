@@ -366,6 +366,7 @@ const DateListCell: React.FC<{ className?: string }> = (props) => (
 const Statistics: React.FC<{
   latestRecords: LatestRecord[]
 }> = (props) => {
+  let totalWorkingDayString = '-'
   let totalWorkingTimeString = '--:--'
   let medianWorkingTimeString = '--:--'
   const targets = props.latestRecords
@@ -374,45 +375,83 @@ const Statistics: React.FC<{
       (record) =>
         record !== null && record.start !== null && record.stop !== null
     )
-  if (
-    targets.some(
-      (record) => record !== null && record.breakTimeLengthMin === null
-    ) === false
-  ) {
-    const workingTimes = targets.map((target) => {
-      const record = target as DailyLatestRecord
-      const start = record.start as Date
-      const stop = record.stop as Date
-      const startTimeMin = start.getHours() * 60 + start.getMinutes()
-      const stopTimeMin = stop.getHours() * 60 + stop.getMinutes()
-      return stopTimeMin - startTimeMin - (record.breakTimeLengthMin as number)
-    })
-    if (!(workingTimes.length === 0 || workingTimes.some((time) => time < 0))) {
-      const totalWorkingTimeMin = workingTimes.reduce(
-        (accumulator, time) => accumulator + time
-      )
-      totalWorkingTimeString = formatStatisticsTime(totalWorkingTimeMin)
-      medianWorkingTimeString = formatStatisticsTime(getMedianOf(workingTimes))
+  if (0 < targets.length) {
+    totalWorkingDayString = `${targets.length}`
+    if (
+      targets.some(
+        (record) => record !== null && record.breakTimeLengthMin === null
+      ) === false
+    ) {
+      const workingTimes = targets.map((target) => {
+        const record = target as DailyLatestRecord
+        const start = record.start as Date
+        const stop = record.stop as Date
+        const startTimeMin = start.getHours() * 60 + start.getMinutes()
+        const stopTimeMin = stop.getHours() * 60 + stop.getMinutes()
+        return (
+          stopTimeMin - startTimeMin - (record.breakTimeLengthMin as number)
+        )
+      })
+      if (
+        !(workingTimes.length === 0 || workingTimes.some((time) => time < 0))
+      ) {
+        const totalWorkingTimeMin = workingTimes.reduce(
+          (accumulator, time) => accumulator + time
+        )
+        totalWorkingTimeString = formatStatisticsTime(totalWorkingTimeMin)
+        medianWorkingTimeString = formatStatisticsTime(
+          getMedianOf(workingTimes)
+        )
+      }
     }
+  }
+
+  const COLUMN_LEFT = {
+    DESKTOP: 9,
+    TABLET: 6,
+    PHONE: 3,
+  }
+  const COLUMN_RIGHT = {
+    DESKTOP: 3,
+    TABLET: 2,
+    PHONE: 1,
   }
 
   return (
     <SingleCellRow>
       <Grid className="statistics-list">
+        <GridRow className="statistics-list-row" data-testid="statistics-day">
+          <GridCell
+            className="statistics-list-cell"
+            desktop={COLUMN_LEFT.DESKTOP}
+            tablet={COLUMN_LEFT.TABLET}
+            phone={COLUMN_LEFT.PHONE}
+          >
+            <FormattedMessage id="Total.working.day" />
+          </GridCell>
+          <GridCell
+            className="statistics-list-cell"
+            desktop={COLUMN_RIGHT.DESKTOP}
+            tablet={COLUMN_RIGHT.TABLET}
+            phone={COLUMN_RIGHT.PHONE}
+          >
+            {totalWorkingDayString}
+          </GridCell>
+        </GridRow>
         <GridRow className="statistics-list-row" data-testid="statistics-total">
           <GridCell
             className="statistics-list-cell"
-            desktop={9}
-            tablet={6}
-            phone={3}
+            desktop={COLUMN_LEFT.DESKTOP}
+            tablet={COLUMN_LEFT.TABLET}
+            phone={COLUMN_LEFT.PHONE}
           >
             <FormattedMessage id="Total.working.time" />
           </GridCell>
           <GridCell
             className="statistics-list-cell"
-            desktop={3}
-            tablet={2}
-            phone={1}
+            desktop={COLUMN_RIGHT.DESKTOP}
+            tablet={COLUMN_RIGHT.TABLET}
+            phone={COLUMN_RIGHT.PHONE}
           >
             {totalWorkingTimeString}
           </GridCell>
@@ -423,17 +462,17 @@ const Statistics: React.FC<{
         >
           <GridCell
             className="statistics-list-cell"
-            desktop={9}
-            tablet={6}
-            phone={3}
+            desktop={COLUMN_LEFT.DESKTOP}
+            tablet={COLUMN_LEFT.TABLET}
+            phone={COLUMN_LEFT.PHONE}
           >
             <FormattedMessage id="Median" />
           </GridCell>
           <GridCell
             className="statistics-list-cell"
-            desktop={3}
-            tablet={2}
-            phone={1}
+            desktop={COLUMN_RIGHT.DESKTOP}
+            tablet={COLUMN_RIGHT.TABLET}
+            phone={COLUMN_RIGHT.PHONE}
           >
             {medianWorkingTimeString}
           </GridCell>
