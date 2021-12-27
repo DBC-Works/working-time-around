@@ -54,9 +54,9 @@ export const updateMemo = actionCreator<{
 /**
  * 'Update break time length' action
  */
-export const updateBreakTimeLengthMin = actionCreator<
-  UpdateBreakTimeActionPayload
->('UPDATE_BREAK_TIME_LENGTH_MIN')
+export const updateBreakTimeLengthMin = actionCreator<UpdateBreakTimeActionPayload>(
+  'UPDATE_BREAK_TIME_LENGTH_MIN'
+)
 
 /**
  * 'Merge exported state' action
