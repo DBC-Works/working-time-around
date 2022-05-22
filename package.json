@@ -58,7 +58,7 @@
     "process": "^0.11.10",
     "sass": "^1.32.8",
     "ts-jest": "^26.5.3",
-    "typescript": "^3.9.7",
+    "typescript": "^4.6.4",
     "unassert": "^1.6.0"
   },
   "dependencies": {
