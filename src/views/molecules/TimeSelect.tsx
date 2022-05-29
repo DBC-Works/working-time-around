@@ -21,6 +21,8 @@ const TimeSelect: React.FC<{
   onChangeHour?: (e: ChangeEvent<HTMLSelectElement>) => void
   onChangeMinute?: (e: ChangeEvent<HTMLSelectElement>) => void
 }> = (props) => {
+  const { onChange, onChangeHour, onChangeMinute } = props
+
   const dj = dayjs(props.time ? props.time : new Date())
 
   const [hour, setHour] = useState(props.time ? `${props.time.getHours()}` : '')
@@ -34,13 +36,13 @@ const TimeSelect: React.FC<{
 
   const handleChangeHour = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
-      if (props.onChangeHour) {
-        props.onChangeHour(e)
+      if (onChangeHour) {
+        onChangeHour(e)
       }
       const newHour = e.currentTarget.value
       setHour(newHour)
-      if (props.onChange && 0 < newHour.length && 0 < minute.length) {
-        props.onChange(
+      if (onChange && 0 < newHour.length && 0 < minute.length) {
+        onChange(
           dj
             .hour(+newHour)
             .minute(+minute)
@@ -48,17 +50,17 @@ const TimeSelect: React.FC<{
         )
       }
     },
-    [props.onChangeHour, hour, minute]
+    [onChangeHour, onChange, minute, dj]
   )
   const handleChangeMinute = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
-      if (props.onChangeMinute) {
-        props.onChangeMinute(e)
+      if (onChangeMinute) {
+        onChangeMinute(e)
       }
       const newMinute = e.currentTarget.value
       setMinute(newMinute)
-      if (props.onChange && 0 < hour.length && 0 < newMinute.length) {
-        props.onChange(
+      if (onChange && 0 < hour.length && 0 < newMinute.length) {
+        onChange(
           dj
             .hour(+hour)
             .minute(+newMinute)
@@ -66,7 +68,7 @@ const TimeSelect: React.FC<{
         )
       }
     },
-    [props.onChangeMinute, hour, minute]
+    [onChangeMinute, onChange, hour, dj]
   )
 
   return (

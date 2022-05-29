@@ -28,6 +28,7 @@ import {
   updateLatestMemo,
 } from '../../state/ducks/records'
 import {
+  getOnLine,
   getTime,
   getWindow,
   showMessage,
@@ -62,7 +63,7 @@ const CurrentState: React.FC = () => {
     return function cleanup(): void {
       window.clearTimeout(intervalRef.current)
     }
-  }, [])
+  }, [dispatch])
 
   const time = useSelector((state: AppState) => getTime(state.running))
   const defaultBreakTimeLength = useSelector((state: AppState) =>
@@ -77,9 +78,10 @@ const CurrentState: React.FC = () => {
   const history = useHistory()
   const handleClick = useCallback(() => {
     history.push(dj.format('/YYYY/M/D'))
-  }, [time])
+  }, [dj, history])
 
   const intl = useIntl()
+
   return (
     <Grid className="current-state">
       <GridRow>
@@ -121,64 +123,70 @@ const StartButton: React.FC<{
   time: Date | null
   disabled: boolean
 }> = (props) => {
-  const initialRef = useRef<{ time: Date | null }>({ time: props.time })
+  const { time } = props
+  const initialRef = useRef<{ time: Date | null }>({ time })
 
   const intl = useIntl()
   const labelStart = intl.formatMessage({ id: 'Start' })
   const timeFormat = intl.formatMessage({ id: 'Format.time.24' })
 
-  const w = useSelector((state: AppState) => getWindow(state.running))
-  const slackSettings = useSelector((state: AppState) =>
+  const onLine = useSelector((state: AppState) => getOnLine(state.running))
+  const { incomingWebhookUrl, context } = useSelector((state: AppState) =>
     getSlackSettings(state.settings)
   )
   const canPost = useSelector((state: AppState) =>
     canSendMessageToSlack(state.settings)
   )
   const dispatch = useDispatch()
-  useEffect(
-    canPost !== false
-      ? (): void => {
-          if (props.time !== null && props.time !== initialRef.current.time) {
-            if (w.navigator.onLine === false) {
-              dispatch(
-                showMessage(
-                  intl.formatMessage({ id: 'Could.not.send.because.offline.' })
-                )
-              )
-              return
-            }
-
-            sendMessageToSlack(
-              slackSettings,
-              `[${labelStart}] ${dayjs(props.time).format(timeFormat)}`
-            ).then((resultMessage) => {
-              if (0 < resultMessage.length) {
-                dispatch(
-                  showMessage(formatSendFailedMessage(intl, resultMessage))
-                )
-              }
-            })
-          }
+  useEffect((): void => {
+    if (canPost !== false) {
+      if (time !== null && time !== initialRef.current.time) {
+        if (onLine === false) {
+          dispatch(
+            showMessage(
+              intl.formatMessage({ id: 'Could.not.send.because.offline.' })
+            )
+          )
+          return
         }
-      : (): void => {},
-    [canPost, props.time]
-  )
+
+        sendMessageToSlack(
+          { incomingWebhookUrl, context },
+          `[${labelStart}] ${dayjs(time).format(timeFormat)}`
+        ).then((resultMessage) => {
+          if (0 < resultMessage.length) {
+            dispatch(showMessage(formatSendFailedMessage(intl, resultMessage)))
+          }
+        })
+      }
+    }
+  }, [
+    canPost,
+    context,
+    dispatch,
+    incomingWebhookUrl,
+    intl,
+    labelStart,
+    onLine,
+    time,
+    timeFormat,
+  ])
 
   const defaultBreakTimeLength = useSelector((state: AppState) =>
     getDefaultBreakTimeLengthMin(state.settings)
   )
   const handleClick = useCallback(() => {
     dispatch(start(defaultBreakTimeLength))
-  }, [])
+  }, [defaultBreakTimeLength, dispatch])
 
   return (
     <Button
       className="full-width"
       unelevated={true}
-      disabled={props.disabled !== false || props.time !== null}
+      disabled={props.disabled !== false || time !== null}
       onClick={handleClick}
     >
-      {props.time !== null ? dayjs(props.time).format(timeFormat) : labelStart}
+      {time !== null ? dayjs(time).format(timeFormat) : labelStart}
     </Button>
   )
 }
@@ -189,13 +197,11 @@ const StartButton: React.FC<{
 const StopButton: React.FC<{
   time: Date | null
 }> = (props) => {
-  const initialRef = useRef<{ time: Date | null }>({ time: props.time })
+  const { time } = props
+  const initialRef = useRef<{ time: Date | null }>({ time: time })
 
   const record = useSelector((state: AppState) =>
-    getDailyRecordOf(
-      props.time !== null ? props.time : new Date(),
-      state.records
-    )
+    getDailyRecordOf(time !== null ? time : new Date(), state.records)
   )
   const memo = record !== null ? getLatestMemoOf(record) : ''
 
@@ -203,57 +209,64 @@ const StopButton: React.FC<{
   const labelStop = intl.formatMessage({ id: 'Stop' })
   const timeFormat = intl.formatMessage({ id: 'Format.time.24' })
 
-  const w = useSelector((state: AppState) => getWindow(state.running))
+  const onLine = useSelector((state: AppState) => getOnLine(state.running))
   const canPost = useSelector((state: AppState) =>
     canSendMessageToSlack(state.settings)
   )
-  const slackSettings = useSelector((state: AppState) =>
+  const { incomingWebhookUrl, context } = useSelector((state: AppState) =>
     getSlackSettings(state.settings)
   )
   const dispatch = useDispatch()
-  useEffect(
-    canPost !== false
-      ? (): void => {
-          if (props.time !== null && props.time !== initialRef.current.time) {
-            if (w.navigator.onLine === false) {
-              dispatch(
-                showMessage(
-                  intl.formatMessage({ id: 'Could.not.send.because.offline.' })
-                )
-              )
-              return
-            }
-
-            sendMessageToSlack(
-              slackSettings,
-              `[${labelStop}] ${dayjs(props.time).format(timeFormat)}\n${memo}`
-            ).then((resultMessage) => {
-              if (0 < resultMessage.length) {
-                dispatch(
-                  showMessage(formatSendFailedMessage(intl, resultMessage))
-                )
-              }
-            })
-          }
+  useEffect((): void => {
+    if (canPost !== false) {
+      if (time !== null && time !== initialRef.current.time) {
+        if (onLine === false) {
+          dispatch(
+            showMessage(
+              intl.formatMessage({ id: 'Could.not.send.because.offline.' })
+            )
+          )
+          return
         }
-      : (): void => {},
-    [canPost, props.time]
-  )
+
+        sendMessageToSlack(
+          { incomingWebhookUrl, context },
+          `[${labelStop}] ${dayjs(time).format(timeFormat)}\n${memo}`
+        ).then((resultMessage) => {
+          if (0 < resultMessage.length) {
+            dispatch(showMessage(formatSendFailedMessage(intl, resultMessage)))
+          }
+        })
+      }
+    }
+  }, [
+    canPost,
+    context,
+    dispatch,
+    incomingWebhookUrl,
+    intl,
+    labelStop,
+    memo,
+    onLine,
+    time,
+    timeFormat,
+  ])
 
   const defaultBreakTimeLength = useSelector((state: AppState) =>
     getDefaultBreakTimeLengthMin(state.settings)
   )
   const handleClick = useCallback(() => {
     dispatch(stop(defaultBreakTimeLength))
-  }, [])
+  }, [defaultBreakTimeLength, dispatch])
+
   return (
     <Button
       className="full-width"
       unelevated={true}
-      disabled={props.time !== null}
+      disabled={time !== null}
       onClick={handleClick}
     >
-      {props.time !== null ? dayjs(props.time).format(timeFormat) : labelStop}
+      {time !== null ? dayjs(time).format(timeFormat) : labelStop}
     </Button>
   )
 }
@@ -281,12 +294,13 @@ const MemoTextField: React.FC<{
     canSendMessageToSlack(state.settings)
   )
   const w = useSelector((state: AppState) => getWindow(state.running))
-  const slackSettings = useSelector((state: AppState) =>
+  const onLine = useSelector((state: AppState) => getOnLine(state.running))
+  const { incomingWebhookUrl, context } = useSelector((state: AppState) =>
     getSlackSettings(state.settings)
   )
   const intl = useIntl()
   const dispatch = useDispatch()
-  const postUpdate = (): void => {
+  const postUpdate = useCallback((): void => {
     const postMemo = updateRef.current.updated
     if (
       postMemo === null ||
@@ -295,7 +309,7 @@ const MemoTextField: React.FC<{
     ) {
       return
     }
-    if (w.navigator.onLine === false) {
+    if (onLine === false) {
       dispatch(
         showMessage(
           intl.formatMessage({ id: 'Could.not.send.because.offline.' })
@@ -305,44 +319,43 @@ const MemoTextField: React.FC<{
     }
 
     sendMessageToSlack(
-      slackSettings,
+      { incomingWebhookUrl, context },
       `[${intl.formatMessage({ id: 'Memo' })}] ${postMemo}`
     ).then((resultMessage) => {
       if (0 < resultMessage.length) {
         dispatch(showMessage(formatSendFailedMessage(intl, resultMessage)))
       }
     })
-  }
+  }, [context, dispatch, incomingWebhookUrl, intl, onLine])
 
   useEffect(() => {
     updateRef.current.initial = props.memo
     updateRef.current.updated = props.memo
-  }, [props.afterStopped])
+  }, [props.afterStopped, props.memo])
 
   const requirePost =
     props.afterStopped !== false &&
     canPost !== false &&
     props.memo !== updateRef.current.initial
-  useEffect(
-    requirePost !== false
-      ? (): (() => void) => {
-          w.addEventListener('unload', postUpdate)
+  useEffect((): (() => void) => {
+    if (requirePost !== false) {
+      w.addEventListener('unload', postUpdate)
 
-          const beforeUnloadHandler = (e: BeforeUnloadEvent): string => {
-            e.returnValue = 'Do you want to leave this page?'
-            return e.returnValue
-          }
-          w.addEventListener('beforeunload', beforeUnloadHandler)
+      const beforeUnloadHandler = (e: BeforeUnloadEvent): void => {
+        e.returnValue = 'Do you want to leave this page?'
+        return
+      }
+      w.addEventListener('beforeunload', beforeUnloadHandler)
 
-          return function cleanup(): void {
-            w.removeEventListener('beforeunload', beforeUnloadHandler)
-            w.removeEventListener('unload', postUpdate)
-            postUpdate()
-          }
-        }
-      : (): void => {},
-    [requirePost]
-  )
+      return function cleanup(): void {
+        w.removeEventListener('beforeunload', beforeUnloadHandler)
+        w.removeEventListener('unload', postUpdate)
+        postUpdate()
+      }
+    } else {
+      return function cleanup(): void {}
+    }
+  }, [postUpdate, requirePost, w])
 
   const handleClickSendUpdate =
     requirePost !== false
@@ -353,10 +366,13 @@ const MemoTextField: React.FC<{
         }
       : undefined
 
-  const handleChange = useCallback((e: FormEvent<HTMLInputElement>) => {
-    updateRef.current.updated = e.currentTarget.value
-    dispatch(updateLatestMemo(e.currentTarget.value))
-  }, [])
+  const handleChange = useCallback(
+    (e: FormEvent<HTMLInputElement>) => {
+      updateRef.current.updated = e.currentTarget.value
+      dispatch(updateLatestMemo(e.currentTarget.value))
+    },
+    [dispatch]
+  )
 
   return (
     <>

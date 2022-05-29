@@ -37,35 +37,33 @@ const BreakTimeLengthSelect: React.FC<{
 
   const dispatch = useDispatch()
   const handleChangeHour = useCallback(
-    time === undefined
-      ? (e: ChangeEvent<HTMLSelectElement>): void => {
-          dispatch(update(+e.currentTarget.value * 60))
-        }
-      : (): void => {},
-    [update, time]
+    (e: ChangeEvent<HTMLSelectElement>): void => {
+      if (time === undefined) {
+        dispatch(update(+e.currentTarget.value * 60))
+      }
+    },
+    [time, dispatch, update]
   )
   const handleChangeMinute = useCallback(
-    time === undefined
-      ? (e: ChangeEvent<HTMLSelectElement>): void => {
-          dispatch(update(+e.currentTarget.value))
-        }
-      : (): void => {},
-    [update, time]
+    (e: ChangeEvent<HTMLSelectElement>): void => {
+      if (time === undefined) {
+        dispatch(update(+e.currentTarget.value))
+      }
+    },
+    [time, dispatch, update]
   )
   const handleChangeTime = useCallback(
     (time: Date) => {
       dispatch(update(time.getHours() * 60 + time.getMinutes()))
     },
-    [update]
+    [dispatch, update]
   )
-  const handleClickClear = useCallback(
-    clear !== undefined
-      ? (): void => {
-          dispatch(clear())
-        }
-      : (): void => {},
-    [clear]
-  )
+  const handleClickClear = useCallback((): void => {
+    if (clear !== undefined) {
+      dispatch(clear())
+    }
+  }, [clear, dispatch])
+
   return (
     <>
       <TimeSelect
