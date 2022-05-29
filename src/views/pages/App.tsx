@@ -140,13 +140,14 @@ const App: React.FC = () => {
       w.removeEventListener('offline', offlineEventHandler)
       w.removeEventListener('online', onlineEventHandler)
     }
-  }, [])
+  }, [dispatch, w])
 
   const handleCloseSnackbar = useCallback(() => {
     dispatch(clearMessage())
-  }, [])
+  }, [dispatch])
 
   const message = useSelector((state: AppState) => getMessage(state.running))
+
   return (
     <div className="whole-content-area">
       <AppBar />

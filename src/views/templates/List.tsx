@@ -285,7 +285,7 @@ const DateRecordRow: React.FC<{
   const history = useHistory()
   const handleClick = useCallback(() => {
     history.push(props.date.format('/YYYY/M/D'))
-  }, [props.date])
+  }, [history, props.date])
 
   return (
     <GridRow className="date-list-row">

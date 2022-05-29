@@ -41,7 +41,7 @@ import {
   updateStartTime,
   updateStopTime,
 } from '../../state/ducks/records'
-import { getWindow, showMessage } from '../../state/ducks/running'
+import { getOnLine, getWindow, showMessage } from '../../state/ducks/running'
 import {
   canSendMessageToSlack,
   getDefaultBreakTimeLengthMin,
@@ -315,6 +315,7 @@ const DetailForm: React.FC<{ target: Date }> = (props) => {
   const dateKey = dj.format(KEY_RECORD)
 
   const w = useSelector((state: AppState) => getWindow(state.running))
+  const onLine = useSelector((state: AppState) => getOnLine(state.running))
   const canPost = useSelector((state: AppState) =>
     canSendMessageToSlack(state.settings)
   )
@@ -351,48 +352,51 @@ const DetailForm: React.FC<{ target: Date }> = (props) => {
   const intl = useIntl()
   const dispatch = useDispatch()
   const updated = isUpdated(updateRef.current.updated)
-  const postUpdate = (target: Date): void => {
-    if (updated !== false) {
-      if (w.navigator.onLine === false) {
-        dispatch(
-          showMessage(
-            intl.formatMessage({ id: 'Could.not.send.because.offline.' })
+  const { incomingWebhookUrl, context } = slackSettings
+  const postUpdate = useCallback(
+    (target: Date): void => {
+      if (updated !== false) {
+        if (onLine === false) {
+          dispatch(
+            showMessage(
+              intl.formatMessage({ id: 'Could.not.send.because.offline.' })
+            )
           )
-        )
+          return
+        }
+
+        sendUpdateToSlack(
+          target,
+          updateRef.current.initial,
+          updateRef.current.updated,
+          { incomingWebhookUrl, context },
+          intl
+        ).then((resultMessage) => {
+          if (0 < resultMessage.length) {
+            dispatch(showMessage(formatSendFailedMessage(intl, resultMessage)))
+          }
+        })
+      }
+    },
+    [updated, onLine, incomingWebhookUrl, context, intl, dispatch]
+  )
+
+  useEffect((): (() => void) => {
+    if (canPost !== false && updated !== false) {
+      const beforeUnloadHandler = (e: BeforeUnloadEvent): void => {
+        setRequireUpdate(true)
+        e.returnValue = 'Do you want to leave this page?'
         return
       }
-
-      sendUpdateToSlack(
-        target,
-        updateRef.current.initial,
-        updateRef.current.updated,
-        slackSettings,
-        intl
-      ).then((resultMessage) => {
-        if (0 < resultMessage.length) {
-          dispatch(showMessage(formatSendFailedMessage(intl, resultMessage)))
-        }
-      })
+      w.addEventListener('beforeunload', beforeUnloadHandler)
+      return function cleanup(): void {
+        w.removeEventListener('beforeunload', beforeUnloadHandler)
+        postUpdate(props.target)
+      }
+    } else {
+      return function cleanup(): void {}
     }
-  }
-
-  useEffect(
-    canPost !== false && updated !== false
-      ? (): (() => void) => {
-          const beforeUnloadHandler = (e: BeforeUnloadEvent): string => {
-            setRequireUpdate(true)
-            e.returnValue = 'Do you want to leave this page?'
-            return e.returnValue
-          }
-          w.addEventListener('beforeunload', beforeUnloadHandler)
-          return function cleanup(): void {
-            w.removeEventListener('beforeunload', beforeUnloadHandler)
-            postUpdate(props.target)
-          }
-        }
-      : (): void => {},
-    [canPost, updated]
-  )
+  }, [canPost, postUpdate, props.target, updated, w])
 
   useEffect((): void => {
     if (dateKey === recordRef.current.dateKey) {
@@ -406,26 +410,32 @@ const DetailForm: React.FC<{ target: Date }> = (props) => {
     recordRef.current = getDailyRecordLatestIndexes(dateKey, record)
     updateRef.current.initial = latest
     resetUpdate()
-  }, [dateKey, record])
+  }, [canPost, dateKey, latest, postUpdate, record])
 
-  const handleChangeStartTime = useCallback((time: Date) => {
-    updateRef.current.updated.start = translateTimeToDate(time, dj)
-    dispatch(
-      updateStartTime({
-        time: updateRef.current.updated.start,
-        targetIndex: recordRef.current.latestStart,
-      })
-    )
-  }, [])
-  const handleChangeStopTime = useCallback((time: Date) => {
-    updateRef.current.updated.stop = translateTimeToDate(time, dj)
-    dispatch(
-      updateStopTime({
-        time: updateRef.current.updated.stop,
-        targetIndex: recordRef.current.latestStop,
-      })
-    )
-  }, [])
+  const handleChangeStartTime = useCallback(
+    (time: Date) => {
+      updateRef.current.updated.start = translateTimeToDate(time, dj)
+      dispatch(
+        updateStartTime({
+          time: updateRef.current.updated.start,
+          targetIndex: recordRef.current.latestStart,
+        })
+      )
+    },
+    [dispatch, dj]
+  )
+  const handleChangeStopTime = useCallback(
+    (time: Date) => {
+      updateRef.current.updated.stop = translateTimeToDate(time, dj)
+      dispatch(
+        updateStopTime({
+          time: updateRef.current.updated.stop,
+          targetIndex: recordRef.current.latestStop,
+        })
+      )
+    },
+    [dispatch, dj]
+  )
   const handleChangeMemo = useCallback(
     (e: FormEvent<HTMLInputElement>) => {
       updateRef.current.updated.memo = e.currentTarget.value
@@ -437,12 +447,12 @@ const DetailForm: React.FC<{ target: Date }> = (props) => {
         })
       )
     },
-    [props.target]
+    [dispatch, props.target]
   )
   const handleClickRequireUpdate = useCallback((): void => {
     postUpdate(props.target)
     resetUpdate()
-  }, [])
+  }, [postUpdate, props.target])
 
   return (
     <>
