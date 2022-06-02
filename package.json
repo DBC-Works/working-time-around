@@ -114,6 +114,9 @@
     ]
   },
   "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "./custom-transformer.js"
+    },
     "moduleNameMapper": {
       "\\.css$": "identity-obj-proxy",
       "\\.scss$": "identity-obj-proxy"
