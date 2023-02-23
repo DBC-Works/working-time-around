@@ -1,12 +1,22 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true,
     "resolveJsonModule": true,
     "jsx": "react",
     "esModuleInterop": true,
     "importHelpers": true,
-    "lib": ["es2018", "dom"]
+    "lib": ["es2018", "dom"],
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   }
 }

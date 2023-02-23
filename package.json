@@ -71,6 +71,7 @@
     "@rmwc/snackbar": "^7.0.3",
     "@rmwc/tabs": "^7.0.3",
     "@rmwc/textfield": "^7.0.3",
+    "@rmwc/theme": "^7.0.3",
     "@rmwc/top-app-bar": "^7.0.3",
     "@rmwc/typography": "^7.0.3",
     "core-js": "^3.6.5",
