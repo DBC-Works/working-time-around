@@ -16,6 +16,8 @@ import { Grid, GridCell, GridRow } from '@rmwc/grid'
 import '@rmwc/grid/styles'
 import { Icon } from '@rmwc/icon'
 import '@rmwc/icon/styles'
+import { Theme } from '@rmwc/theme'
+import '@rmwc/theme/styles'
 import { Typography } from '@rmwc/typography'
 import '@rmwc/typography/styles'
 
@@ -148,11 +150,20 @@ function formatStatisticsTime(timeMin: number): string {
 //
 
 /**
+ * 'ErrorReportText' component
+ */
+const ErrorReportText: React.FC = (props) => (
+  <Theme use={['error']}>
+    <strong>{props.children}</strong>
+  </Theme>
+)
+
+/**
  * 'List' component
  */
 const List: React.FC = () => {
-  const { year, month } = useParams()
-  const firstDayOfMonth = new Date(+(year as string), +(month as string) - 1, 1)
+  const { year, month } = useParams<{ year: string; month: string }>()
+  const firstDayOfMonth = new Date(+year, +month - 1, 1)
   const dj = dayjs(firstDayOfMonth)
 
   const records = useSelector((state: AppState) =>
@@ -304,7 +315,11 @@ const DateRecordRow: React.FC<{
       </DateListCell>
       <DateListCell>
         <Button dense={true} onClick={handleClick}>
-          <span dangerouslySetInnerHTML={{ __html: '&hellip;' }} />
+          {props.latest?.breakTimeLengthMin !== null ? (
+            <span dangerouslySetInnerHTML={{ __html: '&hellip;' }} />
+          ) : (
+            <ErrorReportText>!</ErrorReportText>
+          )}
         </Button>
       </DateListCell>
     </GridRow>
@@ -367,8 +382,8 @@ const Statistics: React.FC<{
   latestRecords: LatestRecord[]
 }> = (props) => {
   let totalWorkingDayString = '-'
-  let totalWorkingTimeString = '--:--'
-  let medianWorkingTimeString = '--:--'
+  let totalWorkingTimeString = null
+  let medianWorkingTimeString = null
   const targets = props.latestRecords
     .map((record) => record.latestRecord)
     .filter(
@@ -453,7 +468,11 @@ const Statistics: React.FC<{
             tablet={COLUMN_RIGHT.TABLET}
             phone={COLUMN_RIGHT.PHONE}
           >
-            {totalWorkingTimeString}
+            {totalWorkingTimeString !== null ? (
+              totalWorkingTimeString
+            ) : (
+              <ErrorReportText>--:--</ErrorReportText>
+            )}
           </GridCell>
         </GridRow>
         <GridRow
@@ -474,7 +493,11 @@ const Statistics: React.FC<{
             tablet={COLUMN_RIGHT.TABLET}
             phone={COLUMN_RIGHT.PHONE}
           >
-            {medianWorkingTimeString}
+            {medianWorkingTimeString !== null ? (
+              medianWorkingTimeString
+            ) : (
+              <ErrorReportText>--:--</ErrorReportText>
+            )}
           </GridCell>
         </GridRow>
       </Grid>
