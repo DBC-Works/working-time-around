@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2023-02-23
+
+### Update
+
+- Add a function to highlight error information in the list(#44)
+
 ## [1.1.0] - 2020-10-27
 
 ### Update
