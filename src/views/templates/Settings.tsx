@@ -224,9 +224,12 @@ const MailAddress: React.FC = () => {
   )
 
   const dispatch = useDispatch()
-  const handleChangeMailAddress = useCallback((e) => {
-    dispatch(updateSendToMailAddress(e.currentTarget.value))
-  }, [])
+  const handleChangeMailAddress = useCallback(
+    (e) => {
+      dispatch(updateSendToMailAddress(e.currentTarget.value))
+    },
+    [dispatch]
+  )
 
   return (
     <>
@@ -258,12 +261,18 @@ const SlackSettings: React.FC = () => {
   )
 
   const dispatch = useDispatch()
-  const handleChangeUrl = useCallback((e) => {
-    dispatch(updateSlackIncomingWebhookUrl(e.currentTarget.value))
-  }, [])
-  const handleChangeContext = useCallback((e) => {
-    dispatch(updateSlackContext(e.currentTarget.value))
-  }, [])
+  const handleChangeUrl = useCallback(
+    (e) => {
+      dispatch(updateSlackIncomingWebhookUrl(e.currentTarget.value))
+    },
+    [dispatch]
+  )
+  const handleChangeContext = useCallback(
+    (e) => {
+      dispatch(updateSlackContext(e.currentTarget.value))
+    },
+    [dispatch]
+  )
 
   return (
     <>
@@ -326,6 +335,7 @@ const SendTestMessageButton: React.FC = () => {
 
   const dispatch = useDispatch()
   const intl = useIntl()
+  const { incomingWebhookUrl, context } = slackSettings
   const handleClick = useCallback(async () => {
     if (canPost === false) {
       return
@@ -333,7 +343,7 @@ const SendTestMessageButton: React.FC = () => {
 
     setPosting(true)
     const resultMessage = await sendMessageToSlack(
-      slackSettings,
+      { incomingWebhookUrl, context },
       intl.formatMessage({
         id: 'Test.message.posted.from.Working.time.around.',
       })
@@ -344,7 +354,7 @@ const SendTestMessageButton: React.FC = () => {
         : intl.formatMessage({ id: 'Send.succeeded.' })
     dispatch(showMessage(message))
     setPosting(false)
-  }, [canPost, slackSettings.incomingWebhookUrl, slackSettings.context])
+  }, [canPost, incomingWebhookUrl, context, intl, dispatch])
 
   return (
     <Button
@@ -365,9 +375,12 @@ const LanguageSelection: React.FC = () => {
   const lang = useSelector((state: AppState) => getLang(state.settings))
 
   const dispatch = useDispatch()
-  const handleChange = useCallback((e) => {
-    dispatch(selectLanguage(e.target.value))
-  }, [])
+  const handleChange = useCallback(
+    (e) => {
+      dispatch(selectLanguage(e.target.value))
+    },
+    [dispatch]
+  )
 
   return (
     <>
@@ -405,18 +418,20 @@ const Export: React.FC = () => {
   const exportObjectUrl = useSelector((state: AppState) =>
     getExportObjectUrl(state.running)
   )
-  const w = useSelector((state: AppState) => getWindow(state.running))
+
+  const { URL } = useSelector((state: AppState) => getWindow(state.running))
   const dispatch = useDispatch()
   useEffect((): (() => void) => {
     const blob = new Blob([formatStateForExport(records, settings)], {
       type: 'application/json',
     })
-    dispatch(setExportObjectUrl(w.URL.createObjectURL(blob)))
+    const url = URL.createObjectURL(blob)
+    dispatch(setExportObjectUrl(url))
     return function cleanup(): void {
-      w.URL.revokeObjectURL(exportObjectUrl)
+      URL.revokeObjectURL(url)
       dispatch(setExportObjectUrl('#'))
     }
-  }, [])
+  }, [dispatch, URL, records, settings])
 
   return (
     <>
@@ -489,7 +504,7 @@ const Import: React.FC = () => {
             : 'Imported.records.',
       })
     )
-  }, [fileInputRef, importSettings])
+  }, [dispatch, fileInputRef, importSettings, intl])
 
   return (
     <>
