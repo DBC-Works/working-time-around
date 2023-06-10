@@ -16,6 +16,7 @@
     "@parcel/transformer-typescript-tsc": "^2.0.1",
     "@redux-devtools/extension": "^3.2.5",
     "@rmwc/types": "^7.0.3",
+    "@testing-library/dom": "^9.3.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.3",
