@@ -4,7 +4,7 @@
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 
-import { Select } from '@rmwc/Select'
+import { Select } from '@rmwc/select'
 import '@rmwc/select/styles'
 
 //

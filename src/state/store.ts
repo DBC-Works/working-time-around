@@ -9,7 +9,7 @@ import {
   Reducer,
   Store,
 } from 'redux'
-import { composeWithDevTools } from 'redux-devtools-extension'
+import { composeWithDevTools } from '@redux-devtools/extension'
 import { createTransform, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
