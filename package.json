@@ -94,7 +94,7 @@
   "scripts": {
     "start": "npx parcel ./src/index.html --open",
     "build": "npx parcel build ./src/index.html --no-source-maps",
-    "build:for-github-pages": "npx parcel build ./src/index.html --no-source-maps --public-url /working-time-around/",
+    "build:for-github-pages": "npx parcel build ./src/index.html --no-source-maps --public-url $BASE_PATH",
     "lint": "eslint src/**",
     "test": "jest",
     "test:coverage": "jest --coverage",

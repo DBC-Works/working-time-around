@@ -36,7 +36,7 @@ const Container: React.FC = () => {
       locale={currentLang}
       messages={getMessageCatalogueOf(currentLang)}
     >
-      <Router>
+      <Router basename={process.env['BASE_PATH'] || '/'}>
         <AppPage />
       </Router>
     </IntlProvider>
