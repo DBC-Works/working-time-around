@@ -17,7 +17,7 @@ dayjs.extend(localizedFormat)
 import configureStore, { AppState } from './state/store'
 import { getLang } from './state/ducks/settings'
 import AppPage from './views/pages/App'
-import { getMessageCatalogueOf } from './views/templates/settings'
+import { getMessageCatalogueOf } from './views/templates/Settings'
 
 import './app.scss'
 
