@@ -236,12 +236,12 @@ function getDailyRecordLatestIndexes(
  * 'Detail' component
  */
 const Detail: React.FC = () => {
-  const { year, month, date } = useParams()
-  const target = new Date(
-    +(year as string),
-    +(month as string) - 1,
-    +(date as string)
-  )
+  const { year, month, date } = useParams<{
+    year: string
+    month: string
+    date: string
+  }>()
+  const target = new Date(+year, +month - 1, +date)
   const dj = dayjs(target)
 
   let headingClassName = ''
