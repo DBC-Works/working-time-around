@@ -379,7 +379,8 @@ const MemoTextField: React.FC<{
       <TextField
         textarea={true}
         outlined={true}
-        fullwidth={true}
+        className="full-width"
+        resizeable={true}
         disabled={tomorrow.diff(dj, 'm') < 5}
         value={props.memo}
         onChange={handleChange}

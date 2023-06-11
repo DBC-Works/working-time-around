@@ -11,7 +11,7 @@ import localizedFormat from 'dayjs/plugin/localizedFormat'
 
 import { AppState, createRootReducer, INITIAL_STATE } from '../state/store'
 import { getLang } from '../state/ducks/settings'
-import { getMessageCatalogueOf } from './templates/settings'
+import { getMessageCatalogueOf } from './templates/Settings'
 
 import '@testing-library/jest-dom/extend-expect'
 import { render, RenderResult } from '@testing-library/react'

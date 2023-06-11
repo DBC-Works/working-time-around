@@ -13,7 +13,7 @@ import { Checkbox } from '@rmwc/checkbox'
 import '@rmwc/checkbox/styles'
 import { Grid, GridCell, GridRow } from '@rmwc/grid'
 import '@rmwc/grid/styles'
-import { Select } from '@rmwc/Select'
+import { Select } from '@rmwc/select'
 import '@rmwc/select/styles'
 import { TextField } from '@rmwc/textfield'
 import '@rmwc/textfield/styles'
@@ -242,7 +242,7 @@ const MailAddress: React.FC = () => {
         <TextField
           type="email"
           id="mail-address"
-          fullwidth={true}
+          className="full-width"
           placeholder="foobar@example.com"
           value={mailAddress}
           onChange={handleChangeMailAddress}
@@ -290,7 +290,7 @@ const SlackSettings: React.FC = () => {
         <TextField
           type="url"
           id="incoming-webhook-url"
-          fullwidth={true}
+          className="full-width"
           placeholder="https://hooks.slack.com/services/..."
           value={slackSettings.incomingWebhookUrl}
           onChange={handleChangeUrl}
@@ -307,7 +307,7 @@ const SlackSettings: React.FC = () => {
         <TextField
           type="test"
           id="context"
-          fullwidth={true}
+          className="full-width"
           value={slackSettings.context}
           onChange={handleChangeContext}
         />

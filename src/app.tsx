@@ -17,7 +17,7 @@ dayjs.extend(localizedFormat)
 import configureStore, { AppState } from './state/store'
 import { getLang } from './state/ducks/settings'
 import AppPage from './views/pages/App'
-import { getMessageCatalogueOf } from './views/templates/settings'
+import { getMessageCatalogueOf } from './views/templates/Settings'
 
 import './app.scss'
 
@@ -36,7 +36,7 @@ const Container: React.FC = () => {
       locale={currentLang}
       messages={getMessageCatalogueOf(currentLang)}
     >
-      <Router>
+      <Router basename={process.env['BASE_PATH'] || '/'}>
         <AppPage />
       </Router>
     </IntlProvider>
