@@ -2,6 +2,15 @@
 // General
 //
 
+@import '../node_modules/@material/button/dist/mdc.button.min.css';
+@import '../node_modules/@material/checkbox/dist/mdc.checkbox.min.css';
+@import '../node_modules/@material/fab/dist/mdc.fab.min.css';
+@import '../node_modules/@material/select/dist/mdc.select.min.css';
+@import '../node_modules/@material/textfield/dist/mdc.textfield.min.css';
+@import '../node_modules/@material/theme/dist/mdc.theme.min.css';
+@import '../node_modules/@material/top-app-bar/dist/mdc.top-app-bar.min.css';
+@import '../node_modules/@material/typography/dist/mdc.typography.min.css';
+
 body {
   margin: 0;
   height: 100vh;
