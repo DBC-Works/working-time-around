@@ -4,7 +4,7 @@
 
 ## Live demo
 
-Access [live demo site](https://workingtimearound.z11.web.core.windows.net/)
+Access [live demo site](https://dbc-works.github.io/working-time-around/)
 
 ## Develop and build
 
