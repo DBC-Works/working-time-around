@@ -42,12 +42,7 @@ const TimeSelect: React.FC<{
       const newHour = e.currentTarget.value
       setHour(newHour)
       if (onChange && 0 < newHour.length && 0 < minute.length) {
-        onChange(
-          dj
-            .hour(+newHour)
-            .minute(+minute)
-            .toDate()
-        )
+        onChange(dj.hour(+newHour).minute(+minute).toDate())
       }
     },
     [onChangeHour, onChange, minute, dj]
@@ -60,12 +55,7 @@ const TimeSelect: React.FC<{
       const newMinute = e.currentTarget.value
       setMinute(newMinute)
       if (onChange && 0 < hour.length && 0 < newMinute.length) {
-        onChange(
-          dj
-            .hour(+hour)
-            .minute(+newMinute)
-            .toDate()
-        )
+        onChange(dj.hour(+hour).minute(+newMinute).toDate())
       }
     },
     [onChangeMinute, onChange, hour, dj]
@@ -77,7 +67,7 @@ const TimeSelect: React.FC<{
         <Select
           data-testid="hour"
           outlined
-          placeholder={!hour ? props.label : undefined}
+          placeholder={!hour && props?.label ? props.label : ''}
           options={Array.from(Array(24), (_, i) => ({
             label: `${dj.hour(i).format('HH')}`,
             value: `${i}`,
@@ -88,7 +78,7 @@ const TimeSelect: React.FC<{
         <Select
           data-testid="minute"
           outlined
-          placeholder={!minute ? '--' : undefined}
+          placeholder={!minute ? '--' : ''}
           value={minute}
           options={Array.from(Array(60), (_, i) => ({
             label: `:${dj.minute(i).format('mm')}`,

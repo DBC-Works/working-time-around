@@ -524,7 +524,8 @@ const Memo: React.FC<{
         <TextField
           textarea={true}
           outlined={true}
-          fullwidth={true}
+          resizeable={true}
+          className="full-width"
           value={props.memo}
           onChange={props.onChange}
         />
@@ -551,12 +552,15 @@ const BreakTimeLength: React.FC<{
         <BreakTimeLengthSelect
           lengthMin={lengthMin}
           actionCreators={{
-            update: (lengthMin: number): Action<UpdateBreakTimeActionPayload> =>
-              updateBreakTimeLengthMin({
+            update: (
+              lengthMin: number
+            ): Action<UpdateBreakTimeActionPayload> => {
+              return updateBreakTimeLengthMin({
                 date,
                 breakTimeLengthMin: lengthMin,
                 targetIndex,
-              }),
+              })
+            },
           }}
         />
       </SingleCellRow>
