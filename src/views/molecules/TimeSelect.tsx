@@ -16,10 +16,10 @@ import '@rmwc/select/styles'
  */
 const TimeSelect: React.FC<{
   label?: string
-  time?: Date | null
-  onChange?: (time: Date) => void
-  onChangeHour?: (e: ChangeEvent<HTMLSelectElement>) => void
-  onChangeMinute?: (e: ChangeEvent<HTMLSelectElement>) => void
+  time?: Date | null | undefined
+  onChange?: ((time: Date) => void) | undefined
+  onChangeHour?: ((e: ChangeEvent<HTMLSelectElement>) => void) | undefined
+  onChangeMinute?: ((e: ChangeEvent<HTMLSelectElement>) => void) | undefined
 }> = (props) => {
   const { onChange, onChangeHour, onChangeMinute } = props
 
@@ -40,14 +40,11 @@ const TimeSelect: React.FC<{
         onChangeHour(e)
       }
       const newHour = e.currentTarget.value
-      setHour(newHour)
-      if (onChange && 0 < newHour.length && 0 < minute.length) {
-        onChange(
-          dj
-            .hour(+newHour)
-            .minute(+minute)
-            .toDate()
-        )
+      if (0 < newHour?.length) {
+        setHour(newHour)
+        if (onChange && 0 < minute.length) {
+          onChange(dj.hour(+newHour).minute(+minute).toDate())
+        }
       }
     },
     [onChangeHour, onChange, minute, dj]
@@ -58,14 +55,11 @@ const TimeSelect: React.FC<{
         onChangeMinute(e)
       }
       const newMinute = e.currentTarget.value
-      setMinute(newMinute)
-      if (onChange && 0 < hour.length && 0 < newMinute.length) {
-        onChange(
-          dj
-            .hour(+hour)
-            .minute(+newMinute)
-            .toDate()
-        )
+      if (0 < newMinute?.length) {
+        setMinute(newMinute)
+        if (onChange && 0 < hour.length) {
+          onChange(dj.hour(+hour).minute(+newMinute).toDate())
+        }
       }
     },
     [onChangeMinute, onChange, hour, dj]
@@ -77,7 +71,7 @@ const TimeSelect: React.FC<{
         <Select
           data-testid="hour"
           outlined
-          placeholder={!hour ? props.label : undefined}
+          placeholder={!hour && props?.label ? props.label : ''}
           options={Array.from(Array(24), (_, i) => ({
             label: `${dj.hour(i).format('HH')}`,
             value: `${i}`,
@@ -88,7 +82,7 @@ const TimeSelect: React.FC<{
         <Select
           data-testid="minute"
           outlined
-          placeholder={!minute ? '--' : undefined}
+          placeholder={!minute ? '--' : ''}
           value={minute}
           options={Array.from(Array(60), (_, i) => ({
             label: `:${dj.minute(i).format('mm')}`,

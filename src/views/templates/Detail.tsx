@@ -236,12 +236,12 @@ function getDailyRecordLatestIndexes(
  * 'Detail' component
  */
 const Detail: React.FC = () => {
-  const { year, month, date } = useParams()
-  const target = new Date(
-    +(year as string),
-    +(month as string) - 1,
-    +(date as string)
-  )
+  const { year, month, date } = useParams<{
+    year: string
+    month: string
+    date: string
+  }>()
+  const target = new Date(+year, +month - 1, +date)
   const dj = dayjs(target)
 
   let headingClassName = ''
@@ -524,7 +524,8 @@ const Memo: React.FC<{
         <TextField
           textarea={true}
           outlined={true}
-          fullwidth={true}
+          resizeable={true}
+          className="full-width"
           value={props.memo}
           onChange={props.onChange}
         />
@@ -551,12 +552,15 @@ const BreakTimeLength: React.FC<{
         <BreakTimeLengthSelect
           lengthMin={lengthMin}
           actionCreators={{
-            update: (lengthMin: number): Action<UpdateBreakTimeActionPayload> =>
-              updateBreakTimeLengthMin({
+            update: (
+              lengthMin: number
+            ): Action<UpdateBreakTimeActionPayload> => {
+              return updateBreakTimeLengthMin({
                 date,
                 breakTimeLengthMin: lengthMin,
                 targetIndex,
-              }),
+              })
+            },
           }}
         />
       </SingleCellRow>
