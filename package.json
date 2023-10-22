@@ -1,6 +1,6 @@
 {
   "name": "working-time-around",
-  "version": "1.1.1",
+  "version": "1.3.0",
   "description": "'Working time around' is a personal attendance and working time recording web application. It save records to browser's local storage, initially does not access any Web APIs. You can also set up and send your activities to Slack by setting the connection(you need to register the app in the workspace and create an Incoming Webhook. Please see [Incoming Webhooks](https://api.slack.com/incoming-webhooks).",
   "author": "D.B.C.",
   "license": "MIT",
@@ -48,7 +48,7 @@
     "jest-transform-css": "^6.0.1",
     "lint-staged": "^13.2.1",
     "parcel": "^2.9.2",
-    "postcss": "^8.4.14",
+    "postcss": "^8.4.31",
     "postcss-custom-properties": "^12.0.1",
     "postcss-import": "^14.0.2",
     "postcss-url": "^10.1.3",

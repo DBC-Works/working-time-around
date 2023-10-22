@@ -7,22 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2023-10-22
+
+### Added
+
+- Add working time column to list(#74)
+
 ## [1.2.0] - 2023-02-23
 
-### Update
+### Updated
 
 - Add a function to highlight error information in the list(#44)
 
 ## [1.1.0] - 2020-10-27
 
-### Update
+### Updated
 
 - Add total working day count to List(#23)
 - Update package references
 
 ## [1.0.0] - 2020-08-23
 
-### Update
+### Updated
 
 - Replace [Material Components for React (MDC React)](https://github.com/material-components/material-components-web-react) with [RMWC - React Material Web Components](https://rmwc.io/)(#16)
 - Fix some bugs
