@@ -38,6 +38,8 @@ import SingleCellRow from '../molecules/SingleCellRow'
 import { getDaysInMonth } from '../../implementations/utilities'
 import { formatSpecifiedMonthRecordsAsCsvForMail } from '../../implementations/formatter'
 
+import { calcWorkingTimeMin } from '../utils'
+
 //
 // Types
 //
@@ -268,10 +270,10 @@ const DateListHeader: React.FC = () => (
       <FormattedMessage id="Date" />
     </DateListCell>
     <DateListCell>
-      <FormattedMessage id="Start" />
+      <FormattedMessage id="Time" />
     </DateListCell>
     <DateListCell>
-      <FormattedMessage id="Stop" />
+      <FormattedMessage id="Length" />
     </DateListCell>
     <DateListCell>
       <FormattedMessage id="Edit" />
@@ -298,31 +300,72 @@ const DateRecordRow: React.FC<{
     history.push(props.date.format('/YYYY/M/D'))
   }, [history, props.date])
 
+  const workingTimeMin =
+    props.latest !== null ? calcWorkingTimeMin(props.latest) : null
   return (
     <GridRow className="date-list-row">
       <DateListCell className={dayKind}>
         {props.date.format('D(ddd)')}
       </DateListCell>
       <DateListCell>
-        {props.latest !== null && props.latest.start !== null
-          ? dayjs(props.latest.start).format(props.timeFormat)
-          : ''}
+        <TimeRange
+          start={props.latest?.start}
+          stop={props.latest?.stop}
+          timeFormat={props.timeFormat}
+        />
       </DateListCell>
       <DateListCell>
-        {props.latest !== null && props.latest.stop !== null
-          ? dayjs(props.latest.stop).format(props.timeFormat)
-          : ''}
+        {props.latest !== null && (
+          <TimeLengthMin
+            length={workingTimeMin}
+            invalid={workingTimeMin === null}
+          />
+        )}
       </DateListCell>
       <DateListCell>
         <Button dense={true} onClick={handleClick}>
-          {props.latest?.breakTimeLengthMin !== null ? (
-            <span dangerouslySetInnerHTML={{ __html: '&hellip;' }} />
-          ) : (
-            <ErrorReportText>!</ErrorReportText>
-          )}
+          <span dangerouslySetInnerHTML={{ __html: '&hellip;' }} />
         </Button>
       </DateListCell>
     </GridRow>
+  )
+}
+
+/**
+ * 'TimeRange' component
+ */
+const TimeRange: React.FC<{
+  start: Date | null | undefined
+  stop: Date | null | undefined
+  timeFormat: string
+}> = (props) => (
+  <div className="time-range">
+    <span>
+      {props.start ? dayjs(props?.start).format(props.timeFormat) : ''}
+    </span>
+    {(props.start || props.stop) && ' - '}
+    {props.stop ? dayjs(props.stop).format(props.timeFormat) : ''}
+  </div>
+)
+
+/**
+ * 'TimeLengthMin' component
+ */
+const TimeLengthMin: React.FC<{
+  length: number | null
+  invalid: boolean
+}> = (props) => {
+  const lengthString =
+    props.length !== null ? formatStatisticsTime(props.length) : '--:--'
+
+  return (
+    <span>
+      {props.invalid === false ? (
+        lengthString
+      ) : (
+        <ErrorReportText>{lengthString}</ErrorReportText>
+      )}
+    </span>
   )
 }
 
@@ -381,43 +424,33 @@ const DateListCell: React.FC<{ className?: string }> = (props) => (
 const Statistics: React.FC<{
   latestRecords: LatestRecord[]
 }> = (props) => {
-  let totalWorkingDayString = '-'
-  let totalWorkingTimeString = null
-  let medianWorkingTimeString = null
   const targets = props.latestRecords
     .map((record) => record.latestRecord)
     .filter(
       (record) =>
         record !== null && record.start !== null && record.stop !== null
     )
-  if (0 < targets.length) {
-    totalWorkingDayString = `${targets.length}`
+  const hasTarget = 0 < targets.length
+
+  let totalWorkingTimeMin = null
+  let medianWorkingTimeMin = null
+  let hasInvalid = false
+  if (hasTarget) {
+    const workingTimes = targets.map((target) =>
+      calcWorkingTimeMin(target as DailyLatestRecord)
+    )
+    hasInvalid = workingTimes.some((time) => time === null)
+    const validWorkingTimes = workingTimes
+      .filter((time) => time !== null)
+      .map((time) => time as number)
     if (
-      targets.some(
-        (record) => record !== null && record.breakTimeLengthMin === null
-      ) === false
+      0 < validWorkingTimes.length &&
+      validWorkingTimes.some((time) => time < 0) === false
     ) {
-      const workingTimes = targets.map((target) => {
-        const record = target as DailyLatestRecord
-        const start = record.start as Date
-        const stop = record.stop as Date
-        const startTimeMin = start.getHours() * 60 + start.getMinutes()
-        const stopTimeMin = stop.getHours() * 60 + stop.getMinutes()
-        return (
-          stopTimeMin - startTimeMin - (record.breakTimeLengthMin as number)
-        )
-      })
-      if (
-        !(workingTimes.length === 0 || workingTimes.some((time) => time < 0))
-      ) {
-        const totalWorkingTimeMin = workingTimes.reduce(
-          (accumulator, time) => accumulator + time
-        )
-        totalWorkingTimeString = formatStatisticsTime(totalWorkingTimeMin)
-        medianWorkingTimeString = formatStatisticsTime(
-          getMedianOf(workingTimes)
-        )
-      }
+      totalWorkingTimeMin = validWorkingTimes.reduce(
+        (accumulator, time) => accumulator + time
+      )
+      medianWorkingTimeMin = getMedianOf(validWorkingTimes)
     }
   }
 
@@ -450,7 +483,7 @@ const Statistics: React.FC<{
             tablet={COLUMN_RIGHT.TABLET}
             phone={COLUMN_RIGHT.PHONE}
           >
-            {totalWorkingDayString}
+            {hasTarget ? `${targets.length}` : '-'}
           </GridCell>
         </GridRow>
         <GridRow className="statistics-list-row" data-testid="statistics-total">
@@ -468,11 +501,12 @@ const Statistics: React.FC<{
             tablet={COLUMN_RIGHT.TABLET}
             phone={COLUMN_RIGHT.PHONE}
           >
-            {totalWorkingTimeString !== null ? (
-              totalWorkingTimeString
-            ) : (
-              <ErrorReportText>--:--</ErrorReportText>
-            )}
+            <TimeLengthMin
+              length={totalWorkingTimeMin}
+              invalid={
+                hasTarget && (hasInvalid || totalWorkingTimeMin === null)
+              }
+            />
           </GridCell>
         </GridRow>
         <GridRow
@@ -493,11 +527,12 @@ const Statistics: React.FC<{
             tablet={COLUMN_RIGHT.TABLET}
             phone={COLUMN_RIGHT.PHONE}
           >
-            {medianWorkingTimeString !== null ? (
-              medianWorkingTimeString
-            ) : (
-              <ErrorReportText>--:--</ErrorReportText>
-            )}
+            <TimeLengthMin
+              length={medianWorkingTimeMin}
+              invalid={
+                hasTarget && (hasInvalid || medianWorkingTimeMin === null)
+              }
+            />
           </GridCell>
         </GridRow>
       </Grid>
