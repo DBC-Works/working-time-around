@@ -90,16 +90,16 @@ describe('"Detail" template', () => {
       expect(screen.getByText(dj.format('ll'))).toBeInTheDocument()
     })
 
-    it('should move to the previous day when click "prev" icon link', () => {
-      userEvent.click(screen.getByText('navigate_before'))
+    it('should move to the previous day when click "prev" icon link', async () => {
+      await userEvent.click(screen.getByText('navigate_before'))
 
       expect(
         screen.getByText(dj.add(-1, 'day').format('ll'))
       ).toBeInTheDocument()
     })
 
-    it('should move to the next month when click "next" icon link', () => {
-      userEvent.click(screen.getByText('navigate_next'))
+    it('should move to the next month when click "next" icon link', async () => {
+      await userEvent.click(screen.getByText('navigate_next'))
 
       expect(
         screen.getByText(dj.add(1, 'day').format('ll'))
@@ -140,8 +140,8 @@ describe('"Detail" template', () => {
       expect(screen.queryByDisplayValue('Start')).not.toBeInTheDocument()
 
       act(() => {
-        window.requestAnimationFrame(() => {
-          userEvent.selectOptions(
+        window.requestAnimationFrame(async () => {
+          await userEvent.selectOptions(
             screen.getByDisplayValue(':33') as HTMLElement,
             '45'
           )
@@ -149,7 +149,7 @@ describe('"Detail" template', () => {
           expect(screen.getByDisplayValue('09')).toBeInTheDocument()
           expect(screen.getByDisplayValue(':45')).toBeInTheDocument()
 
-          userEvent.selectOptions(
+          await userEvent.selectOptions(
             screen.getByDisplayValue('09') as HTMLElement,
             '0'
           )
@@ -189,8 +189,8 @@ describe('"Detail" template', () => {
       expect(screen.queryByDisplayValue('Stop')).not.toBeInTheDocument()
 
       act(() => {
-        window.requestAnimationFrame(() => {
-          userEvent.selectOptions(
+        window.requestAnimationFrame(async () => {
+          await userEvent.selectOptions(
             screen.getByDisplayValue(':59') as HTMLElement,
             '58'
           )
@@ -198,7 +198,7 @@ describe('"Detail" template', () => {
           expect(screen.getByDisplayValue('21')).toBeInTheDocument()
           expect(screen.getByDisplayValue(':58')).toBeInTheDocument()
 
-          userEvent.selectOptions(
+          await userEvent.selectOptions(
             screen.getByDisplayValue('21') as HTMLElement,
             '22'
           )
@@ -278,8 +278,11 @@ describe('"Detail" template', () => {
       expect(getByDisplayValue(table.minute)).toBeInTheDocument()
 
       act(() => {
-        window.requestAnimationFrame(() => {
-          userEvent.selectOptions(getByDisplayValue(':00') as HTMLElement, '45')
+        window.requestAnimationFrame(async () => {
+          await userEvent.selectOptions(
+            getByDisplayValue(':00') as HTMLElement,
+            '45'
+          )
 
           expect(getByDisplayValue(table.hour)).toBeInTheDocument()
           expect(getByDisplayValue(':45')).toBeInTheDocument()
@@ -287,7 +290,7 @@ describe('"Detail" template', () => {
             queryByDisplayValue(LITERAL_NO_SELECTION)
           ).not.toBeInTheDocument()
 
-          userEvent.selectOptions(
+          await userEvent.selectOptions(
             getByDisplayValue(table.hour) as HTMLElement,
             '0'
           )
@@ -315,8 +318,8 @@ describe('"Detail" template', () => {
       )
 
       act(() => {
-        window.requestAnimationFrame(() => {
-          userEvent.selectOptions(
+        window.requestAnimationFrame(async () => {
+          await userEvent.selectOptions(
             (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[0],
             table.value
           )
@@ -341,8 +344,8 @@ describe('"Detail" template', () => {
       )
 
       act(() => {
-        window.requestAnimationFrame(() => {
-          userEvent.selectOptions(
+        window.requestAnimationFrame(async () => {
+          await userEvent.selectOptions(
             (getAllByDisplayValue(LITERAL_NO_SELECTION) as HTMLElement[])[1],
             table.value
           )
@@ -361,8 +364,8 @@ describe('"Detail" template', () => {
       setup(dj.format(PATH_DETAIL))
     })
 
-    it('should move to list of month including the day when click "Back to list" fab link', () => {
-      userEvent.click(screen.getByText('list'))
+    it('should move to list of month including the day when click "Back to list" fab link', async () => {
+      await userEvent.click(screen.getByText('list'))
 
       expect(screen.getByText(dj.format('MMM YYYY'))).toBeInTheDocument()
     })

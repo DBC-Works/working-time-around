@@ -113,13 +113,13 @@ describe('"CurrentState" template', () => {
     expect(stopButton).toBeDisabled()
   })
 
-  it('should change the start button to be disabled and update text to clicked time when the button is clicked', () => {
+  it('should change the start button to be disabled and update text to clicked time when the button is clicked', async () => {
     const [, store] = setup()
 
     const startButton = screen.getByRole('button', { name: 'Start' })
     expect(startButton).toBeEnabled()
 
-    userEvent.click(startButton)
+    await userEvent.click(startButton)
 
     expect(startButton).toBeDisabled()
     expect(startButton).not.toHaveTextContent('Start')
@@ -140,7 +140,7 @@ describe('"CurrentState" template', () => {
     })
   })
 
-  it('should change buttons to be disabled and update text of the stop button to clicked time when the stop button is clicked', () => {
+  it('should change buttons to be disabled and update text of the stop button to clicked time when the stop button is clicked', async () => {
     const [, store] = setup()
 
     const startButton = screen.getByRole('button', { name: 'Start' })
@@ -148,7 +148,7 @@ describe('"CurrentState" template', () => {
     const stopButton = screen.getByRole('button', { name: 'Stop' })
     expect(stopButton).toBeEnabled()
 
-    userEvent.click(stopButton)
+    await userEvent.click(stopButton)
 
     expect(startButton).toBeDisabled()
     expect(startButton).toHaveTextContent('Start')

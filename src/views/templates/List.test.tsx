@@ -50,20 +50,20 @@ describe('"List" template', () => {
       expect(screen.getByText('navigate_next')).toBeInTheDocument()
     })
 
-    it('should move to the previous month when click "prev" icon link', () => {
+    it('should move to the previous month when click "prev" icon link', async () => {
       const dj = dayjs()
       setup(dj.format('/YYYY/M'))
-      userEvent.click(screen.getByText('navigate_before'))
+      await userEvent.click(screen.getByText('navigate_before'))
 
       expect(
         screen.getByText(dj.add(-1, 'month').format('MMM YYYY'))
       ).toBeInTheDocument()
     })
 
-    it('should move to the next month when click "next" icon link', () => {
+    it('should move to the next month when click "next" icon link', async () => {
       const dj = dayjs()
       setup(dj.format('/YYYY/M'))
-      userEvent.click(screen.getByText('navigate_next'))
+      await userEvent.click(screen.getByText('navigate_next'))
 
       expect(
         screen.getByText(dj.add(1, 'month').format('MMM YYYY'))
