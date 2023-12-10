@@ -9,7 +9,7 @@ import en from '../i18n/en.json'
 
 import TimeSelect from './TimeSelect'
 
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom/jest-globals'
 import { act, render, RenderResult, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 

@@ -13,7 +13,7 @@ import { AppState, createRootReducer, INITIAL_STATE } from '../state/store'
 import { getLang } from '../state/ducks/settings'
 import { getMessageCatalogueOf } from './templates/Settings'
 
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom/jest-globals'
 import { render, RenderResult } from '@testing-library/react'
 import IntlPolyfill from 'intl'
 import 'intl/locale-data/jsonp/pt'
@@ -84,5 +84,8 @@ function setupTests(): void {
 //
 // Entry
 //
-
+declare const globalThis: {
+  IS_REACT_ACT_ENVIRONMENT: boolean
+}
+globalThis.IS_REACT_ACT_ENVIRONMENT = true
 setupTests()

@@ -12,7 +12,7 @@ import {
 import { AppState, INITIAL_STATE } from '../../state/store'
 import Settings from './Settings'
 
-import { act, RenderResult, screen } from '@testing-library/react'
+import { act, fireEvent, RenderResult, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProvider } from '../componentTestUtilities'
 
@@ -236,8 +236,8 @@ describe('"Settings" template', () => {
         })
         expect(clearButton).not.toBeDisabled()
 
-        act(async () => {
-          await userEvent.click(clearButton)
+        act(() => {
+          fireEvent.click(clearButton)
         })
 
         expect(

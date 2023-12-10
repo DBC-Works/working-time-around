@@ -2,7 +2,7 @@
  * @file Application entry
  */
 import React from 'react'
-import { render } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Provider, useSelector } from 'react-redux'
 import { persistStore } from 'redux-persist'
@@ -59,4 +59,6 @@ const App: React.FC = () => {
     </Provider>
   )
 }
-render(<App />, document.getElementById('root'))
+const container = document.getElementById('root')
+const root = createRoot(container)
+root.render(<App />)
