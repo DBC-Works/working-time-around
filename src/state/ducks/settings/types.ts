@@ -25,5 +25,5 @@ export interface SettingsState {
   sendToMailAddress: string
   slack: SlackSettings
   lang: Lang
-  defaultBreakTimeLengthMin?: number
+  defaultBreakTimeLengthMin?: number | undefined
 }

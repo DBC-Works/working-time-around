@@ -11,8 +11,8 @@ import { RunningState } from '../../state/ducks/running'
 import { AppState, INITIAL_STATE } from '../../state/store'
 import CurrentState from './CurrentState'
 
-import { RenderResult, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import '@testing-library/jest-dom'
+import { RenderResult, fireEvent, screen } from '@testing-library/react'
 import { renderWithProvider } from '../componentTestUtilities'
 
 describe('"CurrentState" template', () => {
@@ -119,7 +119,7 @@ describe('"CurrentState" template', () => {
     const startButton = screen.getByRole('button', { name: 'Start' })
     expect(startButton).toBeEnabled()
 
-    userEvent.click(startButton)
+    fireEvent.click(startButton)
 
     expect(startButton).toBeDisabled()
     expect(startButton).not.toHaveTextContent('Start')
@@ -148,7 +148,7 @@ describe('"CurrentState" template', () => {
     const stopButton = screen.getByRole('button', { name: 'Stop' })
     expect(stopButton).toBeEnabled()
 
-    userEvent.click(stopButton)
+    fireEvent.click(stopButton)
 
     expect(startButton).toBeDisabled()
     expect(startButton).toHaveTextContent('Start')

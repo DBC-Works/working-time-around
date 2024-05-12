@@ -12,7 +12,7 @@ import {
 import { AppState, INITIAL_STATE } from '../../state/store'
 import Settings from './Settings'
 
-import { act, RenderResult, screen } from '@testing-library/react'
+import { act, fireEvent, RenderResult, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProvider } from '../componentTestUtilities'
 
@@ -76,9 +76,9 @@ describe('"Settings" template', () => {
           screen.getByText(HEADING.DEFAULT_BREAK_TIME_LENGTH)
         ).toBeInTheDocument()
       })
-      it('should not exist when "Operation" tab is not selected', () => {
+      it('should not exist when "Operation" tab is not selected', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.LINKAGE))
+        await userEvent.click(screen.getByText(TAB.LINKAGE))
 
         expect(
           screen.queryByText(HEADING.DEFAULT_BREAK_TIME_LENGTH)
@@ -131,8 +131,8 @@ describe('"Settings" template', () => {
         expect(screen.getByDisplayValue(':00')).toBeInTheDocument()
 
         act(() => {
-          window.requestAnimationFrame(() => {
-            userEvent.selectOptions(
+          window.requestAnimationFrame(async () => {
+            await userEvent.selectOptions(
               screen.getByDisplayValue(':00') as HTMLElement,
               '45'
             )
@@ -145,7 +145,7 @@ describe('"Settings" template', () => {
             expect(clearButton).toBeInTheDocument()
             expect(clearButton).not.toBeDisabled()
 
-            userEvent.selectOptions(
+            await userEvent.selectOptions(
               screen.getByDisplayValue('01') as HTMLElement,
               '0'
             )
@@ -177,8 +177,8 @@ describe('"Settings" template', () => {
         const clearButton = screen.getByText('clear')
 
         act(() => {
-          window.requestAnimationFrame(() => {
-            userEvent.selectOptions(
+          window.requestAnimationFrame(async () => {
+            await userEvent.selectOptions(
               screen.getAllByDisplayValue(LITERAL_NO_SELECTION)[0],
               table.value
             )
@@ -208,8 +208,8 @@ describe('"Settings" template', () => {
         expect(clearButton).toBeInTheDocument()
 
         act(() => {
-          window.requestAnimationFrame(() => {
-            userEvent.selectOptions(
+          window.requestAnimationFrame(async () => {
+            await userEvent.selectOptions(
               screen.getAllByDisplayValue(LITERAL_NO_SELECTION)[1],
               table.value
             )
@@ -222,7 +222,7 @@ describe('"Settings" template', () => {
           })
         })
       })
-      it('should be clear the selection when "clear" button is selected', () => {
+      it('should be clear the selection when "clear" button is selected', async () => {
         const [, store] = setup(
           makeSettingsTestState({
             ...INITIAL_STATE.settings,
@@ -237,12 +237,12 @@ describe('"Settings" template', () => {
         expect(clearButton).not.toBeDisabled()
 
         act(() => {
-          userEvent.click(clearButton)
+          fireEvent.click(clearButton)
         })
 
-        expect(screen.getAllByDisplayValue(LITERAL_NO_SELECTION)).toHaveLength(
-          2
-        )
+        expect(
+          await screen.findAllByDisplayValue(LITERAL_NO_SELECTION)
+        ).toHaveLength(2)
         expect(clearButton).toBeDisabled()
         const {
           settings: { defaultBreakTimeLengthMin },
@@ -256,9 +256,9 @@ describe('"Settings" template', () => {
         setup()
         expect(screen.getByText(HEADING.LANGUAGE)).toBeInTheDocument()
       })
-      it('should not exist when "Operation" tab is not selected', () => {
+      it('should not exist when "Operation" tab is not selected', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.LINKAGE))
+        await userEvent.click(screen.getByText(TAB.LINKAGE))
 
         expect(screen.queryByText(HEADING.LANGUAGE)).not.toBeInTheDocument()
       })
@@ -267,8 +267,8 @@ describe('"Settings" template', () => {
         setup()
 
         act(() => {
-          window.requestAnimationFrame(() => {
-            userEvent.selectOptions(
+          window.requestAnimationFrame(async () => {
+            await userEvent.selectOptions(
               screen.getByDisplayValue('English') as HTMLElement,
               'ja'
             )
@@ -301,9 +301,9 @@ describe('"Settings" template', () => {
     describe('Export', () => {
       const LABEL_DOWNLOAD = 'Download'
 
-      it('should exist when "Record" tab is selected', () => {
+      it('should exist when "Record" tab is selected', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.RECORD))
+        await userEvent.click(screen.getByText(TAB.RECORD))
 
         expect(screen.getByText(HEADING.EXPORT)).toBeInTheDocument()
       })
@@ -311,9 +311,9 @@ describe('"Settings" template', () => {
         setup()
         expect(screen.queryByText(HEADING.EXPORT)).not.toBeInTheDocument()
       })
-      it('should exist "Start download" link', () => {
+      it('should exist "Start download" link', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.RECORD))
+        await userEvent.click(screen.getByText(TAB.RECORD))
 
         const startDownloadAnchor = screen.getByText(LABEL_DOWNLOAD)
         expect(startDownloadAnchor).toBeInTheDocument()
@@ -326,9 +326,9 @@ describe('"Settings" template', () => {
       })
     })
     describe('Import', () => {
-      it('should exist when "Record" tab is selected', () => {
+      it('should exist when "Record" tab is selected', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.RECORD))
+        await userEvent.click(screen.getByText(TAB.RECORD))
 
         expect(screen.getByText(HEADING.IMPORT)).toBeInTheDocument()
       })
@@ -336,16 +336,16 @@ describe('"Settings" template', () => {
         setup()
         expect(screen.queryByText(HEADING.IMPORT)).not.toBeInTheDocument()
       })
-      it('should exist file upload element and "Browse" button', () => {
+      it('should exist file upload element and "Browse" button', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.RECORD))
+        await userEvent.click(screen.getByText(TAB.RECORD))
 
         expect(screen.getByTestId('file-upload')).toBeInTheDocument()
         expect(screen.getByText('Browse...')).toBeInTheDocument()
       })
-      it('should exist checkbox to import settings', () => {
+      it('should exist checkbox to import settings', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.RECORD))
+        await userEvent.click(screen.getByText(TAB.RECORD))
 
         const checkbox = screen.getByLabelText('Import settings')
         expect(checkbox).toBeInTheDocument()
@@ -353,11 +353,11 @@ describe('"Settings" template', () => {
         const label = screen.getByText('Import settings')
         expect(label).toBeInTheDocument()
       })
-      it('should check the import settings checkbox after checkbox click', () => {
+      it('should check the import settings checkbox after checkbox click', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.RECORD))
+        await userEvent.click(screen.getByText(TAB.RECORD))
         const checkbox = screen.getByLabelText('Import settings')
-        userEvent.click(checkbox)
+        await userEvent.click(checkbox)
 
         expect(checkbox).toBeChecked()
       })
@@ -366,9 +366,9 @@ describe('"Settings" template', () => {
 
   describe('"Linkage" tab', () => {
     describe('Send to mail address', () => {
-      it('should exist when "Linkage" tab is selected', () => {
+      it('should exist when "Linkage" tab is selected', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.LINKAGE))
+        await userEvent.click(screen.getByText(TAB.LINKAGE))
 
         expect(
           screen.getByText(HEADING.SEND_TO_MAIL_ADDRESS)
@@ -381,11 +381,11 @@ describe('"Settings" template', () => {
         ).not.toBeInTheDocument()
       })
 
-      it('should update mail address to entered', () => {
+      it('should update mail address to entered', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.LINKAGE))
+        await userEvent.click(screen.getByText(TAB.LINKAGE))
         const mailAddress = screen.getByLabelText('Send to mail address')
-        userEvent.type(mailAddress, 'updated@example.com')
+        await userEvent.type(mailAddress, 'updated@example.com')
 
         expect(
           screen.getByDisplayValue('updated@example.com')
@@ -397,9 +397,9 @@ describe('"Settings" template', () => {
       const LABEL_BUTTON_SEND_A_TEST_MESSAGE = 'Send a test message'
       const LABEL_BUTTON_OFFLINE = '(Offline)'
 
-      it('should exist when "Linkage" tab is selected', () => {
+      it('should exist when "Linkage" tab is selected', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.LINKAGE))
+        await userEvent.click(screen.getByText(TAB.LINKAGE))
 
         expect(screen.getByText(HEADING.SLACK_LINKAGE)).toBeInTheDocument()
         expect(screen.getByText('Incoming webhook URL')).toBeInTheDocument()
@@ -415,25 +415,25 @@ describe('"Settings" template', () => {
         ).not.toBeInTheDocument()
         expect(screen.queryByText('Context')).not.toBeInTheDocument()
       })
-      it('should exist "Send a test message" button when online', () => {
+      it('should exist "Send a test message" button when online', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.LINKAGE))
+        await userEvent.click(screen.getByText(TAB.LINKAGE))
 
         expect(
           screen.getByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)
         ).toBeInTheDocument()
         expect(screen.queryByText(LABEL_BUTTON_OFFLINE)).not.toBeInTheDocument()
       })
-      it('should to be disabled "Send a test message" when "Incoming webhook URL" is not set or invalid', () => {
+      it('should to be disabled "Send a test message" when "Incoming webhook URL" is not set or invalid', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.LINKAGE))
+        await userEvent.click(screen.getByText(TAB.LINKAGE))
 
         expect(
-          screen.getByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE).parentElement
+          screen.getByRole('button', { name: LABEL_BUTTON_SEND_A_TEST_MESSAGE })
         ).toBeDisabled()
       })
 
-      it('should to be enabled "Send a test message" when "incoming Webhook URL" is set and valid', () => {
+      it('should to be enabled "Send a test message" when "incoming Webhook URL" is set and valid', async () => {
         setup(
           makeSettingsTestState({
             ...settingsInitialState,
@@ -444,17 +444,17 @@ describe('"Settings" template', () => {
             },
           })
         )
-        userEvent.click(screen.getByText(TAB.LINKAGE))
+        await userEvent.click(screen.getByText(TAB.LINKAGE))
 
         expect(screen.getByText(LABEL_BUTTON_SEND_A_TEST_MESSAGE)).toBeEnabled()
       })
 
-      it('should exist disabled "(offline)" button when offline', () => {
+      it('should exist disabled "(offline)" button when offline', async () => {
         setup({
           ...INITIAL_STATE,
           running: { ...runningInitialState, onLine: false },
         })
-        userEvent.click(screen.getByText(TAB.LINKAGE))
+        await userEvent.click(screen.getByText(TAB.LINKAGE))
 
         const offLineButton = screen.getByRole('button', {
           name: LABEL_BUTTON_OFFLINE,
@@ -468,11 +468,11 @@ describe('"Settings" template', () => {
         ).not.toBeInTheDocument()
       })
 
-      it('should update incoming webhook url to entered', () => {
+      it('should update incoming webhook url to entered', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.LINKAGE))
+        await userEvent.click(screen.getByText(TAB.LINKAGE))
         const url = screen.getByLabelText('Incoming webhook URL')
-        userEvent.type(
+        await userEvent.type(
           url,
           'https://hooks.slack.com/services/xxxxxxxxx/xxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxx'
         )
@@ -484,10 +484,10 @@ describe('"Settings" template', () => {
         ).toBeInTheDocument()
       })
 
-      it('should update context to entered', () => {
+      it('should update context to entered', async () => {
         setup()
-        userEvent.click(screen.getByText(TAB.LINKAGE))
-        userEvent.type(
+        await userEvent.click(screen.getByText(TAB.LINKAGE))
+        await userEvent.type(
           screen.getByLabelText('Context'),
           'Updated slack context'
         )

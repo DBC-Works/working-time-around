@@ -9,7 +9,7 @@ import en from '../i18n/en.json'
 
 import TimeSelect from './TimeSelect'
 
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom/jest-globals'
 import { act, render, RenderResult, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -55,14 +55,14 @@ describe('"TimeSelect" molecule', () => {
     const minuteSelector = screen.getByDisplayValue('--')
 
     act(() => {
-      window.requestAnimationFrame(() => {
-        userEvent.selectOptions(hourSelector, '1')
+      window.requestAnimationFrame(async () => {
+        await userEvent.selectOptions(hourSelector, '1')
 
         expect(screen.getByDisplayValue('01')).toBeInTheDocument()
         expect(hourSelector).toHaveProperty('value', '1')
         expect(mockOnChange).not.toHaveBeenCalled()
 
-        userEvent.selectOptions(minuteSelector, '34')
+        await userEvent.selectOptions(minuteSelector, '34')
 
         expect(screen.getByDisplayValue(':34')).toBeInTheDocument()
         expect(minuteSelector).toHaveProperty('value', '34')
@@ -80,14 +80,14 @@ describe('"TimeSelect" molecule', () => {
     const minuteSelector = screen.getByDisplayValue('--')
 
     act(() => {
-      window.requestAnimationFrame(() => {
-        userEvent.selectOptions(minuteSelector, '34')
+      window.requestAnimationFrame(async () => {
+        await userEvent.selectOptions(minuteSelector, '34')
 
         expect(screen.getByDisplayValue(':34')).toBeInTheDocument()
         expect(minuteSelector).toHaveProperty('value', '34')
         expect(mockOnChange).not.toHaveBeenCalled()
 
-        userEvent.selectOptions(hourSelector, '1')
+        await userEvent.selectOptions(hourSelector, '1')
 
         expect(screen.getByDisplayValue('01')).toBeInTheDocument()
         expect(hourSelector).toHaveProperty('value', '1')
@@ -105,8 +105,8 @@ describe('"TimeSelect" molecule', () => {
     const hourSelector = screen.getByDisplayValue('01')
 
     act(() => {
-      window.requestAnimationFrame(() => {
-        userEvent.selectOptions(hourSelector, `${time.getHours() + 1}`)
+      window.requestAnimationFrame(async () => {
+        await userEvent.selectOptions(hourSelector, `${time.getHours() + 1}`)
 
         expect(
           screen.getByDisplayValue(`0${time.getHours() + 1}`)
@@ -128,8 +128,11 @@ describe('"TimeSelect" molecule', () => {
     const minuteSelector = screen.getByDisplayValue(`:${time.getMinutes()}`)
 
     act(() => {
-      window.requestAnimationFrame(() => {
-        userEvent.selectOptions(minuteSelector, `${time.getMinutes() - 8}`)
+      window.requestAnimationFrame(async () => {
+        await userEvent.selectOptions(
+          minuteSelector,
+          `${time.getMinutes() - 8}`
+        )
 
         expect(
           screen.getByDisplayValue(`:${time.getMinutes() - 8}`)

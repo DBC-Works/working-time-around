@@ -44,29 +44,29 @@ describe('App', () => {
     expect(screen.getByText('settings')).toBeInTheDocument()
   })
 
-  it('should change content to current state when click today action icon', () => {
+  it('should change content to current state when click today action icon', async () => {
     const dj = dayjs(new Date())
 
     setup()
-    userEvent.click(screen.getByText(dj.format('ll')))
+    await userEvent.click(screen.getByText(dj.format('ll')))
 
     expect(screen.getByText(dj.format('ll'))).toBeInTheDocument()
     expect(screen.getByText('Time')).toBeInTheDocument()
     expect(screen.getByText('Memo')).toBeInTheDocument()
   })
 
-  it('should change content to monthly list when click list action icon', () => {
+  it('should change content to monthly list when click list action icon', async () => {
     setup()
-    userEvent.click(screen.getByText('list'))
+    await userEvent.click(screen.getByText('list'))
 
     expect(
       screen.getByText(dayjs(new Date()).format('MMM YYYY'))
     ).toBeInTheDocument()
   })
 
-  it('should change content to settings when click settings action icon', () => {
+  it('should change content to settings when click settings action icon', async () => {
     setup()
-    userEvent.click(screen.getByText('settings'))
+    await userEvent.click(screen.getByText('settings'))
 
     expect(screen.getByText('Settings')).toBeInTheDocument()
   })

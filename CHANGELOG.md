@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2024-05-13
+
+### Updated
+
+- Correct negative length color in list(#82)
+- Update node.js version and package references
+
 ## [1.3.0] - 2023-10-22
 
 ### Added

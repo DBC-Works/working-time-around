@@ -318,7 +318,7 @@ const DateRecordRow: React.FC<{
         {props.latest !== null && (
           <TimeLengthMin
             length={workingTimeMin}
-            invalid={workingTimeMin === null}
+            invalid={workingTimeMin === null || workingTimeMin < 0}
           />
         )}
       </DateListCell>
