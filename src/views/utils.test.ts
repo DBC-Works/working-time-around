@@ -26,6 +26,15 @@ describe('Utilities', () => {
         },
         expected: 480,
       },
+      {
+        record: {
+          start: new Date(2024, 4, 12, 0, 0, 0),
+          stop: new Date(2024, 4, 12, 0, 0, 0),
+          memo: '',
+          breakTimeLengthMin: 60,
+        },
+        expected: -60,
+      },
     ])(
       'should return working time from valid record',
       ({ record, expected }) => {
