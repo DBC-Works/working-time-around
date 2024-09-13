@@ -2,7 +2,7 @@
  * @file 'List' component unit tests
  */
 import React from 'react'
-import { Route } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import { AnyAction, Store } from 'redux'
 import dayjs from 'dayjs'
 
@@ -20,11 +20,9 @@ describe('"List" template', () => {
     state: AppState = INITIAL_STATE
   ): [RenderResult, Store<AppState, AnyAction>] {
     return renderWithProvider(
-      <Route
-        exact
-        path="/:year(\d{4})/:month([1-9]|10|11|12)"
-        component={List}
-      />,
+      <Routes>
+        <Route path="/:year/:month" element={<List />} />
+      </Routes>,
       route,
       state
     )

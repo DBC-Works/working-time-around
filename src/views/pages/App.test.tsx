@@ -15,12 +15,7 @@ import { renderWithProvider } from '../componentTestUtilities'
 
 describe('App', () => {
   function setup(route = '/'): [RenderResult, Store<AppState, AnyAction>] {
-    return renderWithProvider(
-      <Router initialEntries={[route]}>
-        <App />
-      </Router>,
-      route
-    )
+    return renderWithProvider(<App />, route)
   }
 
   beforeAll(() => {
