@@ -2,7 +2,7 @@
  * @file 'List' component
  */
 import React, { useCallback } from 'react'
-import { Link, useHistory, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { FormattedMessage, useIntl } from 'react-intl'
 import assert from 'assert'
@@ -39,6 +39,7 @@ import { getDaysInMonth } from '../../implementations/utilities'
 import { formatSpecifiedMonthRecordsAsCsvForMail } from '../../implementations/formatter'
 
 import { calcWorkingTimeMin } from '../utils'
+import NotFound from './NotFound'
 
 //
 // Types
@@ -164,8 +165,16 @@ const ErrorReportText: React.FC = (props) => (
  * 'List' component
  */
 const List: React.FC = () => {
-  const { year, month } = useParams<{ year: string; month: string }>()
-  const firstDayOfMonth = new Date(+year, +month - 1, 1)
+  const params = useParams<{ year: string; month: string }>()
+  const year = params['year']?.match(/\d{4}/) ? +params['year'] : 0
+  const month = params['month']?.match(/\d+/) ? +params['month'] : 0
+  const valid = 0 < year && 1 <= month && month <= 12
+
+  const firstDayOfMonth = new Date(
+    0 < year ? year : 0,
+    0 < month ? month - 1 : 0,
+    1
+  )
   const dj = dayjs(firstDayOfMonth)
 
   const records = useSelector((state: AppState) =>
@@ -175,6 +184,11 @@ const List: React.FC = () => {
   const defaultBreakTimeLength = useSelector((state: AppState) =>
     getDefaultBreakTimeLengthMin(state.settings)
   )
+
+  if (valid === false) {
+    return <NotFound />
+  }
+
   const latestRecords = getDaysInMonth(dj).map((date) => {
     const key = makeRecordKey(date.toDate())
     return {
@@ -295,10 +309,10 @@ const DateRecordRow: React.FC<{
   } else if (props.date.day() === 6) {
     dayKind = 'saturday'
   }
-  const history = useHistory()
+  const navigate = useNavigate()
   const handleClick = useCallback(() => {
-    history.push(props.date.format('/YYYY/M/D'))
-  }, [history, props.date])
+    navigate(props.date.format('/YYYY/M/D'))
+  }, [navigate, props.date])
 
   const workingTimeMin =
     props.latest !== null ? calcWorkingTimeMin(props.latest) : null

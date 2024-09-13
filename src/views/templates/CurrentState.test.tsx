@@ -2,7 +2,7 @@
  * @file 'CurrentState' component unit tests
  */
 import React from 'react'
-import { Route } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import { AnyAction, Store } from 'redux'
 import dayjs from 'dayjs'
 
@@ -20,7 +20,9 @@ describe('"CurrentState" template', () => {
     state: AppState = INITIAL_STATE
   ): [RenderResult, Store<AppState, AnyAction>] {
     return renderWithProvider(
-      <Route exact path="/" component={CurrentState} />,
+      <Routes>
+        <Route path="/" element={<CurrentState />} />
+      </Routes>,
       '/',
       state
     )

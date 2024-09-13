@@ -2,7 +2,7 @@
  * @file App page component
  */
 import React, { useCallback, useEffect } from 'react'
-import { NavLink, Route, Switch } from 'react-router-dom'
+import { NavLink, Route, Routes } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
 
@@ -111,8 +111,8 @@ export async function sendMessageToSlack(
     }
     return ''
   } catch (e) {
-    console.error(e.toString())
-    return e.message
+    console.error((e as Error).toString())
+    return (e as Error).message
   }
 }
 
@@ -152,21 +152,13 @@ const App: React.FC = () => {
     <div className="whole-content-area">
       <AppBar />
       <TopAppBarFixedAdjust className="whole-content-area">
-        <Switch>
-          <Route
-            exact
-            path="/:year(\d{4})/:month([1-9]|10|11|12)/:date([1-9]|[12][0-9]|30|31)"
-            component={Detail}
-          />
-          <Route
-            exact
-            path="/:year(\d{4})/:month([1-9]|10|11|12)"
-            component={List}
-          />
-          <Route exact path="/settings" component={Settings} />
-          <Route exact path="/" component={CurrentState} />
-          <Route component={NotFound} />
-        </Switch>
+        <Routes>
+          <Route path="/:year/:month/:date" element={<Detail />} />
+          <Route path="/:year/:month" element={<List />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/" element={<CurrentState />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </TopAppBarFixedAdjust>
       <Snackbar
         open={0 < message.length}

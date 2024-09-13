@@ -2,7 +2,7 @@
  * @file 'CurrentState' component
  */
 import React, { FormEvent, useCallback, useEffect, useRef } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import dayjs from 'dayjs'
@@ -75,10 +75,10 @@ const CurrentState: React.FC = () => {
   const latest = getLatestOf(record, defaultBreakTimeLength)
   const dj = dayjs(time)
 
-  const history = useHistory()
+  const navigate = useNavigate()
   const handleClick = useCallback(() => {
-    history.push(dj.format('/YYYY/M/D'))
-  }, [dj, history])
+    navigate(dj.format('/YYYY/M/D'))
+  }, [dj, navigate])
 
   const intl = useIntl()
 

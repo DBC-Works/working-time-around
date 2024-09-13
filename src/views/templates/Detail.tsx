@@ -53,6 +53,7 @@ import BreakTimeLengthSelect from '../molecules/BreakTimeLengthSelect'
 import SingleCellRow from '../molecules/SingleCellRow'
 import TimeSelect from '../molecules/TimeSelect'
 import { formatSendFailedMessage, sendMessageToSlack } from '../pages/App'
+import NotFound from './NotFound'
 
 //
 // Types & variables
@@ -228,6 +229,23 @@ function getDailyRecordLatestIndexes(
   }
 }
 
+/**
+ * validate path parameter
+ *
+ * @param year  Year
+ * @param month Month
+ * @param date  Date
+ * @returns Validation result
+ */
+function isValidParams(year: number, month: number, date: number) {
+  let valid = 0 < year && 1 <= month && month <= 12
+  if (valid !== false) {
+    valid =
+      1 <= date && date <= dayjs(new Date(year, month - 1, 1)).daysInMonth()
+  }
+  return valid
+}
+
 //
 // Components
 //
@@ -236,12 +254,19 @@ function getDailyRecordLatestIndexes(
  * 'Detail' component
  */
 const Detail: React.FC = () => {
-  const { year, month, date } = useParams<{
+  const params = useParams<{
     year: string
     month: string
     date: string
   }>()
-  const target = new Date(+year, +month - 1, +date)
+  const year = params['year']?.match(/\d{4}/) ? +params['year'] : 0
+  const month = params['month']?.match(/\d+/) ? +params['month'] : 0
+  const date = params['date']?.match(/\d+/) ? +params['date'] : 0
+  if (isValidParams(year, month, date) === false) {
+    return <NotFound />
+  }
+
+  const target = new Date(year, month - 1, date)
   const dj = dayjs(target)
 
   let headingClassName = ''

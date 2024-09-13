@@ -4,6 +4,9 @@
   "description": "'Working time around' is a personal attendance and working time recording web application. It save records to browser's local storage, initially does not access any Web APIs. You can also set up and send your activities to Slack by setting the connection(you need to register the app in the workspace and create an Incoming Webhook. Please see [Incoming Webhooks](https://api.slack.com/incoming-webhooks).",
   "author": "D.B.C.",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.17.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.12.3",
     "@babel/preset-env": "^7.12.1",
@@ -27,7 +30,7 @@
     "@types/lodash.isequal": "^4.5.5",
     "@types/react-dom": "^18.2.17",
     "@types/react-redux": "^7.1.16",
-    "@types/react-router-dom": "^5.1.7",
+    "@types/react-router-dom": "^5.3.3",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@typescript-eslint/parser": "^6.13.2",
     "assert": "^2.0.0",
